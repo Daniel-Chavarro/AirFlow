@@ -140,23 +140,6 @@ public class AirplaneDAO implements DAOMethods<Airplane> {
     }
 
     /**
-     * Returns an Airplane object based on the provided code.
-     *
-     * @param code the code of the airplane to be retrieved
-     * @return an Airplane object with the specified code
-     * @throws SQLException if a database access error occurs
-     */
-    public Airplane getByCode(String code) throws SQLException {
-        String query = "SELECT * FROM airplanes WHERE code = ?";
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, code);
-        ResultSet resultSet = statement.executeQuery();
-        Airplane airplane = transformResultsToClass(resultSet);
-        statement.close();
-        return airplane;
-    }
-
-    /**
      * Transforms the results from a ResultSet into an Airplane object.
      *
      * @param resultSet the ResultSet containing airplane data

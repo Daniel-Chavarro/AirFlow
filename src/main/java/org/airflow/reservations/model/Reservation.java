@@ -12,10 +12,6 @@ public class Reservation {
     private int status_FK;
     private int flight_FK;
     private LocalDateTime reserved_at;
-    
-    // Status information retrieved from joins
-    private String status_name;
-    private String status_description;
 
     /**
      * Constructor for Reservation class.
@@ -33,8 +29,6 @@ public class Reservation {
         this.status_FK = status_FK;
         this.flight_FK = flight_FK;
         this.reserved_at = reserved_at;
-        this.status_name = "";
-        this.status_description = "";
     }
 
     /**
@@ -48,8 +42,6 @@ public class Reservation {
         this.status_FK = 0;
         this.flight_FK = 0;
         this.reserved_at = LocalDateTime.now();
-        this.status_name = "";
-        this.status_description = "";
     }
 
     // Getters and Setters
@@ -91,21 +83,5 @@ public class Reservation {
 
     public void setReserved_at(LocalDateTime reserved_at) {
         this.reserved_at = reserved_at;
-    }
-    
-    public String getStatus_name() {
-        return status_name;
-    }
-
-    public void setStatus_name(String status_name) {
-        this.status_name = status_name;
-    }
-
-    public String getStatus_description() {
-        return status_description;
-    }
-
-    public void setStatus_description(String status_description) {
-        this.status_description = status_description;
     }
 }

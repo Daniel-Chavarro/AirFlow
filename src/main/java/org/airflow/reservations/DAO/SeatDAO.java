@@ -255,7 +255,6 @@ public class SeatDAO implements DAOMethods<Seat> {
     /**
      * Returns available seats (not reserved) for a specific airplane.
      *
-     *
      * @param airplaneId the ID of the airplane
      * @return an ArrayList of available Seat objects for the specified airplane
      * @throws SQLException if a database access error occurs

@@ -135,30 +135,6 @@ public class CityDAO implements DAOMethods<City> {
     }
 
     /**
-     * Retrieves a city by its name.
-     *
-     * @param name the name of the city to be retrieved
-     * @return a City object with the specified name
-     * @throws SQLException if a database access error occurs
-     */
-    public City getByName(String name) throws SQLException {
-        String query = "SELECT * FROM cities WHERE name = ?";
-
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, name);
-
-        ResultSet resultSet = statement.executeQuery();
-
-        City city = transformResultsToClass(resultSet);
-
-        statement.close();
-
-        return city;
-    }
-
-
-
-    /**
      * Transforms the results from a ResultSet into a City object.
      *
      * @param resultSet the ResultSet containing city data

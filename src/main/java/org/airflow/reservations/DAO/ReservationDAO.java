@@ -45,9 +45,7 @@ public class ReservationDAO implements DAOMethods<Reservation> {
      */
     @Override
     public ArrayList<Reservation> getAll() throws SQLException {
-        String query = "SELECT r.*, rs.name as status_name, rs.description as status_description " +
-                "FROM reservations r " +
-                "JOIN reservations_status rs ON r.status_FK = rs.id_PK";
+        String query = "SELECT * FROM reservations";
 
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(query);
@@ -67,10 +65,7 @@ public class ReservationDAO implements DAOMethods<Reservation> {
      */
     @Override
     public Reservation getById(int id) throws SQLException {
-        String query = "SELECT r.*, rs.name as status_name, rs.description as status_description " +
-                "FROM reservations r " +
-                "JOIN reservations_status rs ON r.status_FK = rs.id_PK " +
-                "WHERE r.id_PK = ?";
+        String query = "SELECT * FROM reservations WHERE id_PK = ?";
 
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setInt(1, id);
@@ -157,10 +152,6 @@ public class ReservationDAO implements DAOMethods<Reservation> {
             reservation.setStatus_FK(resultSet.getInt("status_FK"));
             reservation.setFlight_FK(resultSet.getInt("flight_FK"));
             reservation.setReserved_at(resultSet.getTimestamp("reserved_at").toLocalDateTime());
-            
-            // Set status information from join
-            reservation.setStatus_name(resultSet.getString("status_name"));
-            reservation.setStatus_description(resultSet.getString("status_description"));
         }
 
         return reservation;
@@ -183,11 +174,6 @@ public class ReservationDAO implements DAOMethods<Reservation> {
             reservation.setStatus_FK(resultSet.getInt("status_FK"));
             reservation.setFlight_FK(resultSet.getInt("flight_FK"));
             reservation.setReserved_at(resultSet.getTimestamp("reserved_at").toLocalDateTime());
-            
-            // Set status information from join
-            reservation.setStatus_name(resultSet.getString("status_name"));
-            reservation.setStatus_description(resultSet.getString("status_description"));
-            
             reservations.add(reservation);
         }
 
@@ -202,10 +188,7 @@ public class ReservationDAO implements DAOMethods<Reservation> {
      * @throws SQLException if a database access error occurs
      */
     public ArrayList<Reservation> getByUserId(int userId) throws SQLException {
-        String query = "SELECT r.*, rs.name as status_name, rs.description as status_description " +
-                "FROM reservations r " +
-                "JOIN reservations_status rs ON r.status_FK = rs.id_PK " +
-                "WHERE r.user_FK = ?";
+        String query = "SELECT * FROM reservations WHERE user_FK = ?";
 
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setInt(1, userId);
@@ -225,10 +208,7 @@ public class ReservationDAO implements DAOMethods<Reservation> {
      * @throws SQLException if a database access error occurs
      */
     public ArrayList<Reservation> getByFlightId(int flightId) throws SQLException {
-        String query = "SELECT r.*, rs.name as status_name, rs.description as status_description " +
-                "FROM reservations r " +
-                "JOIN reservations_status rs ON r.status_FK = rs.id_PK " +
-                "WHERE r.flight_FK = ?";
+        String query = "SELECT * FROM reservations WHERE flight_FK = ?";
 
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setInt(1, flightId);
@@ -239,8 +219,6 @@ public class ReservationDAO implements DAOMethods<Reservation> {
         statement.close();
         return reservations;
     }
-
-
 
     // Getters and Setters
     public Connection getConnection() {

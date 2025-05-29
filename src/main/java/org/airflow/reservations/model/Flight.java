@@ -17,6 +17,10 @@ public class Flight {
     private LocalDateTime departure_time;
     private LocalDateTime arrival_time;
     private float price_base;
+    
+    // Status information retrieved from joins
+    private String status_name;
+    private String status_description;
 
     /**
      * Constructor for Flight class.
@@ -43,6 +47,8 @@ public class Flight {
         this.departure_time = departure_time;
         this.arrival_time = arrival_time;
         this.price_base = price_base;
+        this.status_name = "";
+        this.status_description = "";
     }
 
     /**
@@ -59,6 +65,8 @@ public class Flight {
         this.departure_time = LocalDateTime.now();
         this.arrival_time = LocalDateTime.now();
         this.price_base = 0.0f;
+        this.status_name = "";
+        this.status_description = "";
     }
 
     // Getters and Setters
@@ -132,5 +140,21 @@ public class Flight {
 
     public void setPrice_base(float price_base) {
         this.price_base = price_base;
+    }
+    
+    public String getStatus_name() {
+        return status_name;
+    }
+
+    public void setStatus_name(String status_name) {
+        this.status_name = status_name;
+    }
+
+    public String getStatus_description() {
+        return status_description;
+    }
+
+    public void setStatus_description(String status_description) {
+        this.status_description = status_description;
     }
 }

@@ -45,7 +45,9 @@ public class FlightDAO implements DAOMethods<Flight> {
      */
     @Override
     public ArrayList<Flight> getAll() throws SQLException {
-        String query = "SELECT * FROM flights";
+        String query = "SELECT f.*, fs.name as status_name, fs.description as status_description " +
+                "FROM flights f " +
+                "JOIN flight_status fs ON f.status_FK = fs.id_PK";
 
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(query);
@@ -65,7 +67,10 @@ public class FlightDAO implements DAOMethods<Flight> {
      */
     @Override
     public Flight getById(int id) throws SQLException {
-        String query = "SELECT * FROM flights WHERE id_PK = ?";
+        String query = "SELECT f.*, fs.name as status_name, fs.description as status_description " +
+                "FROM flights f " +
+                "JOIN flight_status fs ON f.status_FK = fs.id_PK " +
+                "WHERE f.id_PK = ?";
 
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setInt(1, id);
@@ -167,6 +172,10 @@ public class FlightDAO implements DAOMethods<Flight> {
             flight.setDeparture_time(resultSet.getTimestamp("departure_time").toLocalDateTime());
             flight.setArrival_time(resultSet.getTimestamp("arrival_time").toLocalDateTime());
             flight.setPrice_base(resultSet.getFloat("price_base"));
+            
+            // Set status information from join
+            flight.setStatus_name(resultSet.getString("status_name"));
+            flight.setStatus_description(resultSet.getString("status_description"));
         }
 
         return flight;
@@ -193,6 +202,11 @@ public class FlightDAO implements DAOMethods<Flight> {
             flight.setDeparture_time(resultSet.getTimestamp("departure_time").toLocalDateTime());
             flight.setArrival_time(resultSet.getTimestamp("arrival_time").toLocalDateTime());
             flight.setPrice_base(resultSet.getFloat("price_base"));
+            
+            // Set status information from join
+            flight.setStatus_name(resultSet.getString("status_name"));
+            flight.setStatus_description(resultSet.getString("status_description"));
+            
             flights.add(flight);
         }
 
@@ -207,7 +221,10 @@ public class FlightDAO implements DAOMethods<Flight> {
      * @throws SQLException if a database access error occurs
      */
     public ArrayList<Flight> getByOriginCity(int cityId) throws SQLException {
-        String query = "SELECT * FROM flights WHERE origin_city_FK = ?";
+        String query = "SELECT f.*, fs.name as status_name, fs.description as status_description " +
+                "FROM flights f " +
+                "JOIN flight_status fs ON f.status_FK = fs.id_PK " +
+                "WHERE f.origin_city_FK = ?";
 
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setInt(1, cityId);
@@ -227,7 +244,10 @@ public class FlightDAO implements DAOMethods<Flight> {
      * @throws SQLException if a database access error occurs
      */
     public ArrayList<Flight> getByDestinationCity(int cityId) throws SQLException {
-        String query = "SELECT * FROM flights WHERE destination_city_FK = ?";
+        String query = "SELECT f.*, fs.name as status_name, fs.description as status_description " +
+                "FROM flights f " +
+                "JOIN flight_status fs ON f.status_FK = fs.id_PK " +
+                "WHERE f.destination_city_FK = ?";
 
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setInt(1, cityId);

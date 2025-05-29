@@ -152,19 +152,6 @@ public class UsersDAO implements DAOMethods<User> {
     }
 
 
-    public User getByEmail(String email) throws SQLException {
-        String query = "SELECT * FROM users WHERE email LIKE (?)";
-
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, email);
-
-        ResultSet resultSet = statement.executeQuery();
-
-        User user = transformResultsToClass(resultSet);
-        statement.close();
-        return user;
-    }
-
     /**
      * Transforms the results from a ResultSet into a User object.
      *
@@ -176,11 +163,8 @@ public class UsersDAO implements DAOMethods<User> {
         User user = new User();
 
         while (resultSet.next()) {
-            user.setId(resultSet.getInt("id_PK"));
-            user.setName(resultSet.getString("name"));
-            user.setLast_name(resultSet.getString("last_name"));
+            user.setId(resultSet.getInt("id"));
             user.setEmail(resultSet.getString("email"));
-            user.setPassword(resultSet.getString("password"));
             user.setSuperUser(resultSet.getBoolean("isSuperUser"));
             user.setCreated_at(resultSet.getTimestamp("created_at").toLocalDateTime());
         }
@@ -201,14 +185,10 @@ public class UsersDAO implements DAOMethods<User> {
 
         while (resultSet.next()) {
             User user = new User();
-            user.setId(resultSet.getInt("id_PK"));
-            user.setName(resultSet.getString("name"));
-            user.setLast_name(resultSet.getString("last_name"));
+            user.setId(resultSet.getInt("id"));
             user.setEmail(resultSet.getString("email"));
-            user.setPassword(resultSet.getString("password"));
             user.setSuperUser(resultSet.getBoolean("isSuperUser"));
             user.setCreated_at(resultSet.getTimestamp("created_at").toLocalDateTime());
-            users.add(user);
         }
 
         return users;

@@ -1,6 +1,5 @@
 package org.airflow.reservations.model;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 
 /**
@@ -11,18 +10,13 @@ import java.time.LocalDateTime;
 public class Flight {
     private int id;
     private int airplane_FK;
-    private int status_FK;
+    private String status;
     private int origin_city_FK;
     private int destination_city_FK;
     private String code;
     private LocalDateTime departure_time;
-    private LocalDateTime scheduled_arrival_time;
     private LocalDateTime arrival_time;
-    private float price_base;
-
-    // Status information retrieved from joins
-    private String status_name;
-    private String status_description;
+    private float price;
 
     /**
      * Constructor for Flight class.
@@ -30,51 +24,44 @@ public class Flight {
      *
      * @param id                the unique identifier of the flight
      * @param airplane_FK        foreign key to the airplane
-     * @param status_FK          foreign key to the flight status
+     * @param status            the current status of the flight
      * @param origin_city_FK      foreign key to the origin city
      * @param destination_city_FK foreign key to the destination city
      * @param code              the flight code
      * @param departure_time     the scheduled departure time
      * @param arrival_time       the scheduled arrival time
-     * @param price_base         the ticket price for the flight
+     * @param price             the ticket price for the flight
      */
-    public Flight(int id, int airplane_FK, int status_FK, int origin_city_FK, int destination_city_FK,
-                  String code, LocalDateTime departure_time, LocalDateTime scheduled_arrival_time, LocalDateTime arrival_time, float price_base) {
+    public Flight(int id, int airplane_FK, String status, int origin_city_FK, int destination_city_FK,
+                  String code, LocalDateTime departure_time, LocalDateTime arrival_time, float price) {
         this.id = id;
         this.airplane_FK = airplane_FK;
-        this.status_FK = status_FK;
+        this.status = status;
         this.origin_city_FK = origin_city_FK;
         this.destination_city_FK = destination_city_FK;
         this.code = code;
         this.departure_time = departure_time;
-        this.scheduled_arrival_time = scheduled_arrival_time;
         this.arrival_time = arrival_time;
-        this.price_base = price_base;
-        this.status_name = "";
-        this.status_description = "";
+        this.price = price;
     }
 
     /**
      * Default constructor for Flight class.
      * Initializes the flight with default values.
+     * id = 0, airplane_FK = 0, status = "", origin_city_FK = 0,
+     * destination_city_FK = 0, code = "", departure_time = current time,
+     * arrival_time = current time, price = 0.0f.
      */
     public Flight() {
         this.id = 0;
         this.airplane_FK = 0;
-        this.status_FK = 0;
+        this.status = "";
         this.origin_city_FK = 0;
         this.destination_city_FK = 0;
         this.code = "";
         this.departure_time = LocalDateTime.now();
-        this.scheduled_arrival_time = LocalDateTime.now();
         this.arrival_time = LocalDateTime.now();
-        this.price_base = 0.0f;
-        this.status_name = "";
-        this.status_description = "";
-    }
-
-    public Duration getScheduledDuration() {
-        return Duration.between(departure_time, scheduled_arrival_time);
+        this.price = 0.0f;
     }
 
     // Getters and Setters
@@ -94,12 +81,12 @@ public class Flight {
         this.airplane_FK = airplane_FK;
     }
 
-    public int getStatus_FK() {
-        return status_FK;
+    public String getStatus() {
+        return status;
     }
 
-    public void setStatus_FK(int status_FK) {
-        this.status_FK = status_FK;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public int getOrigin_city_FK() {
@@ -142,35 +129,11 @@ public class Flight {
         this.arrival_time = arrival_time;
     }
 
-    public float getPrice_base() {
-        return price_base;
+    public float getPrice() {
+        return price;
     }
 
-    public void setPrice_base(float price_base) {
-        this.price_base = price_base;
-    }
-    
-    public String getStatus_name() {
-        return status_name;
-    }
-
-    public void setStatus_name(String status_name) {
-        this.status_name = status_name;
-    }
-
-    public String getStatus_description() {
-        return status_description;
-    }
-
-    public void setStatus_description(String status_description) {
-        this.status_description = status_description;
-    }
-
-    public LocalDateTime getScheduled_arrival_time() {
-        return scheduled_arrival_time;
-    }
-
-    public void setScheduled_arrival_time(LocalDateTime scheduled_arrival_time) {
-        this.scheduled_arrival_time = scheduled_arrival_time;
+    public void setPrice(float price) {
+        this.price = price;
     }
 }

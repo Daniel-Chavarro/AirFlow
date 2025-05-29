@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `email` varchar(200) NOT NULL,
   `password` varchar(20) NOT NULL,
   `isSuperUser` boolean NOT NULL,
-  `created_at` datetime NOT NULL
+  `created_at` timestamp NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS `airplanes` (
@@ -47,8 +47,8 @@ CREATE TABLE IF NOT EXISTS `flights` (
   `origin_city_FK` int NOT NULL,
   `destination_city_FK` int NOT NULL,
   `code` VARCHAR(10) NOT NULL,
-  `departure_time` DATETIME NOT NULL,
-  `arrival_time` DATETIME NOT NULL,
+  `departure_time` timestamp NOT NULL,
+  `arrival_time` timestamp NOT NULL,
   `price_base` DECIMAL(10,2) NOT NULL,
   FOREIGN KEY (`airplane_FK`) REFERENCES `airplanes` (`id_PK`),
   FOREIGN KEY (`status_FK`) REFERENCES `flight_status` (`id_PK`),
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS `reservations` (
   `user_FK` int NOT NULL,
   `status_FK` int NOT NULL,
   `flight_FK` int NOT NULL,
-  `reserved_at` datetime NOT NULL,
+  `reserved_at` timestamp NOT NULL,
   FOREIGN KEY (`user_FK`) REFERENCES `users` (`id_PK`),
   FOREIGN KEY (`status_FK`) REFERENCES `reservations_status` (`id_PK`),
   FOREIGN KEY (`flight_FK`) REFERENCES `flights` (`id_PK`)

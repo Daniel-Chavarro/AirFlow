@@ -152,6 +152,19 @@ public class UsersDAO implements DAOMethods<User> {
     }
 
 
+    public User getByEmail(String email) throws SQLException {
+        String query = "SELECT * FROM users WHERE email LIKE (?)";
+
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, email);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        User user = transformResultsToClass(resultSet);
+        statement.close();
+        return user;
+    }
+
     /**
      * Transforms the results from a ResultSet into a User object.
      *

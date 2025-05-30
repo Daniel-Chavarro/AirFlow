@@ -240,6 +240,8 @@ public class ReservationDAO implements DAOMethods<Reservation> {
         return reservations;
     }
 
+
+
     // Getters and Setters
     public Connection getConnection() {
         return connection;

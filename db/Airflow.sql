@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS `users` (
   `id_PK` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `name` varchar(40) NOT NULL,
   `last_name` varchar(40) NOT NULL,
-  `email` varchar(200) NOT NULL,
-  `password` varchar(20) NOT NULL,
+  `email` varchar(200) NOT NULL UNIQUE,
+  `password` varchar(73) NOT NULL,
   `isSuperUser` boolean NOT NULL,
   `created_at` timestamp NOT NULL
 );

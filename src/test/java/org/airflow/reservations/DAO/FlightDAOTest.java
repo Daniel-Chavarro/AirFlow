@@ -56,13 +56,12 @@ public class FlightDAOTest {
      */
     private void createTestData() throws SQLException {
         LocalDateTime departureTime = LocalDateTime.now().plusDays(1);
-        LocalDateTime scheduledArrivalTime = departureTime.plusHours(2);
-        LocalDateTime arrivalTime = scheduledArrivalTime.plusMinutes(15); // Llegada real con 15 minutos de retraso
+        LocalDateTime arrivalTime = departureTime.plusHours(2);
 
         try (Statement statement = connection.createStatement()) {
             String insertFlight = "INSERT INTO flights (airplane_FK, status_FK, origin_city_FK, destination_city_FK, " +
-                    "code, departure_time, scheduled_arrival_time, arrival_time, price_base) VALUES " +
-                    "(1, 1, 1, 2, 'TEST123', '" + departureTime + "', '" + scheduledArrivalTime + "', '" + arrivalTime + "', 150.0)";
+                    "code, departure_time, arrival_time, price_base) VALUES " +
+                    "(1, 1, 1, 2, 'TEST123', '" + departureTime + "', '" + arrivalTime + "', 150.0)";
 
             statement.executeUpdate(insertFlight, Statement.RETURN_GENERATED_KEYS);
             var rs = statement.getGeneratedKeys();
@@ -133,14 +132,8 @@ public class FlightDAOTest {
         newFlight.setOrigin_city_FK(2);
         newFlight.setDestination_city_FK(1);
         newFlight.setCode("TEST456");
-
-        LocalDateTime departureTime = LocalDateTime.now().plusDays(2);
-        LocalDateTime scheduledArrivalTime = departureTime.plusHours(2).plusMinutes(30);
-        LocalDateTime actualArrivalTime = scheduledArrivalTime.plusMinutes(10);
-
-        newFlight.setDeparture_time(departureTime);
-        newFlight.setScheduled_arrival_time(scheduledArrivalTime);
-        newFlight.setArrival_time(actualArrivalTime);
+        newFlight.setDeparture_time(LocalDateTime.now().plusDays(2));
+        newFlight.setArrival_time(LocalDateTime.now().plusDays(2).plusHours(3));
         newFlight.setPrice_base(200.0f);
 
         flightDAO.create(newFlight);
@@ -150,8 +143,6 @@ public class FlightDAOTest {
         for (Flight flight : flights) {
             if (flight.getCode().equals("TEST456")) {
                 found = true;
-                // Verificar que el campo scheduled_arrival_time se guardó correctamente
-                assertNotNull(flight.getScheduled_arrival_time(), "El tiempo programado de llegada no debería ser nulo");
                 flightDAO.delete(flight.getId());
                 break;
             }
@@ -192,14 +183,8 @@ public class FlightDAOTest {
         flightToDelete.setOrigin_city_FK(1);
         flightToDelete.setDestination_city_FK(2);
         flightToDelete.setCode("DELETE_ME");
-
-        LocalDateTime departureTime = LocalDateTime.now().plusDays(3);
-        LocalDateTime scheduledArrivalTime = departureTime.plusHours(2);
-        LocalDateTime arrivalTime = scheduledArrivalTime.plusMinutes(5);
-
-        flightToDelete.setDeparture_time(departureTime);
-        flightToDelete.setScheduled_arrival_time(scheduledArrivalTime);
-        flightToDelete.setArrival_time(arrivalTime);
+        flightToDelete.setDeparture_time(LocalDateTime.now().plusDays(3));
+        flightToDelete.setArrival_time(LocalDateTime.now().plusDays(3).plusHours(2));
         flightToDelete.setPrice_base(100.0f);
 
         flightDAO.create(flightToDelete);

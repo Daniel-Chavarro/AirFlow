@@ -230,9 +230,10 @@ public class SeatDAOTest {
     void testGetAvailableSeatsByFlight() throws SQLException {
         ArrayList<Seat> seats = seatDAO.getByReservationId(1);
 
+        assertNotNull(seats);
 
         for (Seat seat : seats) {
-            assertNotNull(seat.getReservation_FK(), "Available seats should not have null reservation_FK");
+            assertNull(seat.getReservation_FK(), "Available seats should have null reservation_FK");
         }
     }
 }

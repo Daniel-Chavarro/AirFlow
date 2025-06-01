@@ -176,8 +176,11 @@ public class UsersDAO implements DAOMethods<User> {
         User user = new User();
 
         while (resultSet.next()) {
-            user.setId(resultSet.getInt("id"));
+            user.setId(resultSet.getInt("id_PK"));
+            user.setName(resultSet.getString("name"));
+            user.setLast_name(resultSet.getString("last_name"));
             user.setEmail(resultSet.getString("email"));
+            user.setPassword(resultSet.getString("password"));
             user.setSuperUser(resultSet.getBoolean("isSuperUser"));
             user.setCreated_at(resultSet.getTimestamp("created_at").toLocalDateTime());
         }
@@ -198,10 +201,14 @@ public class UsersDAO implements DAOMethods<User> {
 
         while (resultSet.next()) {
             User user = new User();
-            user.setId(resultSet.getInt("id"));
+            user.setId(resultSet.getInt("id_PK"));
+            user.setName(resultSet.getString("name"));
+            user.setLast_name(resultSet.getString("last_name"));
             user.setEmail(resultSet.getString("email"));
+            user.setPassword(resultSet.getString("password"));
             user.setSuperUser(resultSet.getBoolean("isSuperUser"));
             user.setCreated_at(resultSet.getTimestamp("created_at").toLocalDateTime());
+            users.add(user);
         }
 
         return users;

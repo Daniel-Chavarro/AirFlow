@@ -7,6 +7,7 @@ import org.junit.jupiter.api.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -130,7 +131,8 @@ public class ReservationDAOTest {
         newReservation.setUser_FK(2);
         newReservation.setStatus_FK(1);
         newReservation.setFlight_FK(2);
-        newReservation.setReserved_at(LocalDateTime.now());
+        LocalDateTime reservedAt = LocalDateTime.now().plusDays(1);
+        newReservation.setReserved_at(reservedAt);
 
         reservationDAO.create(newReservation);
 
@@ -139,10 +141,12 @@ public class ReservationDAOTest {
         int newId = -1;
 
         for (Reservation r : reservations) {
-            if (r.getUser_FK() == 2 && r.getFlight_FK() == 2) {
+            if (r.getUser_FK() == 2 && r.getFlight_FK() == 2 && r.getReserved_at().getDayOfWeek().equals(reservedAt.getDayOfWeek())) {
                 found = true;
                 newId = r.getId();
                 break;
+            } else {
+                continue;
             }
         }
 
@@ -183,10 +187,11 @@ public class ReservationDAOTest {
     void testDelete() throws SQLException {
         // Create a reservation to delete
         Reservation reservationToDelete = new Reservation();
-        reservationToDelete.setUser_FK(3);
+        reservationToDelete.setUser_FK(2);
         reservationToDelete.setStatus_FK(1);
-        reservationToDelete.setFlight_FK(3);
-        reservationToDelete.setReserved_at(LocalDateTime.now());
+        reservationToDelete.setFlight_FK(2);
+        LocalDateTime reservedAt = LocalDateTime.now().plusDays(1);
+        reservationToDelete.setReserved_at(reservedAt);
 
         reservationDAO.create(reservationToDelete);
 
@@ -194,9 +199,11 @@ public class ReservationDAOTest {
         ArrayList<Reservation> reservations = reservationDAO.getAll();
         int deleteId = -1;
         for (Reservation r : reservations) {
-            if (r.getUser_FK() == 3 && r.getFlight_FK() == 3) {
+            if (r.getUser_FK() == 2 && r.getFlight_FK() == 2 && r.getReserved_at().getDayOfWeek().equals(reservedAt.getDayOfWeek())) {
                 deleteId = r.getId();
                 break;
+            } else {
+                continue;
             }
         }
 

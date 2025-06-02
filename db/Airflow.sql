@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS airflow;
+CREATE DATABASE IF NOT EXISTS airflow CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 USE airflow;
 
@@ -77,5 +77,4 @@ CREATE TABLE IF NOT EXISTS `seats` (
   FOREIGN KEY (`airplane_FK`) REFERENCES `airplanes` (`id_PK`),
   FOREIGN KEY (`reservation_FK`) REFERENCES `reservations` (`id_PK`)
 );
-
 

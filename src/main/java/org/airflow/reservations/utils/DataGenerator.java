@@ -3,11 +3,9 @@ package org.airflow.reservations.utils;
 import org.airflow.reservations.DAO.*;
 import org.airflow.reservations.model.*;
 
-import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.Year;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Random;
 

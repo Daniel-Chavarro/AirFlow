@@ -14,11 +14,10 @@ public class ConnectionDB {
     private final static String DATABASE = "airflow";
     private final static String USER = "root";
     private final static String PASSWORD = "root";
-    private final static String PARAMS = "?useUnicode=true&characterEncoding=UTF-8&useSSL=false";
+    private final static String PARAMS = "?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true";
 
     /**
      * Establishes a connection to the MySQL database.
-     *
      * @return a Connection object to the database
      * @throws SQLException if a database access error occurs
      */

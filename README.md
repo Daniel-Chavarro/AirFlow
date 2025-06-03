@@ -49,6 +49,8 @@ Para detener y eliminar todos los datos (útil para reiniciar desde cero):
 docker-compose down -v
 ```
 
+### Poblar la Base de Datos
+Para poblar la base de datos con datos de prueba, es necesario ejecutar la clase DataGenerator.java, la cual se encuentra en el paquete `src/main/java/org/airflow/reservations/utils/DataGenerator.java`. Esta clase generará datos de prueba para las tablas de vuelos, reservas, sillas, aviones y usuarios.
 # 🧠 Reglas de Trabajo en Equipo — GitFlow
 
 Este documento define la estrategia de colaboración para el equipo de desarrollo usando Git y el flujo GitFlow. Aplica al desarrollo del sistema de reservas de vuelos.

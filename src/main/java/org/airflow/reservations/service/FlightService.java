@@ -53,13 +53,8 @@ public class FlightService {
      * @throws SQLException if a database access error occurs
      */
     public boolean existsFlightWithCode(String code) throws SQLException {
-        ArrayList<Flight> flights = flightDAO.getAll();
-        for (Flight f : flights) {
-            if (f.getCode().equalsIgnoreCase(code)) {
-                return true;
-            }
-        }
-        return false;
+        ArrayList<Flight> flights = flightDAO.getByCode(code);
+        return !flights.isEmpty();
     }
 
     /**

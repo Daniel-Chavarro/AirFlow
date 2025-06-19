@@ -172,6 +172,48 @@ public class UsersDAO implements DAOMethods<User> {
         return users;
     }
 
+    /**
+     * Retrieves an ArrayList of User Objects based on the provided name.
+     * The name is matched using a LIKE query to allow for partial matches.
+     *
+     * @param name the name to search for
+     * @return an ArrayList of User objects with the specified name, empty if not found.
+     * @throws SQLException if a database access error occurs
+     */
+    public ArrayList<User> getByName(String name) throws SQLException {
+        String query = "SELECT * FROM users WHERE name LIKE (?)";
+
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, "%" + name + "%");
+
+        ResultSet resultSet = statement.executeQuery();
+
+        ArrayList<User> users = transformResultsToClassArray(resultSet);
+        statement.close();
+        return users;
+    }
+
+    /**
+     * Retrieves an ArrayList of User Objects based on the provided last name.
+     * The last name is matched using a LIKE query to allow for partial matches.
+     *
+     * @param lastName the last name to search for
+     * @return an ArrayList of User objects with the specified last name, empty if not found.
+     * @throws SQLException if a database access error occurs
+     */
+    public ArrayList<User> getByLastName(String lastName) throws SQLException {
+        String query = "SELECT * FROM users WHERE last_name LIKE (?)";
+
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, "%" + lastName + "%");
+
+        ResultSet resultSet = statement.executeQuery();
+
+        ArrayList<User> users = transformResultsToClassArray(resultSet);
+        statement.close();
+        return users;
+    }
+
 
 
     /**

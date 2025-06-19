@@ -255,4 +255,70 @@ public class UsersDAOTest {
         assertTrue(users.isEmpty(), "Should not find users with email containing 'nonexistent@email.com'");
     }
 
+    /**
+     * Tests the getByName method to ensure it retrieves users with names matching the search string.
+     *
+     * @throws SQLException if a database error occurs
+     */
+    @Test
+    void testGetByName() throws SQLException {
+        ArrayList<User> users = usersDAO.getByName("TestU");
+
+        assertNotNull(users);
+        assertFalse(users.isEmpty(), "Should find users with name containing 'TestU'");
+
+        boolean found = false;
+        for (User user : users) {
+            if (user.getName().equals("TestUser")) {
+                found = true;
+                assertEquals("TestLastName", user.getLast_name());
+                assertEquals("test@example.com", user.getEmail());
+                break;
+            }
+        }
+
+        assertTrue(found, "Test user should be in the results");
+
+        // Test with a partial name that should match
+        users = usersDAO.getByName("Test");
+        assertFalse(users.isEmpty(), "Should find users with name containing 'Test'");
+
+        // Test with a name that shouldn't match
+        users = usersDAO.getByName("NonExistentUser");
+        assertTrue(users.isEmpty(), "Should not find users with name containing 'NonExistentUser'");
+    }
+
+    /**
+     * Tests the getByLastName method to ensure it retrieves users with last names matching the search string.
+     *
+     * @throws SQLException if a database error occurs
+     */
+    @Test
+    void testGetByLastName() throws SQLException {
+        ArrayList<User> users = usersDAO.getByLastName("TestLast");
+
+        assertNotNull(users);
+        assertFalse(users.isEmpty(), "Should find users with last name containing 'TestLast'");
+
+        boolean found = false;
+        for (User user : users) {
+            if (user.getLast_name().equals("TestLastName")) {
+                found = true;
+                assertEquals("TestUser", user.getName());
+                assertEquals("test@example.com", user.getEmail());
+                break;
+            }
+        }
+
+        assertTrue(found, "Test user should be in the results");
+
+        // Test with a partial last name that should match
+        users = usersDAO.getByLastName("Last");
+        assertFalse(users.isEmpty(), "Should find users with last name containing 'Last'");
+
+        // Test with a last name that shouldn't match
+        users = usersDAO.getByLastName("NonExistentLastName");
+        assertTrue(users.isEmpty(), "Should not find users with last name containing 'NonExistentLastName'");
+    }
+
 }

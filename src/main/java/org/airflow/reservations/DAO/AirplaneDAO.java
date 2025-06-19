@@ -157,40 +157,6 @@ public class AirplaneDAO implements DAOMethods<Airplane> {
     }
 
     /**
-     * Returns a list of airplanes that match the provided airline name.
-     *
-     * @param airline the name or part of the name of the airline to search for
-     * @return an ArrayList of Airplane objects that match the provided airline name
-     * @throws SQLException if a database access error occurs
-     */
-    public ArrayList<Airplane> getByAirline(String airline) throws SQLException {
-        String query = "SELECT * FROM airplanes WHERE airline LIKE ?";
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, "%" + airline + "%");
-        ResultSet resultSet = statement.executeQuery();
-        ArrayList<Airplane> airplanes = transformResultsToClassArray(resultSet);
-        statement.close();
-        return airplanes;
-    }
-
-    /**
-     * Returns a list of airplanes that match the provided capacity.
-     *
-     * @param capacity the capacity of the airplanes to search for
-     * @return an ArrayList of Airplane objects that match the provided capacity
-     * @throws SQLException if a database access error occurs
-     */
-    public ArrayList<Airplane> getByCapacity(int capacity) throws SQLException {
-        String query = "SELECT * FROM airplanes WHERE capacity = ?";
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setInt(1, capacity);
-        ResultSet resultSet = statement.executeQuery();
-        ArrayList<Airplane> airplanes = transformResultsToClassArray(resultSet);
-        statement.close();
-        return airplanes;
-    }
-
-    /**
      * Transforms the results from a ResultSet into an Airplane object.
      *
      * @param resultSet the ResultSet containing airplane data

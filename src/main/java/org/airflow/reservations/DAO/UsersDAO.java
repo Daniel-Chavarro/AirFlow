@@ -7,13 +7,13 @@ import java.sql.*;
 import java.util.ArrayList;
 
 /**
- * Data Access Object (DAO) class for managing User entities.
+ *
+Data Access Object (DAO) class for managing User entities.
  * This class provides methods to perform CRUD operations on User objects in the database.
  * It implements the DAOMethods interface for generic DAO operations.
  *
  * @see DAOMethods
- * @see User
- */
+ * @see User */
 public class UsersDAO implements DAOMethods<User> {
     private Connection connection;
 
@@ -36,20 +36,20 @@ public class UsersDAO implements DAOMethods<User> {
     }
 
     /**
-     * Returns all users from the database.
-     *
-     * @return an ArrayList of User objects representing all users in the database
-     * @throws SQLException if a database access error occurs
-     */
+    * Returns all users from the database.
+    *
+    * @return an ArrayList of User objects representing all users in the database
+    * @throws SQLException if a database access error occurs
+    */
     @Override
-    public ArrayList<User> getAll() throws SQLException {
+    public ArrayList<User> getAll() throws SQLException{
         String query = "SELECT * FROM users";
 
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(query);
 
 
-        ArrayList<User> users = transformResultsToClassArray(resultSet);
+        ArrayList <User> users = transformResultsToClassArray(resultSet);
         statement.close();
 
         return users;
@@ -115,8 +115,8 @@ public class UsersDAO implements DAOMethods<User> {
     public void update(int id, User toUpdate) throws SQLException {
         String query =
                 "UPDATE users " +
-                        "SET name = ?, last_name = ?, email = ?, password = ?, isSuperUser = ?, created_at = ? " +
-                        "WHERE id_PK = ?";
+                "SET name = ?, last_name = ?, email = ?, password = ?, isSuperUser = ?, created_at = ? " +
+                "WHERE id_PK = ?";
 
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setString(1, toUpdate.getName());
@@ -151,28 +151,19 @@ public class UsersDAO implements DAOMethods<User> {
         statement.close();
     }
 
-    /**
-     * Retrieves an ArrayList of User Objects  based on the provided email.
-     * The email is matched using a LIKE query to allow for partial matches.
-     *
-     * @param email the email address to search for
-     * @return an Arraylist of User objects with the specified email, empty if not found.
-     * @throws SQLException if a database access error occurs
-     */
-    public ArrayList<User> getByEmail(String email) throws SQLException {
+
+    public User getByEmail(String email) throws SQLException {
         String query = "SELECT * FROM users WHERE email LIKE (?)";
 
         PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, "%" + email + "%");
+        statement.setString(1, email);
 
         ResultSet resultSet = statement.executeQuery();
 
-        ArrayList<User> users = transformResultsToClassArray(resultSet);
+        User user = transformResultsToClass(resultSet);
         statement.close();
-        return users;
+        return user;
     }
-
-
 
     /**
      * Transforms the results from a ResultSet into a User object.

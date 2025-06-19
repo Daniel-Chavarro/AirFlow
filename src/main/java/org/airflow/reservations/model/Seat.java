@@ -12,7 +12,12 @@ public class Seat {
     private SeatClass seat_class;
     private Boolean is_window;
 
-
+    /**
+     * Enum representing the different classes of seats.
+     */
+    public enum SeatClass {
+        ECONOMY, BUSINESS, FIRST
+    }
 
     /**
      * Constructor for Seat class.

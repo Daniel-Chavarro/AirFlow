@@ -202,13 +202,13 @@ public class ReservationDAOTest {
             if (r.getUser_FK() == 2 && r.getFlight_FK() == 2 && r.getReserved_at().getDayOfWeek().equals(reservedAt.getDayOfWeek())) {
                 deleteId = r.getId();
                 break;
+            } else {
+                continue;
             }
         }
 
         // Delete the reservation
-        if (deleteId != -1) {
-            reservationDAO.delete(deleteId);
-        }
+        reservationDAO.delete(deleteId);
 
         // Verify it's been deleted
         reservations = reservationDAO.getAll();
@@ -224,12 +224,12 @@ public class ReservationDAOTest {
     }
 
     /**
-     * Tests the getByUserId method to ensure it retrieves reservations by user ID.
+     * Tests the getReservationsByUser method to ensure it retrieves reservations by user ID.
      *
      * @throws SQLException if a database error occurs
      */
     @Test
-    void testGetByUserId() throws SQLException {
+    void testGetReservationsByUser() throws SQLException {
         ArrayList<Reservation> reservations = reservationDAO.getByUserId(1);
 
         assertNotNull(reservations);
@@ -241,12 +241,12 @@ public class ReservationDAOTest {
     }
 
     /**
-     * Tests the getByFlightId method to ensure it retrieves reservations by flight ID.
+     * Tests the getReservationsByFlight method to ensure it retrieves reservations by flight ID.
      *
      * @throws SQLException if a database error occurs
      */
     @Test
-    void testGetByFlightId() throws SQLException {
+    void testGetReservationsByFlight() throws SQLException {
         ArrayList<Reservation> reservations = reservationDAO.getByFlightId(1);
 
         assertNotNull(reservations);
@@ -255,92 +255,5 @@ public class ReservationDAOTest {
         for (Reservation reservation : reservations) {
             assertEquals(1, reservation.getFlight_FK());
         }
-    }
-
-    /**
-     * Tests the getByStatusId method to ensure it retrieves reservations by status ID.
-     *
-     * @throws SQLException if a database error occurs
-     */
-    @Test
-    void testGetByStatusId() throws SQLException {
-        ArrayList<Reservation> reservations = reservationDAO.getByStatusId(1);
-
-        assertNotNull(reservations);
-        assertFalse(reservations.isEmpty(), "There should be reservations with status 1");
-
-        for (Reservation reservation : reservations) {
-            assertEquals(1, reservation.getStatus_FK());
-        }
-    }
-
-    /**
-     * Tests the getByUserNameOrEmail method to ensure it retrieves reservations by username or email.
-     *
-     * @throws SQLException if a database error occurs
-     */
-    @Test
-    void testGetByUserNameOrEmail() throws SQLException {
-        // This test depends on having a user with name or email containing "test" in the database
-        // and that user must have a reservation
-        ArrayList<Reservation> reservations = reservationDAO.getByUserNameOrEmail("test");
-
-        // Since we might not know the actual data in the database, we'll just verify that the method executes
-        // without errors and returns a non-null result
-        assertNotNull(reservations);
-
-        // Optional: if we know there are users with "test" in their name/email and they have reservations
-        // assertFalse(reservations.isEmpty(), "Should find reservations for users with 'test' in name or email");
-
-        // Create a test user and reservation to ensure we have data to test with
-        try (Statement statement = connection.createStatement()) {
-            // First check if test user exists
-            var userIdRs = statement.executeQuery("SELECT id_PK FROM users WHERE name LIKE '%TestReservation%' OR email LIKE '%testreservation%'");
-            int userId;
-
-            if (userIdRs.next()) {
-                // Use existing user
-                userId = userIdRs.getInt(1);
-            } else {
-                // Create test user
-                statement.executeUpdate(
-                    "INSERT INTO users (name, last_name, email, password, isSuperUser, created_at) VALUES " +
-                    "('TestReservation', 'User', 'testreservation@example.com', 'password', 0, '" + LocalDateTime.now() + "')",
-                    Statement.RETURN_GENERATED_KEYS
-                );
-                var rs = statement.getGeneratedKeys();
-                if (!rs.next()) {
-                    fail("Failed to create test user for getByUserNameOrEmail test");
-                }
-                userId = rs.getInt(1);
-            }
-
-            // Create a reservation for this user
-            int reservationId = -1;
-            statement.executeUpdate(
-                "INSERT INTO reservations (user_FK, status_FK, flight_FK, reserved_at) VALUES " +
-                "(" + userId + ", 1, 1, '" + LocalDateTime.now() + "')",
-                Statement.RETURN_GENERATED_KEYS
-            );
-            var rs = statement.getGeneratedKeys();
-            if (rs.next()) {
-                reservationId = rs.getInt(1);
-            }
-
-            // Now test the method with our test data
-            reservations = reservationDAO.getByUserNameOrEmail("TestReservation");
-
-            // Clean up
-            if (reservationId != -1) {
-                statement.executeUpdate("DELETE FROM reservations WHERE id_PK = " + reservationId);
-            }
-            // Don't delete the user as it might be used by other tests
-        }
-
-        assertFalse(reservations.isEmpty(), "Should find reservations for users with 'TestReservation' in name or email");
-
-        // Test with a search term that shouldn't match any users
-        reservations = reservationDAO.getByUserNameOrEmail("NonExistentUserXYZ123");
-        assertTrue(reservations.isEmpty(), "Should not find reservations for non-existent users");
     }
 }

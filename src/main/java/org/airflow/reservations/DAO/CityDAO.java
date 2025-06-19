@@ -135,64 +135,28 @@ public class CityDAO implements DAOMethods<City> {
     }
 
     /**
-     * Returns a list of cities that match the provided name.
+     * Retrieves a city by its name.
      *
-     * @param name the name or part of the name of the city to search for
-     * @return an ArrayList of City objects that match the provided name
+     * @param name the name of the city to be retrieved
+     * @return a City object with the specified name
      * @throws SQLException if a database access error occurs
      */
-    public ArrayList<City> getByName(String name) throws SQLException {
-        String query = "SELECT * FROM cities WHERE name LIKE ?";
+    public City getByName(String name) throws SQLException {
+        String query = "SELECT * FROM cities WHERE name = ?";
 
         PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, "%" + name + "%");
+        statement.setString(1, name);
 
         ResultSet resultSet = statement.executeQuery();
 
-        ArrayList<City> cities = transformResultsToClassArray(resultSet);
+        City city = transformResultsToClass(resultSet);
+
         statement.close();
-        return cities;
+
+        return city;
     }
 
-    /**
-     * Returns a list of cities that match the provided country.
-     *
-     * @param country the name or part of the name of the country to search for
-     * @return an ArrayList of City objects that match the provided country
-     * @throws SQLException if a database access error occurs
-     */
-    public ArrayList<City> getByCountry(String country) throws SQLException {
-        String query = "SELECT * FROM cities WHERE country LIKE ?";
 
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, "%" + country + "%");
-
-        ResultSet resultSet = statement.executeQuery();
-
-        ArrayList<City> cities = transformResultsToClassArray(resultSet);
-        statement.close();
-        return cities;
-    }
-
-    /**
-     * Returns a list of cities that match the provided code.
-     *
-     * @param code the code or part of the code of the city to search for
-     * @return an ArrayList of City objects that match the provided code
-     * @throws SQLException if a database access error occurs
-     */
-    public ArrayList<City> getByCode(String code) throws SQLException {
-        String query = "SELECT * FROM cities WHERE code LIKE ?";
-
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, "%" + code + "%");
-
-        ResultSet resultSet = statement.executeQuery();
-
-        ArrayList<City> cities = transformResultsToClassArray(resultSet);
-        statement.close();
-        return cities;
-    }
 
     /**
      * Transforms the results from a ResultSet into a City object.

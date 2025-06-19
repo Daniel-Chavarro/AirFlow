@@ -1,6 +1,6 @@
 package org.airflow.reservations.DAO;
 
-import org.airflow.reservations.model.Flight;
+import org.airflow.reservations.model.*;
 import org.airflow.reservations.utils.ConnectionDB;
 
 import java.sql.*;
@@ -153,75 +153,6 @@ public class FlightDAO implements DAOMethods<Flight> {
     }
 
     /**
-     * Returns flights by destination city.
-     *
-     * @param cityId the ID of the destination city
-     * @return an ArrayList of Flight objects with the specified destination city
-     * @throws SQLException if a database access error occurs
-     */
-    public ArrayList<Flight> getByDestinationCity(int cityId) throws SQLException {
-        String query = "SELECT f.*, fs.name as status_name, fs.description as status_description " +
-                "FROM flights f " +
-                "JOIN flight_status fs ON f.status_FK = fs.id_PK " +
-                "WHERE f.destination_city_FK = ?";
-
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setInt(1, cityId);
-
-        ResultSet resultSet = statement.executeQuery();
-
-        ArrayList<Flight> flights = transformResultsToClassArray(resultSet);
-        statement.close();
-        return flights;
-    }
-
-    /**
-     * Returns flights by origin city.
-     *
-     * @param cityId the ID of the origin city
-     * @return an ArrayList of Flight objects with the specified origin city
-     * @throws SQLException if a database access error occurs
-     */
-    public ArrayList<Flight> getByOriginCity(int cityId) throws SQLException {
-        String query = "SELECT f.*, fs.name as status_name, fs.description as status_description " +
-                "FROM flights f " +
-                "JOIN flight_status fs ON f.status_FK = fs.id_PK " +
-                "WHERE f.origin_city_FK = ?";
-
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setInt(1, cityId);
-
-        ResultSet resultSet = statement.executeQuery();
-
-        ArrayList<Flight> flights = transformResultsToClassArray(resultSet);
-        statement.close();
-        return flights;
-    }
-
-    /**
-     * Returns flights by flight code.
-     *
-     * @param code the flight code to search for
-     * @return an ArrayList of Flight objects matching the specified code
-     * @throws SQLException if a database access error occurs
-     */
-    public ArrayList<Flight> getByCode(String code) throws SQLException {
-        String query = "SELECT f.*, fs.name as status_name, fs.description as status_description " +
-                "FROM flights f " +
-                "JOIN flight_status fs ON f.status_FK = fs.id_PK " +
-                "WHERE f.code LIKE ?";
-
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, "%" + code + "%");
-
-        ResultSet resultSet = statement.executeQuery();
-
-        ArrayList<Flight> flights = transformResultsToClassArray(resultSet);
-        statement.close();
-        return flights;
-    }
-
-    /**
      * Transforms the results from a ResultSet into a Flight object.
      *
      * @param resultSet the ResultSet containing flight data
@@ -241,7 +172,7 @@ public class FlightDAO implements DAOMethods<Flight> {
             flight.setDeparture_time(resultSet.getTimestamp("departure_time").toLocalDateTime());
             flight.setArrival_time(resultSet.getTimestamp("arrival_time").toLocalDateTime());
             flight.setPrice_base(resultSet.getFloat("price_base"));
-
+            
             // Set status information from join
             flight.setStatus_name(resultSet.getString("status_name"));
             flight.setStatus_description(resultSet.getString("status_description"));
@@ -271,17 +202,62 @@ public class FlightDAO implements DAOMethods<Flight> {
             flight.setDeparture_time(resultSet.getTimestamp("departure_time").toLocalDateTime());
             flight.setArrival_time(resultSet.getTimestamp("arrival_time").toLocalDateTime());
             flight.setPrice_base(resultSet.getFloat("price_base"));
-
+            
             // Set status information from join
             flight.setStatus_name(resultSet.getString("status_name"));
             flight.setStatus_description(resultSet.getString("status_description"));
-
+            
             flights.add(flight);
         }
 
         return flights;
     }
 
+    /**
+     * Returns flights by origin city.
+     *
+     * @param cityId the ID of the origin city
+     * @return an ArrayList of Flight objects with the specified origin city
+     * @throws SQLException if a database access error occurs
+     */
+    public ArrayList<Flight> getByOriginCity(int cityId) throws SQLException {
+        String query = "SELECT f.*, fs.name as status_name, fs.description as status_description " +
+                "FROM flights f " +
+                "JOIN flight_status fs ON f.status_FK = fs.id_PK " +
+                "WHERE f.origin_city_FK = ?";
+
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setInt(1, cityId);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        ArrayList<Flight> flights = transformResultsToClassArray(resultSet);
+        statement.close();
+        return flights;
+    }
+
+    /**
+     * Returns flights by destination city.
+     *
+     * @param cityId the ID of the destination city
+     * @return an ArrayList of Flight objects with the specified destination city
+     * @throws SQLException if a database access error occurs
+     */
+    public ArrayList<Flight> getByDestinationCity(int cityId) throws SQLException {
+        String query = "SELECT f.*, fs.name as status_name, fs.description as status_description " +
+                "FROM flights f " +
+                "JOIN flight_status fs ON f.status_FK = fs.id_PK " +
+                "WHERE f.destination_city_FK = ?";
+
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setInt(1, cityId);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        ArrayList<Flight> flights = transformResultsToClassArray(resultSet);
+        statement.close();
+        return flights;
+    }
 
     // Getters and Setters
     public Connection getConnection() {

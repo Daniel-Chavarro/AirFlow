@@ -219,5 +219,64 @@ public class AirplaneDAOTest {
         assertEquals("TestAirline", airplane.getAirline());
         assertEquals("TestModel", airplane.getModel());
         assertEquals(200, airplane.getCapacity());
+        assertEquals(Year.of(2020), airplane.getYear());
+    }
+
+    /**
+     * Tests the getByAirline method to ensure it retrieves airplanes with airline names matching the search string.
+     *
+     * @throws SQLException if a database error occurs
+     */
+    @Test
+    void testGetByAirline() throws SQLException {
+        ArrayList<Airplane> airplanes = airplaneDAO.getByAirline("TestAir");
+
+        assertNotNull(airplanes);
+        assertFalse(airplanes.isEmpty(), "Should find airplanes with airline containing 'TestAir'");
+
+        boolean found = false;
+        for (Airplane airplane : airplanes) {
+            if (airplane.getAirline().equals("TestAirline")) {
+                found = true;
+                break;
+            }
+        }
+
+        assertTrue(found, "Test airplane should be in the results");
+
+        // Test with a partial airline name that should match
+        airplanes = airplaneDAO.getByAirline("Test");
+        assertFalse(airplanes.isEmpty(), "Should find airplanes with airline containing 'Test'");
+
+        // Test with an airline name that shouldn't match
+        airplanes = airplaneDAO.getByAirline("NonExistentAirline");
+        assertTrue(airplanes.isEmpty(), "Should not find airplanes with airline containing 'NonExistentAirline'");
+    }
+
+    /**
+     * Tests the getByCapacity method to ensure it retrieves airplanes with the specified capacity.
+     *
+     * @throws SQLException if a database error occurs
+     */
+    @Test
+    void testGetByCapacity() throws SQLException {
+        ArrayList<Airplane> airplanes = airplaneDAO.getByCapacity(200);
+
+        assertNotNull(airplanes);
+        assertFalse(airplanes.isEmpty(), "Should find airplanes with capacity of 200");
+
+        boolean found = false;
+        for (Airplane airplane : airplanes) {
+            if (airplane.getCode().equals("TA123")) {
+                found = true;
+                break;
+            }
+        }
+
+        assertTrue(found, "Test airplane should be in the results");
+
+        // Test with a capacity that shouldn't match
+        airplanes = airplaneDAO.getByCapacity(999);
+        assertTrue(airplanes.isEmpty(), "Should not find airplanes with capacity of 999");
     }
 }

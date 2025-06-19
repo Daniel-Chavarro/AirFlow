@@ -223,18 +223,36 @@ public class UsersDAOTest {
     }
 
     /**
-     * Tests the getUserByEmail method to ensure it retrieves a user by email.
+     * Tests the getUserByEmail method to ensure it retrieves users with email matching the search string.
      *
      * @throws SQLException if a database error occurs
      */
     @Test
-    void testGetUserByEmail() throws SQLException {
-        User user = usersDAO.getByEmail("test@example.com");
+    void testGetByEmail() throws SQLException {
+        ArrayList<User> users = usersDAO.getByEmail("test@example");
 
-        assertNotNull(user);
-        assertEquals("TestUser", user.getName());
-        assertEquals("TestLastName", user.getLast_name());
-        assertEquals("test@example.com", user.getEmail());
+        assertNotNull(users);
+        assertFalse(users.isEmpty(), "Should find users with email containing 'test@example'");
+
+        boolean found = false;
+        for (User user : users) {
+            if (user.getEmail().equals("test@example.com")) {
+                found = true;
+                assertEquals("TestUser", user.getName());
+                assertEquals("TestLastName", user.getLast_name());
+                break;
+            }
+        }
+
+        assertTrue(found, "Test user should be in the results");
+
+        // Test with a partial email that should match
+        users = usersDAO.getByEmail("example.com");
+        assertFalse(users.isEmpty(), "Should find users with email containing 'example.com'");
+
+        // Test with an email that shouldn't match
+        users = usersDAO.getByEmail("nonexistent@email.com");
+        assertTrue(users.isEmpty(), "Should not find users with email containing 'nonexistent@email.com'");
     }
 
 }

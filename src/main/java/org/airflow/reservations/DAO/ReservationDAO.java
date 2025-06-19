@@ -142,6 +142,59 @@ public class ReservationDAO implements DAOMethods<Reservation> {
     }
 
     /**
+     * Transforms the results from a ResultSet into a Reservation object.
+     *
+     * @param resultSet the ResultSet containing reservation data
+     * @return a Reservation object populated with data from the ResultSet
+     * @throws SQLException if a database access error occurs
+     */
+    private Reservation transformResultsToClass(ResultSet resultSet) throws SQLException {
+        Reservation reservation = new Reservation();
+
+        if (resultSet.next()) {
+            reservation.setId(resultSet.getInt("id_PK"));
+            reservation.setUser_FK(resultSet.getInt("user_FK"));
+            reservation.setStatus_FK(resultSet.getInt("status_FK"));
+            reservation.setFlight_FK(resultSet.getInt("flight_FK"));
+            reservation.setReserved_at(resultSet.getTimestamp("reserved_at").toLocalDateTime());
+            
+            // Set status information from join
+            reservation.setStatus_name(resultSet.getString("status_name"));
+            reservation.setStatus_description(resultSet.getString("status_description"));
+        }
+
+        return reservation;
+    }
+
+    /**
+     * Transforms the results from a ResultSet into an ArrayList of Reservation objects.
+     *
+     * @param resultSet the ResultSet containing reservation data
+     * @return an ArrayList of Reservation objects populated with data from the ResultSet
+     * @throws SQLException if a database access error occurs
+     */
+    private ArrayList<Reservation> transformResultsToClassArray(ResultSet resultSet) throws SQLException {
+        ArrayList<Reservation> reservations = new ArrayList<>();
+
+        while (resultSet.next()) {
+            Reservation reservation = new Reservation();
+            reservation.setId(resultSet.getInt("id_PK"));
+            reservation.setUser_FK(resultSet.getInt("user_FK"));
+            reservation.setStatus_FK(resultSet.getInt("status_FK"));
+            reservation.setFlight_FK(resultSet.getInt("flight_FK"));
+            reservation.setReserved_at(resultSet.getTimestamp("reserved_at").toLocalDateTime());
+            
+            // Set status information from join
+            reservation.setStatus_name(resultSet.getString("status_name"));
+            reservation.setStatus_description(resultSet.getString("status_description"));
+            
+            reservations.add(reservation);
+        }
+
+        return reservations;
+    }
+
+    /**
      * Returns reservations by user ID.
      *
      * @param userId the ID of the user
@@ -186,108 +239,6 @@ public class ReservationDAO implements DAOMethods<Reservation> {
         statement.close();
         return reservations;
     }
-
-    /**
-     * Returns reservations by status ID.
-     *
-     * @param statusId the ID of the reservation status
-     * @return an ArrayList of Reservation objects with the specified status
-     * @throws SQLException if a database access error occurs
-     */
-    public ArrayList<Reservation> getByStatusId(int statusId) throws SQLException {
-        String query = "SELECT r.*, rs.name as status_name, rs.description as status_description " +
-                "FROM reservations r " +
-                "JOIN reservations_status rs ON r.status_FK = rs.id_PK " +
-                "WHERE r.status_FK = ?";
-
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setInt(1, statusId);
-
-        ResultSet resultSet = statement.executeQuery();
-
-        ArrayList<Reservation> reservations = transformResultsToClassArray(resultSet);
-        statement.close();
-        return reservations;
-    }
-
-    /**
-     * Returns reservations by username or email.
-     * This method performs a join with the users table to search by user data.
-     *
-     * @param userSearch the search string to match against user name or email
-     * @return an ArrayList of Reservation objects for users matching the search criteria
-     * @throws SQLException if a database access error occurs
-     */
-    public ArrayList<Reservation> getByUserNameOrEmail(String userSearch) throws SQLException {
-        String query = "SELECT r.*, rs.name as status_name, rs.description as status_description " +
-                "FROM reservations r " +
-                "JOIN reservations_status rs ON r.status_FK = rs.id_PK " +
-                "JOIN users u ON r.user_FK = u.id_PK " +
-                "WHERE u.name LIKE ? OR u.email LIKE ?";
-
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, "%" + userSearch + "%");
-        statement.setString(2, "%" + userSearch + "%");
-
-        ResultSet resultSet = statement.executeQuery();
-
-        ArrayList<Reservation> reservations = transformResultsToClassArray(resultSet);
-        statement.close();
-        return reservations;
-    }
-
-    /**
-     * Transforms the results from a ResultSet into a Reservation object.
-     *
-     * @param resultSet the ResultSet containing reservation data
-     * @return a Reservation object populated with data from the ResultSet
-     * @throws SQLException if a database access error occurs
-     */
-    private Reservation transformResultsToClass(ResultSet resultSet) throws SQLException {
-        Reservation reservation = new Reservation();
-
-        if (resultSet.next()) {
-            reservation.setId(resultSet.getInt("id_PK"));
-            reservation.setUser_FK(resultSet.getInt("user_FK"));
-            reservation.setStatus_FK(resultSet.getInt("status_FK"));
-            reservation.setFlight_FK(resultSet.getInt("flight_FK"));
-            reservation.setReserved_at(resultSet.getTimestamp("reserved_at").toLocalDateTime());
-
-            // Set status information from join
-            reservation.setStatus_name(resultSet.getString("status_name"));
-            reservation.setStatus_description(resultSet.getString("status_description"));
-        }
-
-        return reservation;
-    }
-
-    /**
-     * Transforms the results from a ResultSet into an ArrayList of Reservation objects.
-     *
-     * @param resultSet the ResultSet containing reservation data
-     * @return an ArrayList of Reservation objects populated with data from the ResultSet
-     * @throws SQLException if a database access error occurs
-     */
-    private ArrayList<Reservation> transformResultsToClassArray(ResultSet resultSet) throws SQLException {
-        ArrayList<Reservation> reservations = new ArrayList<>();
-
-        while (resultSet.next()) {
-            Reservation reservation = new Reservation();
-            reservation.setId(resultSet.getInt("id_PK"));
-            reservation.setUser_FK(resultSet.getInt("user_FK"));
-            reservation.setStatus_FK(resultSet.getInt("status_FK"));
-            reservation.setFlight_FK(resultSet.getInt("flight_FK"));
-            reservation.setReserved_at(resultSet.getTimestamp("reserved_at").toLocalDateTime());
-
-            // Set status information from join
-            reservation.setStatus_name(resultSet.getString("status_name"));
-            reservation.setStatus_description(resultSet.getString("status_description"));
-            reservations.add(reservation);
-        }
-
-        return reservations;
-    }
-
 
 
 

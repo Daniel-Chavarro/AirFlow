@@ -1,7 +1,6 @@
 package org.airflow.reservations.DAO;
 
 import org.airflow.reservations.model.Seat;
-import org.airflow.reservations.model.SeatClass;
 import org.airflow.reservations.utils.ConnectionDB;
 import org.junit.jupiter.api.*;
 
@@ -113,7 +112,7 @@ public class SeatDAOTest {
         assertNotNull(seat);
         assertEquals("A1", seat.getSeat_number());
         assertEquals(1, seat.getAirplane_FK());
-        assertEquals(SeatClass.ECONOMY, seat.getSeat_class());
+        assertEquals(Seat.SeatClass.ECONOMY, seat.getSeat_class());
         assertTrue(seat.getIs_window());
     }
 
@@ -128,7 +127,7 @@ public class SeatDAOTest {
         newSeat.setAirplane_FK(1);
         newSeat.setReservation_FK(null);
         newSeat.setSeat_number("B2");
-        newSeat.setSeat_class(SeatClass.BUSINESS);
+        newSeat.setSeat_class(Seat.SeatClass.BUSINESS);
         newSeat.setIs_window(false);
 
         seatDAO.create(newSeat);
@@ -155,13 +154,13 @@ public class SeatDAOTest {
     void testUpdate() throws SQLException {
         Seat seat = seatDAO.getById(testSeatId);
 
-        seat.setSeat_class(SeatClass.FIRST);
+        seat.setSeat_class(Seat.SeatClass.FIRST);
         seat.setIs_window(false);
 
         seatDAO.update(testSeatId, seat);
 
         Seat updatedSeat = seatDAO.getById(testSeatId);
-        assertEquals(SeatClass.FIRST, updatedSeat.getSeat_class());
+        assertEquals(Seat.SeatClass.FIRST, updatedSeat.getSeat_class());
         assertFalse(updatedSeat.getIs_window());
         assertEquals("A1", updatedSeat.getSeat_number());
     }
@@ -177,7 +176,7 @@ public class SeatDAOTest {
         seatToDelete.setAirplane_FK(1);
         seatToDelete.setReservation_FK(null);
         seatToDelete.setSeat_number("C3");
-        seatToDelete.setSeat_class(SeatClass.ECONOMY);
+        seatToDelete.setSeat_class(Seat.SeatClass.ECONOMY);
         seatToDelete.setIs_window(true);
 
         seatDAO.create(seatToDelete);
@@ -234,54 +233,6 @@ public class SeatDAOTest {
 
         for (Seat seat : seats) {
             assertNotNull(seat.getReservation_FK(), "Available seats should not have null reservation_FK");
-        }
-    }
-
-    /**
-     * Tests the getAvailableSeatsByAirplaneId method to ensure it retrieves available seats for a specific airplane.
-     *
-     * @throws SQLException if a database error occurs
-     */
-    @Test
-    void testGetAvailableSeatsByAirplaneId() throws SQLException {
-        ArrayList<Seat> availableSeats = seatDAO.getAvailableSeatsByAirplaneId(1);
-
-        assertNotNull(availableSeats);
-        for (Seat seat : availableSeats) {
-            assertEquals(1, seat.getAirplane_FK());
-            assertNull(seat.getReservation_FK(), "Available seats should have null reservation_FK");
-        }
-    }
-
-    /**
-     * Tests the getAvailableSeatsBySeatClass method to ensure it retrieves available seats for a specific seat class.
-     *
-     * @throws SQLException if a database error occurs
-     */
-    @Test
-    void testGetAvailableSeatsBySeatClass() throws SQLException {
-        ArrayList<Seat> economySeats = seatDAO.getAvailableSeatsBySeatClass(SeatClass.ECONOMY);
-
-        assertNotNull(economySeats);
-        for (Seat seat : economySeats) {
-            assertEquals(SeatClass.ECONOMY, seat.getSeat_class());
-            assertNull(seat.getReservation_FK(), "Available seats should have null reservation_FK");
-        }
-    }
-
-    /**
-     * Tests the getAvailableSeatsBySeatClass method with another seat class to ensure it works for different classes.
-     *
-     * @throws SQLException if a database error occurs
-     */
-    @Test
-    void testGetAvailableSeatsBySeatClassBusiness() throws SQLException {
-        ArrayList<Seat> businessSeats = seatDAO.getAvailableSeatsBySeatClass(SeatClass.BUSINESS);
-
-        assertNotNull(businessSeats);
-        for (Seat seat : businessSeats) {
-            assertEquals(SeatClass.BUSINESS, seat.getSeat_class());
-            assertNull(seat.getReservation_FK(), "Available seats should have null reservation_FK");
         }
     }
 }

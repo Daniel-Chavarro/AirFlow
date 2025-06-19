@@ -245,4 +245,35 @@ public class FlightDAOTest {
             assertEquals(2, flight.getDestination_city_FK());
         }
     }
+
+    /**
+     * Tests the getByCode method to ensure it retrieves flights with codes matching the search string.
+     *
+     * @throws SQLException if a database error occurs
+     */
+    @Test
+    void testGetByCode() throws SQLException {
+        ArrayList<Flight> flights = flightDAO.getByCode("TEST");
+
+        assertNotNull(flights);
+        assertFalse(flights.isEmpty(), "Should find flights with code containing 'TEST'");
+
+        boolean found = false;
+        for (Flight flight : flights) {
+            if (flight.getCode().equals("TEST123")) {
+                found = true;
+                break;
+            }
+        }
+
+        assertTrue(found, "Test flight should be in the results");
+
+        // Test with a partial code that should match
+        flights = flightDAO.getByCode("123");
+        assertFalse(flights.isEmpty(), "Should find flights with code containing '123'");
+
+        // Test with a code that shouldn't match
+        flights = flightDAO.getByCode("NONEXISTENT");
+        assertTrue(flights.isEmpty(), "Should not find flights with code containing 'NONEXISTENT'");
+    }
 }

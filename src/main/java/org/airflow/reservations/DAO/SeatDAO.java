@@ -153,66 +153,6 @@ public class SeatDAO implements DAOMethods<Seat> {
     }
 
     /**
-     * Transforms the results from a ResultSet into a Seat object.
-     *
-     * @param resultSet the ResultSet containing seat data
-     * @return a Seat object populated with data from the ResultSet
-     * @throws SQLException if a database access error occurs
-     */
-    private Seat transformResultsToClass(ResultSet resultSet) throws SQLException {
-        Seat seat = new Seat();
-
-        if (resultSet.next()) {
-            seat.setId(resultSet.getInt("id_PK"));
-            seat.setAirplane_FK(resultSet.getInt("airplane_FK"));
-            
-            int reservationFK = resultSet.getInt("reservation_FK");
-            if (!resultSet.wasNull()) {
-                seat.setReservation_FK(reservationFK);
-            } else {
-                seat.setReservation_FK(null);
-            }
-            
-            seat.setSeat_number(resultSet.getString("seat_number"));
-            seat.setSeat_class(Seat.SeatClass.valueOf(resultSet.getString("seat_class")));
-            seat.setIs_window(resultSet.getBoolean("is_window"));
-        }
-
-        return seat;
-    }
-
-    /**
-     * Transforms the results from a ResultSet into an ArrayList of Seat objects.
-     *
-     * @param resultSet the ResultSet containing seat data
-     * @return an ArrayList of Seat objects populated with data from the ResultSet
-     * @throws SQLException if a database access error occurs
-     */
-    private ArrayList<Seat> transformResultsToClassArray(ResultSet resultSet) throws SQLException {
-        ArrayList<Seat> seats = new ArrayList<>();
-
-        while (resultSet.next()) {
-            Seat seat = new Seat();
-            seat.setId(resultSet.getInt("id_PK"));
-            seat.setAirplane_FK(resultSet.getInt("airplane_FK"));
-            
-            int reservationFK = resultSet.getInt("reservation_FK");
-            if (!resultSet.wasNull()) {
-                seat.setReservation_FK(reservationFK);
-            } else {
-                seat.setReservation_FK(null);
-            }
-            
-            seat.setSeat_number(resultSet.getString("seat_number"));
-            seat.setSeat_class(Seat.SeatClass.valueOf(resultSet.getString("seat_class")));
-            seat.setIs_window(resultSet.getBoolean("is_window"));
-            seats.add(seat);
-        }
-
-        return seats;
-    }
-
-    /**
      * Returns seats by airplane ID.
      *
      * @param airplaneId the ID of the airplane
@@ -272,6 +212,87 @@ public class SeatDAO implements DAOMethods<Seat> {
         statement.close();
         return seats;
     }
+
+    /**
+     * Returns available seats (not reserved) for a specific seat class.
+     *
+     * @param seatClass the class of the seat (e.g., ECONOMY, BUSINESS)
+     * @return an ArrayList of available Seat objects for the specified seat class
+     * @throws SQLException if a database access error occurs
+     */
+    public ArrayList<Seat> getAvailableSeatsBySeatClass(SeatClass seatClass) throws SQLException {
+        String query = "SELECT * FROM seats WHERE seat_class = ? AND reservation_FK IS NULL";
+
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, seatClass.toString());
+
+        ResultSet resultSet = statement.executeQuery();
+
+        ArrayList<Seat> seats = transformResultsToClassArray(resultSet);
+        statement.close();
+        return seats;
+    }
+
+    /**
+     * Transforms the results from a ResultSet into a Seat object.
+     *
+     * @param resultSet the ResultSet containing seat data
+     * @return a Seat object populated with data from the ResultSet
+     * @throws SQLException if a database access error occurs
+     */
+    private Seat transformResultsToClass(ResultSet resultSet) throws SQLException {
+        Seat seat = new Seat();
+
+        if (resultSet.next()) {
+            seat.setId(resultSet.getInt("id_PK"));
+            seat.setAirplane_FK(resultSet.getInt("airplane_FK"));
+
+            int reservationFK = resultSet.getInt("reservation_FK");
+            if (!resultSet.wasNull()) {
+                seat.setReservation_FK(reservationFK);
+            } else {
+                seat.setReservation_FK(null);
+            }
+
+            seat.setSeat_number(resultSet.getString("seat_number"));
+            seat.setSeat_class(SeatClass.valueOf(resultSet.getString("seat_class")));
+            seat.setIs_window(resultSet.getBoolean("is_window"));
+        }
+
+        return seat;
+    }
+
+    /**
+     * Transforms the results from a ResultSet into an ArrayList of Seat objects.
+     *
+     * @param resultSet the ResultSet containing seat data
+     * @return an ArrayList of Seat objects populated with data from the ResultSet
+     * @throws SQLException if a database access error occurs
+     */
+    private ArrayList<Seat> transformResultsToClassArray(ResultSet resultSet) throws SQLException {
+        ArrayList<Seat> seats = new ArrayList<>();
+
+        while (resultSet.next()) {
+            Seat seat = new Seat();
+            seat.setId(resultSet.getInt("id_PK"));
+            seat.setAirplane_FK(resultSet.getInt("airplane_FK"));
+
+            int reservationFK = resultSet.getInt("reservation_FK");
+            if (!resultSet.wasNull()) {
+                seat.setReservation_FK(reservationFK);
+            } else {
+                seat.setReservation_FK(null);
+            }
+
+            seat.setSeat_number(resultSet.getString("seat_number"));
+            seat.setSeat_class(SeatClass.valueOf(resultSet.getString("seat_class")));
+            seat.setIs_window(resultSet.getBoolean("is_window"));
+            seats.add(seat);
+        }
+
+        return seats;
+    }
+
 
     // Getters and Setters
     public Connection getConnection() {

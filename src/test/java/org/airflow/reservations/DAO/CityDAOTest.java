@@ -200,17 +200,95 @@ public class CityDAOTest {
     }
 
     /**
-     * Tests the getByName method to ensure it retrieves a city by its name.
+     * Tests the getByName method to ensure it retrieves cities with names matching the search string.
      *
      * @throws SQLException if a database error occurs
      */
     @Test
     void testGetByName() throws SQLException {
-        City city = cityDAO.getByName("TestCity");
+        ArrayList<City> cities = cityDAO.getByName("TestCi");
 
-        assertNotNull(city);
-        assertEquals("TestCity", city.getName());
-        assertEquals("TestCountry", city.getCountry());
-        assertEquals("TCY", city.getCode());
+        assertNotNull(cities);
+        assertFalse(cities.isEmpty(), "Should find cities with name containing 'TestCi'");
+
+        boolean found = false;
+        for (City city : cities) {
+            if (city.getName().equals("TestCity")) {
+                found = true;
+                break;
+            }
+        }
+
+        assertTrue(found, "Test city should be in the results");
+
+        // Test with a partial name that should match
+        cities = cityDAO.getByName("Test");
+        assertFalse(cities.isEmpty(), "Should find cities with name containing 'Test'");
+
+        // Test with a name that shouldn't match
+        cities = cityDAO.getByName("NonExistentCity");
+        assertTrue(cities.isEmpty(), "Should not find cities with name containing 'NonExistentCity'");
+    }
+
+    /**
+     * Tests the getByCountry method to ensure it retrieves cities with countries matching the search string.
+     *
+     * @throws SQLException if a database error occurs
+     */
+    @Test
+    void testGetByCountry() throws SQLException {
+        ArrayList<City> cities = cityDAO.getByCountry("TestCoun");
+
+        assertNotNull(cities);
+        assertFalse(cities.isEmpty(), "Should find cities with country containing 'TestCoun'");
+
+        boolean found = false;
+        for (City city : cities) {
+            if (city.getCountry().equals("TestCountry")) {
+                found = true;
+                break;
+            }
+        }
+
+        assertTrue(found, "Test city should be in the results");
+
+        // Test with a partial country that should match
+        cities = cityDAO.getByCountry("Test");
+        assertFalse(cities.isEmpty(), "Should find cities with country containing 'Test'");
+
+        // Test with a country that shouldn't match
+        cities = cityDAO.getByCountry("NonExistentCountry");
+        assertTrue(cities.isEmpty(), "Should not find cities with country containing 'NonExistentCountry'");
+    }
+
+    /**
+     * Tests the getByCode method to ensure it retrieves cities with codes matching the search string.
+     *
+     * @throws SQLException if a database error occurs
+     */
+    @Test
+    void testGetByCode() throws SQLException {
+        ArrayList<City> cities = cityDAO.getByCode("TC");
+
+        assertNotNull(cities);
+        assertFalse(cities.isEmpty(), "Should find cities with code containing 'TC'");
+
+        boolean found = false;
+        for (City city : cities) {
+            if (city.getCode().equals("TCY")) {
+                found = true;
+                break;
+            }
+        }
+
+        assertTrue(found, "Test city should be in the results");
+
+        // Test with a partial code that should match
+        cities = cityDAO.getByCode("T");
+        assertFalse(cities.isEmpty(), "Should find cities with code containing 'T'");
+
+        // Test with a code that shouldn't match
+        cities = cityDAO.getByCode("XYZ");
+        assertTrue(cities.isEmpty(), "Should not find cities with code containing 'XYZ'");
     }
 }

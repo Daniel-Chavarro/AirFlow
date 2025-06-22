@@ -91,7 +91,7 @@ public class FlightDAO implements DAOMethods<Flight> {
     @Override
     public void create(Flight object) throws SQLException {
         String query = "INSERT INTO flights (airplane_FK, status_FK, origin_city_FK, destination_city_FK, " +
-                "code, departure_time, arrival_time, price_base) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                "code, departure_time, scheduled_arrival_time, arrival_time, price_base) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setInt(1, object.getAirplane_FK());
@@ -100,8 +100,9 @@ public class FlightDAO implements DAOMethods<Flight> {
         statement.setInt(4, object.getDestination_city_FK());
         statement.setString(5, object.getCode());
         statement.setTimestamp(6, Timestamp.valueOf(object.getDeparture_time()));
-        statement.setTimestamp(7, Timestamp.valueOf(object.getArrival_time()));
-        statement.setFloat(8, object.getPrice_base());
+        statement.setTimestamp(7, Timestamp.valueOf(object.getScheduled_arrival_time()));
+        statement.setTimestamp(8, Timestamp.valueOf(object.getArrival_time()));
+        statement.setFloat(9, object.getPrice_base());
 
         statement.executeUpdate();
         statement.close();
@@ -117,7 +118,7 @@ public class FlightDAO implements DAOMethods<Flight> {
     @Override
     public void update(int id, Flight toUpdate) throws SQLException {
         String query = "UPDATE flights SET airplane_FK = ?, status_FK = ?, origin_city_FK = ?, " +
-                "destination_city_FK = ?, code = ?, departure_time = ?, arrival_time = ?, price_base = ? " +
+                "destination_city_FK = ?, code = ?, departure_time = ?, scheduled_arrival_time = ?, arrival_time = ?, price_base = ? " +
                 "WHERE id_PK = ?";
 
         PreparedStatement statement = connection.prepareStatement(query);
@@ -127,9 +128,10 @@ public class FlightDAO implements DAOMethods<Flight> {
         statement.setInt(4, toUpdate.getDestination_city_FK());
         statement.setString(5, toUpdate.getCode());
         statement.setTimestamp(6, Timestamp.valueOf(toUpdate.getDeparture_time()));
-        statement.setTimestamp(7, Timestamp.valueOf(toUpdate.getArrival_time()));
-        statement.setFloat(8, toUpdate.getPrice_base());
-        statement.setInt(9, id);
+        statement.setTimestamp(7, Timestamp.valueOf(toUpdate.getScheduled_arrival_time()));
+        statement.setTimestamp(8, Timestamp.valueOf(toUpdate.getArrival_time()));
+        statement.setFloat(9, toUpdate.getPrice_base());
+        statement.setInt(10, id);
 
         statement.executeUpdate();
         statement.close();
@@ -170,6 +172,7 @@ public class FlightDAO implements DAOMethods<Flight> {
             flight.setDestination_city_FK(resultSet.getInt("destination_city_FK"));
             flight.setCode(resultSet.getString("code"));
             flight.setDeparture_time(resultSet.getTimestamp("departure_time").toLocalDateTime());
+            flight.setScheduled_arrival_time(resultSet.getTimestamp("scheduled_arrival_time").toLocalDateTime());
             flight.setArrival_time(resultSet.getTimestamp("arrival_time").toLocalDateTime());
             flight.setPrice_base(resultSet.getFloat("price_base"));
             
@@ -200,6 +203,7 @@ public class FlightDAO implements DAOMethods<Flight> {
             flight.setDestination_city_FK(resultSet.getInt("destination_city_FK"));
             flight.setCode(resultSet.getString("code"));
             flight.setDeparture_time(resultSet.getTimestamp("departure_time").toLocalDateTime());
+            flight.setScheduled_arrival_time(resultSet.getTimestamp("scheduled_arrival_time").toLocalDateTime());
             flight.setArrival_time(resultSet.getTimestamp("arrival_time").toLocalDateTime());
             flight.setPrice_base(resultSet.getFloat("price_base"));
             

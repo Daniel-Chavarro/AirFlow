@@ -54,10 +54,10 @@ public class DetailsFlightPanel extends JPanel {
     /**
      * Sets the flight data and initializes the details panel with flight information.
      *
-     * @param flight            The flight object containing flight details.
-     * @param originCity        The city object representing the origin city.
-     * @param destinationCity   The city object representing the destination city.
-     * @param airplane          The airplane object containing airplane details.
+     * @param flight          The flight object containing flight details.
+     * @param originCity      The city object representing the origin city.
+     * @param destinationCity The city object representing the destination city.
+     * @param airplane        The airplane object containing airplane details.
      */
     public void setData(Flight flight, City originCity, City destinationCity, Airplane airplane) {
         this.flight = flight;
@@ -281,5 +281,4 @@ public class DetailsFlightPanel extends JPanel {
     public JButton getBackButton() {
         return backButton;
     }
-
 }

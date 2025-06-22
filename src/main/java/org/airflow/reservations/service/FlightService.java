@@ -26,6 +26,10 @@ public class FlightService {
     public FlightService() throws SQLException {
         this.flightDAO = new FlightDAO();
     }
+    
+    public FlightService(FlightDAO flightDAO) {
+        this.flightDAO = flightDAO;
+    }
 
     /**
      * Registers a new flight after validating that the flight code is unique

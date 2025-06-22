@@ -1,5 +1,6 @@
 package org.airflow.reservations.GUI.panels;
 
+
 import org.airflow.reservations.model.Airplane;
 import org.airflow.reservations.model.City;
 import org.airflow.reservations.model.Flight;
@@ -281,4 +282,5 @@ public class DetailsFlightPanel extends JPanel {
     public JButton getBackButton() {
         return backButton;
     }
+
 }

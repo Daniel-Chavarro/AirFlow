@@ -7,35 +7,25 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+
 /**
  * RegisterDialog class provides a dialog for user registration.
  * It includes fields for first name, last name, email, and password,
  * along with a register button and a link to the login dialog.
  */
 public class RegisterDialog extends JDialog {
-    // Components of the RegisterDialog
-    // Panels
-    private final JPanel mainPane;
+    private JPanel mainPane;
 
-    // Labels
-    private final JLabel createAccountLabel;
-    private final JLabel loginLabel;
+    private JLabel createAccountLabel;
+    private JLabel loginLabel;
 
-    // Input fields
-    private final JTextField firstNameTextField;
-    private final JTextField lastNameTextField;
-    private final JTextField emailTextField;
-    private final JPasswordField passwordField;
+    private JTextField firstNameTextField;
+    private JTextField lastNameTextField;
+    private JTextField emailTextField;
+    private JPasswordField passwordField;
 
-    // Register button
-    private final JButton registerButton;
+    private JButton registerButton;
 
-    /**
-     * Constructor for the RegisterDialog class.
-     * Initializes the dialog with components for user registration.
-     *
-     * @param parent the parent JFrame for this dialog
-     */
     public RegisterDialog(JFrame parent) {
         super(parent, "Register", true);
 

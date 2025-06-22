@@ -27,6 +27,7 @@ public class LoginDialog extends JDialog {
     // Buttons
     private JButton loginButton;
 
+
     /**
      * Constructor for the LoginDialog class.
      * Initializes the dialog with components for user login.
@@ -90,6 +91,7 @@ public class LoginDialog extends JDialog {
             public void mouseClicked(MouseEvent e) {
                 dispose();
                 new RegisterDialog(parent).setVisible(true);
+                JOptionPane.showMessageDialog(null, "Redirecting to sign up...");
             }
         });
         mainPane.add(signup);

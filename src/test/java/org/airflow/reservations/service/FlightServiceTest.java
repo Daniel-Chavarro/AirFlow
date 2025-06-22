@@ -72,7 +72,7 @@ public class FlightServiceTest {
      */
     private void cleanupTestData() throws SQLException {
         try (Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate("DELETE FROM flights WHERE code IN ('SERVICE001', 'SERVICE_DUP', 'INVALID_DATE')");
+            stmt.executeUpdate("DELETE FROM flights WHERE code IN ('SERVICE001', 'SRVC002', 'SRVC003', 'INVALID_DATE')");
         }
     }
 
@@ -97,15 +97,19 @@ public class FlightServiceTest {
      */
     @Test
     void testRegisterFlight_Success() throws SQLException {
-        Flight newFlight = new Flight(0, 1, 1, 1, 2, "SERVICE_002",
-                LocalDateTime.now().plusDays(2),
-                LocalDateTime.now().plusDays(2).plusHours(3),
-                LocalDateTime.now().plusDays(2).plusHours(3),
+        LocalDateTime departureTime = LocalDateTime.now().plusDays(2);
+        LocalDateTime scheduledArrivalTime = departureTime.plusHours(3);
+        LocalDateTime actualArrivalTime = scheduledArrivalTime.plusMinutes(10);
+
+        Flight newFlight = new Flight(0, 1, 1, 1, 2, "SRVC002",
+                departureTime,
+                scheduledArrivalTime,
+                actualArrivalTime,
                 200.0f);
 
         flightService.registerFlight(newFlight);
 
-        assertTrue(flightService.existsFlightWithCode("SERVICE_002"));
+        assertTrue(flightService.existsFlightWithCode("SRVC002"));
     }
 
     /**
@@ -113,11 +117,23 @@ public class FlightServiceTest {
      */
     @Test
     void testRegisterFlight_DuplicateCode_ThrowsException() throws SQLException {
-        Flight duplicate = new Flight(0, 1, 1, 1, 2, "SERVICE_002",
-                LocalDateTime.now().plusDays(2),
-                LocalDateTime.now().plusDays(2).plusHours(3),
-                LocalDateTime.now().plusDays(2).plusHours(3),
+        LocalDateTime departureTime = LocalDateTime.now().plusDays(2);
+        LocalDateTime scheduledArrivalTime = departureTime.plusHours(3);
+        LocalDateTime actualArrivalTime = scheduledArrivalTime.plusMinutes(10);
+
+        Flight firstFlight = new Flight(0, 1, 1, 1, 2, "SRVC003",
+                departureTime,
+                scheduledArrivalTime,
+                actualArrivalTime,
                 200.0f);
+
+        flightService.registerFlight(firstFlight);
+
+        Flight duplicate = new Flight(0, 1, 1, 1, 2, "SRVC003",
+                departureTime.plusDays(1),
+                scheduledArrivalTime.plusDays(1),
+                actualArrivalTime.plusDays(1),
+                250.0f);
 
         assertThrows(IllegalArgumentException.class, () -> {
             flightService.registerFlight(duplicate);
@@ -129,11 +145,14 @@ public class FlightServiceTest {
      */
     @Test
     void testRegisterFlight_InvalidTimes_ThrowsException() {
-        Flight invalid = new Flight(0, 1, 1, 1, 2, "SERVICE_002",
-                LocalDateTime.now().plusDays(2),
-                LocalDateTime.now().plusDays(2).plusHours(3),
-                LocalDateTime.now().plusDays(2).plusHours(3),
-                200.0f);
+        LocalDateTime departureTime = LocalDateTime.now().plusDays(3);
+        LocalDateTime scheduledArrivalTime = departureTime.minusHours(1);
+        LocalDateTime actualArrivalTime = scheduledArrivalTime.plusMinutes(10);
+        Flight invalid = new Flight(0, 1, 1, 1, 2, "INVALID_DATE",
+                departureTime,
+                scheduledArrivalTime,
+                actualArrivalTime,
+                300.0f);
 
         assertThrows(IllegalArgumentException.class, () -> {
             flightService.registerFlight(invalid);

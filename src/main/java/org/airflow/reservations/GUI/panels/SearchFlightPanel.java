@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 
+
 import com.formdev.flatlaf.FlatLightLaf;
 import com.github.lgooddatepicker.components.DatePicker;
 
@@ -28,6 +29,7 @@ public class SearchFlightPanel extends JPanel {
 
     private JButton searchButton;
 
+
     /**
      * Constructor for the SearchFlightPanel class.
      * Initializes the panel with components for searching flights.
@@ -49,6 +51,7 @@ public class SearchFlightPanel extends JPanel {
         // Set the main panel as the viewport view for the JScrollPane
         add(searchFlightPanel);
     }
+
 
     /**
      * Initializes the form panel with input fields and a search button.
@@ -240,4 +243,5 @@ public class SearchFlightPanel extends JPanel {
     public void setSearchButton(JButton searchButton) {
         this.searchButton = searchButton;
     }
+
 }

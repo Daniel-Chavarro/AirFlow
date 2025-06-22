@@ -1,5 +1,6 @@
 package org.airflow.reservations.model;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 /**
@@ -15,9 +16,10 @@ public class Flight {
     private int destination_city_FK;
     private String code;
     private LocalDateTime departure_time;
+    private LocalDateTime scheduled_arrival_time;
     private LocalDateTime arrival_time;
     private float price_base;
-    
+
     // Status information retrieved from joins
     private String status_name;
     private String status_description;
@@ -37,7 +39,7 @@ public class Flight {
      * @param price_base         the ticket price for the flight
      */
     public Flight(int id, int airplane_FK, int status_FK, int origin_city_FK, int destination_city_FK,
-                  String code, LocalDateTime departure_time, LocalDateTime arrival_time, float price_base) {
+                  String code, LocalDateTime departure_time, LocalDateTime scheduled_arrival_time, LocalDateTime arrival_time, float price_base) {
         this.id = id;
         this.airplane_FK = airplane_FK;
         this.status_FK = status_FK;
@@ -45,6 +47,7 @@ public class Flight {
         this.destination_city_FK = destination_city_FK;
         this.code = code;
         this.departure_time = departure_time;
+        this.scheduled_arrival_time = scheduled_arrival_time;
         this.arrival_time = arrival_time;
         this.price_base = price_base;
         this.status_name = "";
@@ -63,10 +66,15 @@ public class Flight {
         this.destination_city_FK = 0;
         this.code = "";
         this.departure_time = LocalDateTime.now();
+        this.scheduled_arrival_time = LocalDateTime.now();
         this.arrival_time = LocalDateTime.now();
         this.price_base = 0.0f;
         this.status_name = "";
         this.status_description = "";
+    }
+
+    public Duration getScheduledDuration() {
+        return Duration.between(departure_time, scheduled_arrival_time);
     }
 
     // Getters and Setters
@@ -156,5 +164,13 @@ public class Flight {
 
     public void setStatus_description(String status_description) {
         this.status_description = status_description;
+    }
+
+    public LocalDateTime getScheduled_arrival_time() {
+        return scheduled_arrival_time;
+    }
+
+    public void setScheduled_arrival_time(LocalDateTime scheduled_arrival_time) {
+        this.scheduled_arrival_time = scheduled_arrival_time;
     }
 }

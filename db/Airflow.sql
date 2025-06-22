@@ -48,7 +48,8 @@ CREATE TABLE IF NOT EXISTS `flights` (
   `destination_city_FK` int NOT NULL,
   `code` VARCHAR(10) NOT NULL,
   `departure_time` timestamp NOT NULL,
-  `arrival_time` timestamp NOT NULL,
+  `scheduled_arrival_time` timestamp NOT NULL,
+  `arrival_time` timestamp NULL,
   `price_base` DECIMAL(10,2) NOT NULL,
   FOREIGN KEY (`airplane_FK`) REFERENCES `airplanes` (`id_PK`),
   FOREIGN KEY (`status_FK`) REFERENCES `flight_status` (`id_PK`),
@@ -77,4 +78,3 @@ CREATE TABLE IF NOT EXISTS `seats` (
   FOREIGN KEY (`airplane_FK`) REFERENCES `airplanes` (`id_PK`),
   FOREIGN KEY (`reservation_FK`) REFERENCES `reservations` (`id_PK`)
 );
-

@@ -347,7 +347,7 @@ public class DataGenerator {
     private void generateFlights(int count) throws SQLException {
         try (PreparedStatement pstmt = connection.prepareStatement(
                 "INSERT INTO flights (airplane_FK, status_FK, origin_city_FK, destination_city_FK, code, " +
-                "departure_time, arrival_time, price_base) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                "departure_time, scheduled_arrival_time, arrival_time, price_base) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 Statement.RETURN_GENERATED_KEYS)) {
 
             for (int i = 0; i < count; i++) {
@@ -376,10 +376,18 @@ public class DataGenerator {
 
                 // Flight duration between 1 and 12 hours
                 int durationHours = 1 + random.nextInt(12);
-                LocalDateTime arrivalTime = departureTime.plusHours(durationHours);
+                int durationMinutes = random.nextInt(60);
+
+                // Calculate scheduled arrival time
+                LocalDateTime scheduledArrivalTime = departureTime.plusHours(durationHours).plusMinutes(durationMinutes);
+
+                // For actual arrival time, add some randomness for realism (some flights arrive early, some late)
+                int arrivalOffset = random.nextInt(61) - 30; // Between -30 and +30 minutes
+                LocalDateTime arrivalTime = scheduledArrivalTime.plusMinutes(arrivalOffset);
 
                 // Convert to java.sql.Timestamp
                 Timestamp departureTimestamp = Timestamp.valueOf(departureTime);
+                Timestamp scheduledArrivalTimestamp = Timestamp.valueOf(scheduledArrivalTime);
                 Timestamp arrivalTimestamp = Timestamp.valueOf(arrivalTime);
 
                 // Base price between $100 and $1000
@@ -391,8 +399,9 @@ public class DataGenerator {
                 pstmt.setInt(4, destination.getId());
                 pstmt.setString(5, flightCode);
                 pstmt.setTimestamp(6, departureTimestamp);
-                pstmt.setTimestamp(7, arrivalTimestamp);
-                pstmt.setFloat(8, basePrice);
+                pstmt.setTimestamp(7, scheduledArrivalTimestamp);
+                pstmt.setTimestamp(8, arrivalTimestamp);
+                pstmt.setFloat(9, basePrice);
 
                 pstmt.executeUpdate();
 
@@ -400,12 +409,13 @@ public class DataGenerator {
                     if (generatedKeys.next()) {
                         Flight flight = new Flight();
                         flight.setId(generatedKeys.getInt(1));
-                        flight.setId(airplane.getId());
+                        flight.setAirplane_FK(airplane.getId());
                         flight.setStatus_FK(statusId);
                         flight.setOrigin_city_FK(origin.getId());
                         flight.setDestination_city_FK(destination.getId());
                         flight.setCode(flightCode);
                         flight.setDeparture_time(departureTimestamp.toLocalDateTime());
+                        flight.setScheduled_arrival_time(scheduledArrivalTimestamp.toLocalDateTime());
                         flight.setArrival_time(arrivalTimestamp.toLocalDateTime());
                         flight.setPrice_base(basePrice);
                         flights.add(flight);

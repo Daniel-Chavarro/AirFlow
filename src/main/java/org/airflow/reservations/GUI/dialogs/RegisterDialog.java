@@ -14,22 +14,17 @@ import java.awt.event.MouseEvent;
  * along with a register button and a link to the login dialog.
  */
 public class RegisterDialog extends JDialog {
-    // Components of the RegisterDialog
-    // Panels
-    private final JPanel mainPane;
+    private JPanel mainPane;
 
-    // Labels
-    private final JLabel createAccountLabel;
-    private final JLabel loginLabel;
+    private JLabel createAccountLabel;
+    private JLabel loginLabel;
 
-    // Input fields
-    private final JTextField firstNameTextField;
-    private final JTextField lastNameTextField;
-    private final JTextField emailTextField;
-    private final JPasswordField passwordField;
+    private JTextField firstNameTextField;
+    private JTextField lastNameTextField;
+    private JTextField emailTextField;
+    private JPasswordField passwordField;
 
-    // Register button
-    private final JButton registerButton;
+    private JButton registerButton;
 
     /**
      * Constructor for the RegisterDialog class.
@@ -132,6 +127,7 @@ public class RegisterDialog extends JDialog {
         } catch (Exception ex) {
             System.err.println("Failed to initialize FlatLaf");
         }
+
 
         SwingUtilities.invokeLater((() -> new RegisterDialog(new JFrame()).setVisible(true)));
     }

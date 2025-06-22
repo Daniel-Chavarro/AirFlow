@@ -55,7 +55,7 @@ public class SearchFlightPanel extends JPanel {
      * The form includes fields for origin, destination, departure date,
      * return date, and a search button.
      */
-    public void startFormPanel(){
+    public void startFormPanel() {
         formPanel = new JPanel();
         formPanel.setLayout(new GridBagLayout());
         formPanel.setBackground(Color.WHITE);

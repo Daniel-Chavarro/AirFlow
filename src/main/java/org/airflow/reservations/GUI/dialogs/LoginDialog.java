@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+
 /**
  * LoginDialog class provides a dialog for user login.
  * It includes fields for email and password, a login button,
@@ -26,6 +27,7 @@ public class LoginDialog extends JDialog {
 
     // Buttons
     private JButton loginButton;
+
 
 
     /**

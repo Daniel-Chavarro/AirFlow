@@ -243,5 +243,4 @@ public class SearchFlightPanel extends JPanel {
     public void setSearchButton(JButton searchButton) {
         this.searchButton = searchButton;
     }
-
 }

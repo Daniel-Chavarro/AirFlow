@@ -50,12 +50,14 @@ public class FlightServiceTest {
      */
     private void createTestData() throws SQLException {
         LocalDateTime departure = LocalDateTime.now().plusDays(1);
-        LocalDateTime arrival = departure.plusHours(2);
+        LocalDateTime scheduledArrival = departure.plusHours(2);
+        LocalDateTime actualArrival = scheduledArrival.plusMinutes(15); // 15 minutos de retraso
 
         try (Statement stmt = connection.createStatement()) {
             String sql = "INSERT INTO flights (airplane_FK, status_FK, origin_city_FK, destination_city_FK, " +
-                    "code, departure_time, arrival_time, price_base) VALUES " +
-                    "(1, 1, 1, 2, 'SERVICE001', '" + departure + "', '" + arrival + "', 120.0)";
+                    "code, departure_time, scheduled_arrival_time, arrival_time, price_base) VALUES " +
+                    "(1, 1, 1, 2, 'SERVICE001', '" + departure + "', '" + scheduledArrival + "', '" +
+                    actualArrival + "', 120.0)";
             stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 
             var rs = stmt.getGeneratedKeys();
@@ -98,11 +100,11 @@ public class FlightServiceTest {
         Flight newFlight = new Flight(0, 1, 1, 1, 2, "SERVICE_002",
                 LocalDateTime.now().plusDays(2),
                 LocalDateTime.now().plusDays(2).plusHours(3),
+                LocalDateTime.now().plusDays(2).plusHours(3),
                 200.0f);
 
         flightService.registerFlight(newFlight);
 
-        ArrayList<Flight> all = flightService.getAllFlights();
         assertTrue(flightService.existsFlightWithCode("SERVICE_002"));
     }
 
@@ -111,8 +113,9 @@ public class FlightServiceTest {
      */
     @Test
     void testRegisterFlight_DuplicateCode_ThrowsException() throws SQLException {
-        Flight duplicate = new Flight(0, 1, 1, 1, 2, "SERVICE001",
+        Flight duplicate = new Flight(0, 1, 1, 1, 2, "SERVICE_002",
                 LocalDateTime.now().plusDays(2),
+                LocalDateTime.now().plusDays(2).plusHours(3),
                 LocalDateTime.now().plusDays(2).plusHours(3),
                 200.0f);
 
@@ -126,9 +129,10 @@ public class FlightServiceTest {
      */
     @Test
     void testRegisterFlight_InvalidTimes_ThrowsException() {
-        Flight invalid = new Flight(0, 1, 1, 1, 2, "INVALID_DATE",
-                LocalDateTime.now().plusDays(1).plusHours(2),
-                LocalDateTime.now().plusDays(1),
+        Flight invalid = new Flight(0, 1, 1, 1, 2, "SERVICE_002",
+                LocalDateTime.now().plusDays(2),
+                LocalDateTime.now().plusDays(2).plusHours(3),
+                LocalDateTime.now().plusDays(2).plusHours(3),
                 200.0f);
 
         assertThrows(IllegalArgumentException.class, () -> {

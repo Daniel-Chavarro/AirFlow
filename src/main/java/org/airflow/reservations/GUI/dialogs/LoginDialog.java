@@ -7,6 +7,11 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+/**
+ * LoginDialog class provides a dialog for user login.
+ * It includes fields for email and password, a login button,
+ * and a link to the sign-up dialog.
+ */
 public class LoginDialog extends JDialog {
     // Panels
     private JPanel mainPane;
@@ -22,6 +27,12 @@ public class LoginDialog extends JDialog {
     // Buttons
     private JButton loginButton;
 
+    /**
+     * Constructor for the LoginDialog class.
+     * Initializes the dialog with components for user login.
+     *
+     * @param parent the parent JFrame for this dialog
+     */
     public LoginDialog(JFrame parent) {
         super(parent, "Login", true);
 
@@ -77,7 +88,8 @@ public class LoginDialog extends JDialog {
         signup.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         signup.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-                JOptionPane.showMessageDialog(null, "Redirecting to sign up...");
+                dispose();
+                new RegisterDialog(parent).setVisible(true);
             }
         });
         mainPane.add(signup);

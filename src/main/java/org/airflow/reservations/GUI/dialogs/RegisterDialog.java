@@ -14,18 +14,29 @@ import java.awt.event.MouseEvent;
  * along with a register button and a link to the login dialog.
  */
 public class RegisterDialog extends JDialog {
-    private JPanel mainPane;
+    // Components of the RegisterDialog
+    // Panels
+    private final JPanel mainPane;
 
-    private JLabel createAccountLabel;
-    private JLabel loginLabel;
+    // Labels
+    private final JLabel createAccountLabel;
+    private final JLabel loginLabel;
 
-    private JTextField firstNameTextField;
-    private JTextField lastNameTextField;
-    private JTextField emailTextField;
-    private JPasswordField passwordField;
+    // Input fields
+    private final JTextField firstNameTextField;
+    private final JTextField lastNameTextField;
+    private final JTextField emailTextField;
+    private final JPasswordField passwordField;
 
-    private JButton registerButton;
+    // Register button
+    private final JButton registerButton;
 
+    /**
+     * Constructor for the RegisterDialog class.
+     * Initializes the dialog with components for user registration.
+     *
+     * @param parent the parent JFrame for this dialog
+     */
     public RegisterDialog(JFrame parent) {
         super(parent, "Register", true);
 

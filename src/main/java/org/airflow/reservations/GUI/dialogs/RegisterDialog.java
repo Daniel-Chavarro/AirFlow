@@ -7,24 +7,40 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+/**
+ * RegisterDialog class provides a dialog for user registration.
+ * It includes fields for first name, last name, email, and password,
+ * along with a register button and a link to the login dialog.
+ */
 public class RegisterDialog extends JDialog {
-    private JPanel mainPane;
+    // Components of the RegisterDialog
+    // Panels
+    private final JPanel mainPane;
 
-    private JLabel createAccountLabel;
-    private JLabel loginLabel;
+    // Labels
+    private final JLabel createAccountLabel;
+    private final JLabel loginLabel;
 
-    private JTextField firstNameTextField;
-    private JTextField lastNameTextField;
-    private JTextField emailTextField;
-    private JPasswordField passwordField;
+    // Input fields
+    private final JTextField firstNameTextField;
+    private final JTextField lastNameTextField;
+    private final JTextField emailTextField;
+    private final JPasswordField passwordField;
 
-    private JButton registerButton;
+    // Register button
+    private final JButton registerButton;
 
+    /**
+     * Constructor for the RegisterDialog class.
+     * Initializes the dialog with components for user registration.
+     *
+     * @param parent the parent JFrame for this dialog
+     */
     public RegisterDialog(JFrame parent) {
         super(parent, "Register", true);
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setSize(400, 400);
+        setSize(400, 450);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
@@ -116,6 +132,40 @@ public class RegisterDialog extends JDialog {
             System.err.println("Failed to initialize FlatLaf");
         }
 
-            SwingUtilities.invokeLater((() -> new RegisterDialog(new JFrame()).setVisible(true)));
+        SwingUtilities.invokeLater((() -> new RegisterDialog(new JFrame()).setVisible(true)));
+    }
+
+    //Getters and Setters
+
+    public JPanel getMainPane() {
+        return mainPane;
+    }
+
+    public JLabel getCreateAccountLabel() {
+        return createAccountLabel;
+    }
+
+    public JLabel getLoginLabel() {
+        return loginLabel;
+    }
+
+    public JTextField getFirstNameTextField() {
+        return firstNameTextField;
+    }
+
+    public JTextField getLastNameTextField() {
+        return lastNameTextField;
+    }
+
+    public JTextField getEmailTextField() {
+        return emailTextField;
+    }
+
+    public JPasswordField getPasswordField() {
+        return passwordField;
+    }
+
+    public JButton getRegisterButton() {
+        return registerButton;
     }
 }

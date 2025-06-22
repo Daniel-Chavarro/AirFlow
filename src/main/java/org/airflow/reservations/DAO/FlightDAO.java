@@ -155,6 +155,29 @@ public class FlightDAO implements DAOMethods<Flight> {
     }
 
     /**
+     * Returns an ArrayList of Flights based on the provided code.
+     *
+     * @param code the code of the flight to be retrieved
+     * @return an ArrayList of Flights with the specified code
+     * @throws SQLException if a database access error occurs
+     */
+    public ArrayList<Flight> getByCode(String code) throws SQLException {
+        String query = "SELECT f.*, fs.name as status_name, fs.description as status_description " +
+                "FROM flights f " +
+                "JOIN flight_status fs ON f.status_FK = fs.id_PK " +
+                "WHERE f.code LIKE ?";
+
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, code);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        ArrayList<Flight> flights = transformResultsToClassArray(resultSet);
+        statement.close();
+        return flights;
+    }
+
+    /**
      * Transforms the results from a ResultSet into a Flight object.
      *
      * @param resultSet the ResultSet containing flight data
@@ -210,7 +233,7 @@ public class FlightDAO implements DAOMethods<Flight> {
             // Set status information from join
             flight.setStatus_name(resultSet.getString("status_name"));
             flight.setStatus_description(resultSet.getString("status_description"));
-            
+            // Add the flight to the list
             flights.add(flight);
         }
 

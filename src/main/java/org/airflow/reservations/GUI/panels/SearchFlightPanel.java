@@ -150,4 +150,76 @@ public class SearchFlightPanel extends JPanel {
         frame.setLocationRelativeTo(null); // Center the frame on the screen
         searchFlightPanel.setVisible(true);
     }
+
+    public JPanel getSearchFlightPanel() {
+        return searchFlightPanel;
+    }
+
+    public void setSearchFlightPanel(JPanel searchFlightPanel) {
+        this.searchFlightPanel = searchFlightPanel;
+    }
+
+    public JPanel getFormPanel() {
+        return formPanel;
+    }
+
+    public void setFormPanel(JPanel formPanel) {
+        this.formPanel = formPanel;
+    }
+
+    public JPanel getResultsPanel() {
+        return resultsPanel;
+    }
+
+    public void setResultsPanel(JPanel resultsPanel) {
+        this.resultsPanel = resultsPanel;
+    }
+
+    public JLabel getBookFlightLabel() {
+        return bookFlightLabel;
+    }
+
+    public void setBookFlightLabel(JLabel bookFlightLabel) {
+        this.bookFlightLabel = bookFlightLabel;
+    }
+
+    public JComboBox<String> getOriginComboBox() {
+        return originComboBox;
+    }
+
+    public void setOriginComboBox(JComboBox<String> originComboBox) {
+        this.originComboBox = originComboBox;
+    }
+
+    public JComboBox<String> getDestinationComboBox() {
+        return destinationComboBox;
+    }
+
+    public void setDestinationComboBox(JComboBox<String> destinationComboBox) {
+        this.destinationComboBox = destinationComboBox;
+    }
+
+    public DatePicker getDepartureDatePicker() {
+        return departureDatePicker;
+    }
+
+    public void setDepartureDatePicker(DatePicker departureDatePicker) {
+        this.departureDatePicker = departureDatePicker;
+    }
+
+    public DatePicker getReturnDatePicker() {
+        return returnDatePicker;
+    }
+
+    public void setReturnDatePicker(DatePicker returnDatePicker) {
+        this.returnDatePicker = returnDatePicker;
+    }
+
+    public JButton getSearchButton() {
+        return searchButton;
+    }
+
+    public void setSearchButton(JButton searchButton) {
+        this.searchButton = searchButton;
+    }
 }

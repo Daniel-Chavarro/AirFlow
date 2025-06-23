@@ -239,7 +239,19 @@ public class ReservationDAO implements DAOMethods<Reservation> {
         statement.close();
         return reservations;
     }
-
+    public Reservation getByFlightIdAndUserId(int flightId, int userId) throws SQLException {
+        String query = "SELECT r.*, rs.name as status_name, rs.description as status_description " +
+                "FROM reservations r " +
+                "JOIN reservations_status rs ON r.status_FK = rs.id_PK " +
+                "WHERE r.flight_FK = ? AND r.user_FK = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setInt(1, flightId);
+        statement.setInt(2, userId);
+        ResultSet resultSet = statement.executeQuery();
+        Reservation reservation = transformResultsToClass(resultSet);
+        statement.close();
+        return reservation;
+    }
 
 
     // Getters and Setters

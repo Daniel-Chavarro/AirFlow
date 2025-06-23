@@ -68,7 +68,17 @@ public class Flight {
         this.status_name = "";
         this.status_description = "";
     }
-
+    @Override
+    public String toString() {
+        return (
+                "------------------------------------------"+"\n " +
+                "Flight: " + id + "\n " +
+                "Code :" + code + "\n " +
+                "Departure time :" + departure_time +  "\n "+
+                "Arrival time :" + arrival_time + "\n " +
+                "Base Price :" + price_base+ "\n " +
+                "------------------------------------------"+"\n ");
+    }
     // Getters and Setters
     public int getId() {
         return id;

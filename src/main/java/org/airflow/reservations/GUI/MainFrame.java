@@ -1,89 +1,205 @@
 package org.airflow.reservations.GUI;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import java.awt.CardLayout;
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.HeadlessException;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-// Import custom panels
+import javax.swing.*;
+import java.awt.*;
+import java.util.Objects;
 
+import com.formdev.flatlaf.FlatLightLaf;
+import org.airflow.reservations.GUI.panels.*;
 
 public class MainFrame extends JFrame {
+    private JPanel menuPanel;
+    private JPanel logoPanel;
+    private JPanel buttonsPanel;
+    private JPanel contentPanel;
+    private JScrollPane scrollPane;
 
-    private CardLayout cardLayout;
-    private JPanel cardPanel;
+    private JLabel imageLabel;
+    private JLabel titleLabel;
+
+    private ConfirmPanel confirmPanel;
+    private DetailsFlightPanel detailsFlightPanel;
+    private SearchFlightPanel searchFlightPanel;
 
 
-    public MainFrame() throws HeadlessException {
-//        super("Airflow Flight Reservation");
-//
-//        cardLayout = new CardLayout();
-//        cardPanel = new JPanel(cardLayout);
-//
-//        // Initialize custom panels
-//        flightSearchPanel = new FlightSearchPanel();
-//        bookingPanel = new BookingPanel();
-//        reservationListPanel = new ReservationListPanel();
-//
-//        // Add panels to cardPanel
-//        cardPanel.add(flightSearchPanel, "SEARCH");
-//        cardPanel.add(bookingPanel, "BOOKING");
-//        cardPanel.add(reservationListPanel, "RESERVATIONS");
-//
-//        // Create navigation panel
-//        JPanel navigationPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-//        JButton searchButton = new JButton("Search Flights");
-//        JButton bookButton = new JButton("Book Flight (Placeholder)"); // Placeholder until a flight is selected
-//        JButton reservationsButton = new JButton("View Reservations");
-//
-//        // Add ActionListeners for navigation buttons
-//        searchButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                showPanel("SEARCH");
-//            }
-//        });
-//
-//        bookButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                // For now, this directly shows the booking panel.
-//                // In a real app, this might be enabled/disabled based on flight selection.
-//                showPanel("BOOKING");
-//            }
-//        });
-//
-//        reservationsButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                showPanel("RESERVATIONS");
-//            }
-//        });
-//
-//        navigationPanel.add(searchButton);
-//        navigationPanel.add(bookButton);
-//        navigationPanel.add(reservationsButton);
-//
-//        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        setSize(800, 600);
-//
-//        // Add components to the frame's content pane
-//        getContentPane().setLayout(new BorderLayout()); // Set layout for the content pane
-//        getContentPane().add(navigationPanel, BorderLayout.NORTH);
-//        getContentPane().add(cardPanel, BorderLayout.CENTER);
-//
-//        // Show default panel
-//        showPanel("SEARCH");
-//
-//        setVisible(true);
+    public MainFrame() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle("Airflow Reservations");
+        setSize(1000, 700);
+        setResizable(false);
+        setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
+
+
+        confirmPanel = new ConfirmPanel();
+        detailsFlightPanel = new DetailsFlightPanel();
+        searchFlightPanel = new SearchFlightPanel();
+
+        createHorizontalMenu();
+        createContentPanel();
     }
 
-    public void showPanel(String panelName) {
-        cardLayout.show(cardPanel, panelName);
+    public void createHorizontalMenu(){
+        menuPanel = new JPanel();
+        menuPanel.setLayout(new BorderLayout());
+        menuPanel.setBackground(Color.WHITE);
+        menuPanel.setPreferredSize(new Dimension(1000, 60));
+        menuPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+
+        // Logo panel
+        logoPanel = new JPanel();
+        logoPanel.setLayout(new FlowLayout(FlowLayout.LEFT,10,0));
+        logoPanel.setBackground(Color.WHITE);
+
+        imageLabel = new JLabel();
+        imageLabel.setIcon(new ImageIcon(new ImageIcon(
+                Objects.requireNonNull(getClass()
+                        .getResource("/images/logo.png")))
+                .getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH)));
+        imageLabel.setPreferredSize(new Dimension(24, 24));
+
+        logoPanel.add(imageLabel);
+
+        // Title label
+        titleLabel = new JLabel("Airflow");
+        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
+        titleLabel.setForeground(Color.BLACK);
+
+        logoPanel.add(titleLabel);
+
+        // Buttons panel
+        buttonsPanel = new JPanel();
+        buttonsPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 20, 0));
+        buttonsPanel.setBackground(Color.WHITE);
+
+        String[] sections = {"Flights", "Logout"};
+
+        for (String section : sections) {
+            JButton btn = new JButton(section);
+            btn.setFont(new Font("SansSerif", Font.PLAIN, 14));
+            btn.setFocusPainted(false);
+            btn.setContentAreaFilled(false);
+            btn.setBorderPainted(false);
+            btn.setForeground(Color.BLACK);
+            buttonsPanel.add(btn);
+        }
+
+        menuPanel.add(logoPanel, BorderLayout.WEST);
+        menuPanel.add(buttonsPanel, BorderLayout.EAST);
+
+        add(menuPanel, BorderLayout.NORTH);
+    }
+
+    private void createContentPanel() {
+        contentPanel = new JPanel();
+        contentPanel.setLayout(new CardLayout());
+        contentPanel.setBackground(Color.WHITE);
+
+        contentPanel.add(searchFlightPanel, "SearchFlightPanel");
+        contentPanel.add(detailsFlightPanel, "DetailsFlightPanel");
+        contentPanel.add(confirmPanel, "ConfirmPanel");
+
+
+
+        scrollPane = new JScrollPane(contentPanel);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+
+        add(scrollPane, BorderLayout.CENTER);
+    }
+
+    public static void main(String[] args) {
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (Exception ex) {
+            System.err.println("Failed to initialize FlatLaf");
+        }
+
+        MainFrame mainFrame = new MainFrame();
+        ((CardLayout) mainFrame.contentPanel.getLayout()).show(mainFrame.contentPanel, "SearchFlightPanel");
+        mainFrame.setVisible(true);
+    }
+
+    public JPanel getMenuPanel() {
+        return menuPanel;
+    }
+
+    public void setMenuPanel(JPanel menuPanel) {
+        this.menuPanel = menuPanel;
+    }
+
+    public JPanel getLogoPanel() {
+        return logoPanel;
+    }
+
+    public void setLogoPanel(JPanel logoPanel) {
+        this.logoPanel = logoPanel;
+    }
+
+    public JPanel getButtonsPanel() {
+        return buttonsPanel;
+    }
+
+    public void setButtonsPanel(JPanel buttonsPanel) {
+        this.buttonsPanel = buttonsPanel;
+    }
+
+    public JPanel getContentPanel() {
+        return contentPanel;
+    }
+
+    public void setContentPanel(JPanel contentPanel) {
+        this.contentPanel = contentPanel;
+    }
+
+    public JScrollPane getScrollPane() {
+        return scrollPane;
+    }
+
+    public void setScrollPane(JScrollPane scrollPane) {
+        this.scrollPane = scrollPane;
+    }
+
+    public JLabel getImageLabel() {
+        return imageLabel;
+    }
+
+    public void setImageLabel(JLabel imageLabel) {
+        this.imageLabel = imageLabel;
+    }
+
+    public JLabel getTitleLabel() {
+        return titleLabel;
+    }
+
+    public void setTitleLabel(JLabel titleLabel) {
+        this.titleLabel = titleLabel;
+    }
+
+    public ConfirmPanel getConfirmPanel() {
+        return confirmPanel;
+    }
+
+    public void setConfirmPanel(ConfirmPanel confirmPanel) {
+        this.confirmPanel = confirmPanel;
+    }
+
+    public DetailsFlightPanel getDetailsFlightPanel() {
+        return detailsFlightPanel;
+    }
+
+    public void setDetailsFlightPanel(DetailsFlightPanel detailsFlightPanel) {
+        this.detailsFlightPanel = detailsFlightPanel;
+    }
+
+    public SearchFlightPanel getSearchFlightPanel() {
+        return searchFlightPanel;
+    }
+
+    public void setSearchFlightPanel(SearchFlightPanel searchFlightPanel) {
+        this.searchFlightPanel = searchFlightPanel;
     }
 }

@@ -7,7 +7,11 @@ import java.awt.*;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.github.lgooddatepicker.components.DatePicker;
 
-
+/**
+ * SearchFlightPanel class provides a panel for searching flights.
+ * It includes input fields for origin, destination, departure and return dates,
+ * and a search button. The results panel is also included to display search results.
+ */
 public class SearchFlightPanel extends JPanel {
 
     private JPanel searchFlightPanel;
@@ -24,6 +28,10 @@ public class SearchFlightPanel extends JPanel {
 
     private JButton searchButton;
 
+    /**
+     * Constructor for the SearchFlightPanel class.
+     * Initializes the panel with components for searching flights.
+     */
     public SearchFlightPanel() {
         // Initialize the main panel
         setLayout(new BorderLayout());
@@ -42,6 +50,11 @@ public class SearchFlightPanel extends JPanel {
         add(searchFlightPanel);
     }
 
+    /**
+     * Initializes the form panel with input fields and a search button.
+     * The form includes fields for origin, destination, departure date,
+     * return date, and a search button.
+     */
     public void startFormPanel(){
         formPanel = new JPanel();
         formPanel.setLayout(new GridBagLayout());
@@ -116,6 +129,10 @@ public class SearchFlightPanel extends JPanel {
         searchFlightPanel.add(formPanel);
     }
 
+    /**
+     * Initializes the results panel where search results will be displayed.
+     * Currently, it contains a placeholder label indicating where results will appear.
+     */
     public void startResultsPanel() {
         resultsPanel = new JPanel();
         resultsPanel.setLayout(new BorderLayout());

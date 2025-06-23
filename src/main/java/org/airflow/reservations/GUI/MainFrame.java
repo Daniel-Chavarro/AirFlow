@@ -8,6 +8,11 @@ import java.util.Objects;
 import com.formdev.flatlaf.FlatLightLaf;
 import org.airflow.reservations.GUI.panels.*;
 
+/**
+ * MainFrame class represents the main window of the Airflow Reservations application.
+ * It contains a horizontal menu with a logo and buttons, and a content panel that
+ * displays different panels for searching flights, viewing flight details, and confirming reservations.
+ */
 public class MainFrame extends JFrame {
     private JPanel menuPanel;
     private JPanel logoPanel;
@@ -22,7 +27,11 @@ public class MainFrame extends JFrame {
     private DetailsFlightPanel detailsFlightPanel;
     private SearchFlightPanel searchFlightPanel;
 
-
+    /**
+     * Constructor for the MainFrame class.
+     * Initializes the main frame with a title, size, and layout,
+     * and sets up the horizontal menu and content panel.
+     */
     public MainFrame() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("Airflow Reservations");
@@ -40,6 +49,10 @@ public class MainFrame extends JFrame {
         createContentPanel();
     }
 
+    /**
+     * Creates the horizontal menu at the top of the main frame.
+     * The menu includes a logo, title, and buttons for different sections.
+     */
     public void createHorizontalMenu(){
         menuPanel = new JPanel();
         menuPanel.setLayout(new BorderLayout());
@@ -91,6 +104,10 @@ public class MainFrame extends JFrame {
         add(menuPanel, BorderLayout.NORTH);
     }
 
+    /**
+     * Creates the content panel that holds different sections of the application.
+     * It uses a CardLayout to switch between different panels.
+     */
     private void createContentPanel() {
         contentPanel = new JPanel();
         contentPanel.setLayout(new CardLayout());

@@ -1,800 +1,426 @@
-\documentclass[12pt,a4paper]{article}
-\usepackage[utf8]{inputenc}
-\usepackage[spanish]{babel}
-\usepackage{geometry}
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
 \usepackage{graphicx}
-\usepackage{amsmath}
-\usepackage{amsfonts}
-\usepackage{amssymb}
-\usepackage{fancyhdr}
-\usepackage{hyperref}
-\usepackage{tabularx}
-\usepackage{longtable}
+\usepackage{textcomp}
+\usepackage{xcolor}
 \usepackage{array}
 \usepackage{booktabs}
-\usepackage{xcolor}
 \usepackage{float}
-
-% Configuración de página
-\geometry{margin=2.5cm}
-\pagestyle{fancy}
-\fancyhf{}
-\fancyhead[L]{Documentación del Proyecto}
-\fancyhead[R]{App de Reserva de Vuelos}
-\fancyfoot[C]{\thepage}
-
-% Colores personalizados
-\definecolor{primaryblue}{RGB}{41, 128, 185}
-\definecolor{secondaryblue}{RGB}{52, 152, 219}
-
-\title{\textbf{\Huge Documentación del Proyecto}\\
-\vspace{0.5cm}
-\textbf{\Large Aplicación de Reserva de Vuelos}\\
-\vspace{0.3cm}
-\textcolor{primaryblue}{\rule{\textwidth}{2pt}}}
-
-\author{Equipo de Desarrollo}
-\date{\today}
+\usepackage{url}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \begin{document}
 
-\maketitle
-\thispagestyle{empty}
-
-\newpage
-\tableofcontents
-\newpage
-
-\section{Introducción}
-
-Este documento presenta la documentación técnica completa del proyecto de desarrollo de una aplicación de reserva de vuelos. El sistema está diseñado para gestionar de manera eficiente las reservaciones de vuelos, proporcionando una plataforma robusta que permite a los usuarios buscar, reservar y gestionar sus viajes aéreos.
-
-La aplicación contempla la gestión integral de vuelos, desde la administración de aeronaves y asientos hasta el control de estados de reservaciones y vuelos, brindando una experiencia completa tanto para usuarios finales como para administradores del sistema.
-
-\section{Base de Datos}
-
-\subsection{Metodología de Desarrollo}
-
-El desarrollo del modelo entidad-relación se fundamenta en el uso de ontologías como base conceptual. Esta metodología permite crear un diseño de base de datos más coherente y semánticamente rico, asegurando que las relaciones entre entidades reflejen fielmente la lógica del dominio del negocio.
-
-El proceso de desarrollo siguió las siguientes etapas:
-
-\begin{enumerate}
-    \item \textbf{Declaración de Entidades}: Identificación y definición de las entidades principales del sistema
-    \item \textbf{Definición de Atributos}: Especificación de las propiedades de cada entidad con sus respectivos tipos de datos
-    \item \textbf{Establecimiento de Relaciones}: Desarrollo de las conexiones entre entidades mediante análisis de cardinalidades
-    \item \textbf{Validación del Modelo}: Verificación de la integridad y consistencia del diseño
-\end{enumerate}
-
-\subsection{Entidades del Sistema}
-
-El sistema está compuesto por las siguientes entidades principales:
-
-\subsubsection{Users (Usuarios)}
-Representa tanto a administradores como clientes regulares del sistema. Esta entidad centraliza la gestión de usuarios con diferentes niveles de privilegios.
-
-\textbf{Atributos:}
-\begin{itemize}
-    \item \texttt{id\_PK}: Identificador único del usuario (int, clave primaria)
-    \item \texttt{name}: Nombre del usuario (varchar(40), no nulo)
-    \item \texttt{last\_name}: Apellido del usuario (varchar(40), no nulo)
-    \item \texttt{email}: Dirección de correo electrónico (varchar(200), no nulo)
-    \item \texttt{password}: Contraseña encriptada (varchar(20), no nulo)
-    \item \texttt{isSuperUser}: Indicador de privilegios administrativos (boolean, no nulo)
-    \item \texttt{created\_at}: Fecha y hora de creación de la cuenta (datetime, no nulo)
-\end{itemize}
-
-\subsubsection{Airplanes (Aeronaves)}
-Gestiona la información de las aeronaves disponibles en la flota.
-
-\textbf{Atributos:}
-\begin{itemize}
-    \item \texttt{id\_PK}: Identificador único de la aeronave (int, clave primaria)
-    \item \texttt{airline}: Aerolínea propietaria (varchar(20), no nulo)
-    \item \texttt{model}: Modelo de la aeronave (varchar(50), no nulo)
-    \item \texttt{code}: Código identificador de la aeronave (varchar(10), no nulo)
-    \item \texttt{capacity}: Capacidad total de pasajeros (int, no nulo)
-    \item \texttt{year}: Año de fabricación (year)
-\end{itemize}
-
-\subsubsection{Cities (Ciudades)}
-Representa las ciudades que forman parte de la red de vuelos, utilizada para implementar la lógica de grafo de rutas.
-
-\textbf{Atributos:}
-\begin{itemize}
-    \item \texttt{id\_PK}: Identificador único de la ciudad (int, clave primaria)
-    \item \texttt{name}: Nombre de la ciudad (varchar(100), no nulo)
-    \item \texttt{country}: País donde se ubica la ciudad (varchar(100), no nulo)
-    \item \texttt{code}: Código aeroportuario de la ciudad (varchar(10), no nulo)
-\end{itemize}
-
-\subsubsection{Flights (Vuelos)}
-Gestiona la información de los vuelos programados en el sistema.
-
-\textbf{Atributos:}
-\begin{itemize}
-    \item \texttt{id\_PK}: Identificador único del vuelo (int, clave primaria)
-    \item \texttt{airplane\_FK}: Referencia a la aeronave asignada (int, clave foránea)
-    \item \texttt{status\_FK}: Estado actual del vuelo (int, clave foránea)
-    \item \texttt{origin\_city\_FK}: Ciudad de origen (int, clave foránea)
-    \item \texttt{destination\_city\_FK}: Ciudad de destino (int, clave foránea)
-    \item \texttt{code}: Código identificador del vuelo (varchar(10), no nulo)
-    \item \texttt{departure\_time}: Fecha y hora de salida (timestamp, no nulo)
-    \item \texttt{arrival\_time}: Fecha y hora de llegada (timestamp, no nulo)
-    \item \texttt{price\_base}: Precio base del vuelo (decimal(10,2), no nulo)
-\end{itemize}
-
-\subsubsection{Reservations (Reservaciones)}
-Administra las reservas realizadas por los usuarios.
-
-\textbf{Atributos:}
-\begin{itemize}
-    \item \texttt{id\_PK}: Identificador único de la reserva (int, clave primaria)
-    \item \texttt{user\_FK}: Usuario que realizó la reserva (int, clave foránea)
-    \item \texttt{status\_FK}: Estado actual de la reserva (int, clave foránea)
-    \item \texttt{flight\_FK}: Vuelo reservado (int, clave foránea)
-    \item \texttt{reserved\_at}: Fecha y hora de la reservación (timestamp, no nulo)
-\end{itemize}
-
-\subsubsection{Seats (Asientos)}
-Gestiona los asientos disponibles en las aeronaves.
-
-\textbf{Atributos:}
-\begin{itemize}
-    \item \texttt{id\_PK}: Identificador único del asiento (int, clave primaria)
-    \item \texttt{airplane\_FK}: Aeronave a la que pertenece (int, clave foránea)
-    \item \texttt{reservation\_FK}: Reservación asociada, si existe (int, clave foránea, nullable)
-    \item \texttt{seat\_number}: Número de asiento (varchar(10), no nulo)
-    \item \texttt{seat\_class}: Clase del asiento (enum: ECONOMY, BUSINESS, FIRST)
-    \item \texttt{is\_window}: Indica si es un asiento de ventana (boolean)
-\end{itemize}
-
-\subsubsection{Flight\_Status (Estados de Vuelo)}
-Catálogo de estados posibles para los vuelos.
-
-\textbf{Atributos:}
-\begin{itemize}
-    \item \texttt{id\_PK}: Identificador único del estado (int, clave primaria)
-    \item \texttt{name}: Nombre del estado (varchar(15), no nulo)
-    \item \texttt{description}: Descripción detallada del estado (varchar(100))
-\end{itemize}
-
-\subsubsection{Reservations\_Status (Estados de Reservación)}
-Catálogo de estados posibles para las reservaciones.
-
-\textbf{Atributos:}
-\begin{itemize}
-    \item \texttt{id\_PK}: Identificador único del estado (int, clave primaria)
-    \item \texttt{name}: Nombre del estado (varchar(15), no nulo)
-    \item \texttt{description}: Descripción detallada del estado (varchar(100))
-\end{itemize}
-
-\subsection{Relaciones entre Entidades}
-
-El sistema establece las siguientes relaciones entre las entidades identificadas:
-
-\subsubsection{Relaciones Usuario-Reservación}
-\textbf{Cardinalidad}: 1:M (Uno a Muchos)
-\begin{itemize}
-    \item Un usuario puede realizar cero o varias reservaciones de vuelos
-    \item Cada reservación es asignada únicamente a un usuario
-    \item Esta relación garantiza la trazabilidad de las reservaciones
-\end{itemize}
-
-\subsubsection{Relaciones Aeronave-Reservación}
-\textbf{Cardinalidad}: 1:M (Uno a Muchos)
-\begin{itemize}
-    \item Una aeronave puede estar asignada a múltiples reservaciones
-    \item Cada reservación puede tener solamente una aeronave asignada
-    \item Es posible que una reservación no tenga aeronave asignada inicialmente
-\end{itemize}
-
-\subsubsection{Relaciones Aeronave-Asiento}
-\textbf{Cardinalidad}: 1:M (Uno a Muchos)
-\begin{itemize}
-    \item Una aeronave está compuesta de múltiples asientos
-    \item Un asiento pertenece obligatoriamente a una aeronave específica
-    \item Esta relación define la configuración física de cada aeronave
-\end{itemize}
-
-\subsubsection{Relaciones Aeronave-Vuelo}
-\textbf{Cardinalidad}: 1:M (Uno a Muchos)
-\begin{itemize}
-    \item Una aeronave puede estar asignada o no a un vuelo activo
-    \item Un vuelo debe tener obligatoriamente una aeronave asignada
-    \item Esta relación gestiona la operación de vuelos
-\end{itemize}
-
-\subsubsection{Relaciones Reservación-Asiento}
-\textbf{Cardinalidad}: 1:M (Uno a Muchos)
-\begin{itemize}
-    \item Una reservación puede incluir uno o varios asientos
-    \item Un asiento puede estar asignado o no a una reservación
-    \item Esta relación permite reservaciones grupales
-\end{itemize}
-
-\subsubsection{Relaciones Reservación-Vuelo}
-\textbf{Cardinalidad}: M:1 (Muchos a Uno)
-\begin{itemize}
-    \item Una reservación se asigna a un vuelo específico
-    \item Un vuelo puede tener múltiples reservaciones registradas
-    \item Esta relación vincula las reservaciones con los vuelos programados
-\end{itemize}
-
-\subsubsection{Relaciones de Estados}
-\textbf{Cardinalidad}: 1:M (Uno a Muchos)
-\begin{itemize}
-    \item Una reservación tiene un único estado en un momento dado
-    \item Un estado puede estar asignado a múltiples reservaciones
-    \item Un vuelo tiene un estado específico
-    \item Un estado de vuelo puede aplicarse a múltiples vuelos
-\end{itemize}
-
-\subsubsection{Relaciones Ciudad-Vuelo}
-\textbf{Cardinalidad}: 1:M (Uno a Muchos)
-\begin{itemize}
-    \item Un vuelo parte obligatoriamente de una ciudad de origen
-    \item Un vuelo aterriza obligatoriamente en una ciudad de destino
-    \item Una ciudad puede ser origen de múltiples vuelos
-    \item Una ciudad puede ser destino de múltiples vuelos
-    \item Esta estructura permite implementar algoritmos de rutas y grafos
-\end{itemize}
-
-\subsection{Matriz de Relaciones}
-
-La siguiente matriz muestra las relaciones existentes entre todas las entidades del sistema, donde las celdas marcadas en verde indican la existencia de una relación directa entre las entidades correspondientes:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{images/db/relations_matrix.jpg}
-    \caption{Matriz de Relaciones entre Entidades}
-    \label{fig:matriz_relaciones}
-\end{figure}
-
-\subsection{Modelo Entidad-Relación}
-
-El diagrama completo del modelo entidad-relación muestra la estructura integral de la base de datos, incluyendo todas las entidades, sus atributos, tipos de datos y las relaciones establecidas entre ellas:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{images/db/er_model.png}
-    \caption{Modelo Entidad-Relación Completo}
-    \label{fig:modelo_er}
-\end{figure}
-
-\subsection{Consideraciones de Diseño}
-
-\subsubsection{Integridad Referencial}
-El diseño implementa restricciones de integridad referencial mediante claves foráneas, asegurando la consistencia de los datos y evitando referencias a entidades inexistentes.
-
-\subsubsection{Normalización}
-El modelo se encuentra en tercera forma normal (3NF), eliminando redundancias y dependencias transitivas, lo que optimiza el almacenamiento y reduce las anomalías de actualización.
-
-\subsubsection{Escalabilidad}
-La estructura permite el crecimiento horizontal mediante la implementación de índices apropiados y particionamiento de tablas grandes como \texttt{reservations} y \texttt{flights}.
-
-\subsubsection{Flexibilidad}
-El uso de tablas de estados (\texttt{flight\_status} y \texttt{reservations\_status}) proporciona flexibilidad para agregar nuevos estados sin modificar la estructura de las tablas principales.
-
-\section{Conclusiones}
-
-El modelo de base de datos presentado proporciona una base sólida para el desarrollo de la aplicación de reserva de vuelos. La metodología basada en ontologías ha permitido crear un diseño coherente que refleja fielmente la lógica del negocio y las necesidades operativas del sistema.
-
-El diseño implementado ofrece:
-\begin{itemize}
-    \item Integridad de datos mediante restricciones y relaciones bien definidas
-    \item Flexibilidad para adaptarse a futuros requerimientos
-    \item Escalabilidad para manejar volúmenes crecientes de información
-    \item Trazabilidad completa de las operaciones de reservación
-    \item Soporte para funcionalidades avanzadas como algoritmos de rutas
-\end{itemize}
-
-Esta documentación servirá como referencia fundamental para las siguientes etapas del desarrollo del proyecto, incluyendo la implementación de la lógica de negocio y las interfaces de usuario.
-
-\section{Persistencia de Datos}
-
-\subsection{Fundamentos de Álgebra Relacional}
-
-El diseño de consultas en el sistema AirFlow está fundamentado en los principios del álgebra relacional, proporcionando un marco matemático sólido para las operaciones sobre la base de datos. Las principales operaciones relacionales utilizadas son:
-
-\begin{itemize}
-    \item \textbf{Selección ($\sigma$)}: Filtra filas de una relación según condiciones específicas. Ejemplo: seleccionar vuelos cuyo precio base sea menor a cierta cantidad.
-
-    \begin{align}
-    \sigma_{\text{price\_base} < 500}(\text{Flights})
-    \end{align}
-
-    \item \textbf{Proyección ($\pi$)}: Extrae columnas específicas de una relación. Ejemplo: obtener solo código y modelo de aeronaves.
-
-    \begin{align}
-    \pi_{\text{code, model}}(\text{Airplanes})
-    \end{align}
-
-    \item \textbf{Unión Natural ($\bowtie$)}: Combina dos relaciones basándose en atributos comunes. Ejemplo: unir vuelos con información de aeronaves.
-
-    \begin{align}
-    \text{Flights} \bowtie \text{Airplanes}
-    \end{align}
-
-    \item \textbf{Juntas (Join)}: Combina tuplas relacionadas de diferentes tablas. La implementación usa extensivamente inner joins, left joins y right joins según los requerimientos de cada consulta.
-\end{itemize}
-
-Estas operaciones fundamentales se traducen a SQL en las consultas del sistema, permitiendo una manipulación eficiente y matemáticamente consistente de los datos.
-
-\subsection{Patrón DAO (Data Access Object)}
-
-El sistema implementa el patrón de diseño DAO para abstraer y encapsular el acceso a la base de datos, separando claramente la lógica de negocio de la lógica de persistencia. La implementación sigue estos principios:
-
-\subsubsection{Estructura del Patrón DAO}
-
-\begin{figure}[H]
-\centering
-\begin{tikzpicture}[node distance=2cm, auto]
-    % Nodos
-    \node[rectangle, draw, minimum width=3cm, minimum height=1cm] (interface) {DAOMethods<T>};
-    \node[rectangle, draw, minimum width=3cm, minimum height=1cm, below left=1cm and -0.5cm of interface] (flightDAO) {FlightDAO};
-    \node[rectangle, draw, minimum width=3cm, minimum height=1cm, below=1cm of interface] (reservationDAO) {ReservationDAO};
-    \node[rectangle, draw, minimum width=3cm, minimum height=1cm, below right=1cm and -0.5cm of interface] (userDAO) {UsersDAO};
-
-    % Conexiones
-    \draw[->] (flightDAO) -- (interface);
-    \draw[->] (reservationDAO) -- (interface);
-    \draw[->] (userDAO) -- (interface);
-\end{tikzpicture}
-\caption{Implementación del patrón DAO en AirFlow}
-\end{figure}
-
-\subsubsection{Interfaz DAOMethods}
-
-Se define una interfaz genérica \texttt{DAOMethods<T>} que establece los métodos estándar para operaciones CRUD:
-
-\begin{itemize}
-    \item \texttt{ArrayList<T> getAll()}: Recupera todos los objetos de tipo T
-    \item \texttt{T getById(int id)}: Recupera un objeto específico por su identificador
-    \item \texttt{void create(T object)}: Crea un nuevo registro en la base de datos
-    \item \texttt{void update(int id, T toUpdate)}: Actualiza un registro existente
-    \item \texttt{void delete(int id)}: Elimina un registro específico
-\end{itemize}
-
-\subsubsection{Implementaciones Específicas}
-
-Cada entidad del dominio cuenta con su propia implementación DAO que extiende la interfaz genérica:
-
-\begin{itemize}
-    \item \texttt{FlightDAO}: Gestiona operaciones CRUD para vuelos
-    \item \texttt{ReservationDAO}: Gestiona operaciones CRUD para reservaciones
-    \item \texttt{UsersDAO}: Gestiona operaciones CRUD para usuarios
-    \item \texttt{AirplaneDAO}: Gestiona operaciones CRUD para aeronaves
-    \item \texttt{CityDAO}: Gestiona operaciones CRUD para ciudades
-    \item \texttt{SeatDAO}: Gestiona operaciones CRUD para asientos
-\end{itemize}
-
-Esta estructura garantiza la uniformidad en el acceso a datos y facilita la mantenibilidad del código al centralizar la lógica de persistencia.
-
-\subsection{Métodos de Consulta SQL}
-
-Los DAOs implementan diversas consultas SQL para satisfacer los requerimientos del sistema. A continuación se detallan algunos ejemplos relevantes:
-
-\subsubsection{Consultas en FlightDAO}
-
-\begin{verbatim}
-// Obtener todos los vuelos con información de su estado
-public ArrayList<Flight> getAll() throws SQLException {
-    String query = "SELECT f.*, fs.name as status_name,
-                   fs.description as status_description
-                   FROM flights f
-                   JOIN flight_status fs ON f.status_FK = fs.id_PK";
-
-    // Implementación del método...
-}
-
-// Búsqueda de vuelos según origen, destino y fecha
-public ArrayList<Flight> searchFlights(int originId, int destinationId,
-                                      Date date) throws SQLException {
-    String query = "SELECT f.*, fs.name as status_name
-                   FROM flights f
-                   JOIN flight_status fs ON f.status_FK = fs.id_PK
-                   WHERE f.origin_city_FK = ?
-                   AND f.destination_city_FK = ?
-                   AND DATE(f.departure_time) = ?";
-
-    // Implementación del método...
-}
-\end{verbatim}
-
-\subsubsection{Consultas en ReservationDAO}
-
-\begin{verbatim}
-// Obtener reservaciones por usuario
-public ArrayList<Reservation> getReservationsByUser(int userId)
-                                                   throws SQLException {
-    String query = "SELECT r.*, rs.name as status_name
-                   FROM reservations r
-                   JOIN reservations_status rs ON r.status_FK = rs.id_PK
-                   WHERE r.user_FK = ?";
-
-    // Implementación del método...
-}
-
-// Verificar disponibilidad de asientos
-public boolean checkSeatAvailability(int flightId, String seatNumber)
-                                    throws SQLException {
-    String query = "SELECT COUNT(*) FROM seats s
-                   JOIN flights f ON s.airplane_FK = f.airplane_FK
-                   WHERE f.id_PK = ? AND s.seat_number = ?
-                   AND s.reservation_FK IS NULL";
-
-    // Implementación del método...
-}
-\end{verbatim}
-
-\subsection{Conexión a la Base de Datos}
-
-La gestión de conexiones a la base de datos se centraliza en la clase \texttt{ConnectionDB}, siguiendo el patrón Singleton para optimizar recursos:
-
-\begin{verbatim}
-public class ConnectionDB {
-    private final static String URL = "jdbc:mysql://localhost:3306/";
-    private final static String DATABASE = "airflow";
-    private final static String USER = "root";
-    private final static String PASSWORD = "root";
-    private final static String PARAMS = "?useUnicode=true&characterEncoding=UTF-8
-                                        &useSSL=false&allowPublicKeyRetrieval=true";
-
-    public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL + DATABASE + PARAMS,
-                                         USER, PASSWORD);
+    \title{Technical Documentation and System Architecture for Airflow: A Flight Reservation Management Application}
+
+    \author{\IEEEauthorblockN{Development Team}
+    \IEEEauthorblockA{\textit{Software Engineering Department} \\
+    \textit{University/Organization Name}\\
+    City, Country \\
+    email@domain.com}
     }
-}
-\end{verbatim}
 
-\subsubsection{Características de la Conexión}
-
-\begin{itemize}
-    \item \textbf{Driver JDBC}: Utiliza el driver MySQL para Java, permitiendo una comunicación eficiente con el servidor de base de datos
-    \item \textbf{Gestión de Caracteres}: Configuración para soporte completo de Unicode, esencial para la internacionalización
-    \item \textbf{Seguridad}: Configuración flexible para entornos de desarrollo y producción
-    \item \textbf{Manejo de Excepciones}: Implementación robusta para gestionar errores de conexión y consultas
-\end{itemize}
-
-\subsubsection{Transacciones}
-
-El sistema implementa control de transacciones para operaciones críticas como reservaciones de vuelos:
-
-\begin{verbatim}
-// Ejemplo de manejo de transacciones
-public void createReservationWithSeats(Reservation reservation,
-                                      List<Seat> seats) throws SQLException {
-    Connection conn = ConnectionDB.getConnection();
-    try {
-        conn.setAutoCommit(false);
-
-        // Crear reservación
-        // Actualizar asientos
-
-        conn.commit();
-    } catch (SQLException e) {
-        conn.rollback();
-        throw e;
-    } finally {
-        conn.setAutoCommit(true);
-        conn.close();
-    }
-}
-\end{verbatim}
-
-Este enfoque garantiza la integridad de los datos incluso en operaciones complejas que afectan a múltiples tablas.
-
-\section{Arquitectura del Sistema}
-
-\subsection{Descripción General}
-
-La arquitectura de la aplicación de reserva de vuelos se basa en una estructura de capas que separa claramente las distintas responsabilidades del sistema. Las principales capas de la arquitectura son:
-
-\begin{itemize}
-    \item \textbf{Capa de Presentación}: Interfaz de usuario y interacción
-    \item \textbf{Capa de Negocio}: Lógica de negocio y reglas del sistema
-    \item \textbf{Capa de Persistencia}: Acceso y gestión de datos en la base de datos
-    \item \textbf{Capa de Servicios}: Servicios externos e integración
-\end{itemize}
-
-\subsection{Diagrama de Arquitectura}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{images/architecture/architecture_diagram.png}
-    \caption{Diagrama de Arquitectura del Sistema}
-    \label{fig:diagrama_arquitectura}
-\end{figure}
-
-\subsection{Descripción de Capas}
-
-\subsubsection{Capa de Presentación}
-
-\begin{itemize}
-    \item Implementada con tecnologías web modernas (HTML, CSS, JavaScript)
-    \item Frameworks como React o Angular para una interfaz de usuario dinámica
-    \item Comunicación con la capa de negocio a través de API RESTful
-\end{itemize}
-
-\subsubsection{Capa de Negocio}
-
-\begin{itemize}
-    \item Implementa la lógica de negocio central de la aplicación
-    \item Expuesta a través de servicios web (API REST) para ser consumida por la capa de presentación
-    \item Contiene la validación de reglas de negocio y procesamiento de datos
-\end{itemize}
-
-\subsubsection{Capa de Persistencia}
-
-\begin{itemize}
-    \item Maneja el acceso a datos y la comunicación con la base de datos
-    \item Utiliza el patrón DAO para abstraer la lógica de acceso a datos
-    \item Implementa métodos para operaciones CRUD y consultas complejas
-\end{itemize}
-
-\subsubsection{Capa de Servicios}
-
-\begin{itemize}
-    \item Integra servicios externos como pasarelas de pago, servicios de correo, etc.
-    \item Proporciona funcionalidades adicionales como generación de reportes, análisis de datos, etc.
-    \item Puede incluir servicios en la nube para escalabilidad y flexibilidad
-\end{itemize}
-
-\subsection{Flujo de Datos}
-
-El flujo de datos en el sistema sigue el siguiente patrón:
-
-\begin{enumerate}
-    \item El usuario interactúa con la interfaz de la aplicación (Capa de Presentación)
-    \item La interfaz envía solicitudes a la API REST de la aplicación
-    \item Las solicitudes son recibidas por la capa de negocio que procesa la lógica correspondiente
-    \item La capa de negocio puede consultar o modificar datos a través de la capa de persistencia
-    \item La capa de persistencia ejecuta las operaciones en la base de datos y devuelve los resultados
-    \item La capa de negocio recibe los datos, aplica la lógica de negocio y devuelve la respuesta a la interfaz
-    \item La interfaz presenta los datos al usuario final
-\end{enumerate}
-
-\subsection{Consideraciones de Diseño de Arquitectura}
-
-\begin{itemize}
-    \item \textbf{Desacoplamiento}: Las capas están desacopladas, permitiendo cambios independientes en cada una
-    \item \textbf{Escalabilidad}: La arquitectura permite escalar horizontalmente añadiendo más instancias de servicios
-    \item \textbf{Mantenibilidad}: El código está organizado por capas y módulos, facilitando el mantenimiento y la evolución
-    \item \textbf{Seguridad}: Implementación de medidas de seguridad en cada capa, incluyendo autenticación, autorización y encriptación de datos sensibles
-\end{itemize}
-
-\section{Interfaz de Usuario}
-
-\subsection{Tecnologías Utilizadas}
-
-La interfaz de usuario de la aplicación está desarrollada con las siguientes tecnologías:
-
-\begin{itemize}
-    \item \textbf{HTML5}: Estructura básica de las páginas web
-    \item \textbf{CSS3}: Estilos y diseño responsivo
-    \item \textbf{JavaScript}: Interactividad y dinámicas en el cliente
-    \item \textbf{React}: Biblioteca de JavaScript para construir interfaces de usuario
-    \item \textbf{Redux}: Manejo del estado de la aplicación
-    \item \textbf{Axios}: Cliente HTTP para realizar solicitudes a la API
-\end{itemize}
-
-\subsection{Diseño Responsivo}
-
-La aplicación utiliza un diseño responsivo que se adapta a diferentes tamaños de pantalla y dispositivos. Las principales características del diseño responsivo son:
-
-\begin{itemize}
-    \item Uso de unidades relativas (%, em, rem) en lugar de unidades fijas (px) para un escalado fluido
-    \item Media queries de CSS para aplicar estilos específicos según el tamaño de pantalla
-    \item Imágenes y elementos multimedia escalables que mantienen su proporción
-    \item Navegación adaptativa que se ajusta a pantallas táctiles y de escritorio
-\end{itemize}
-
-\subsection{Accesibilidad}
-
-Se han implementado características de accesibilidad para asegurar que la aplicación sea usable por la mayor cantidad de personas posible, incluyendo aquellas con discapacidades. Algunas de las consideraciones de accesibilidad son:
-
-\begin{itemize}
-    \item Uso de etiquetas y atributos ARIA para mejorar la accesibilidad de los componentes
-    \item Navegación por teclado completa, permitiendo el uso de la aplicación sin mouse
-    \item Colores y contrastes adecuados para usuarios con discapacidades visuales
-    \item Textos alternativos en imágenes y elementos no textuales
-\end{itemize}
-
-\subsection{Ejemplos de Pantallas}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{images/ui/home_page.png}
-    \caption{Página de Inicio}
-    \label{fig:pantalla_inicio}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{images/ui/flight_search_results.png}
-    \caption{Resultados de Búsqueda de Vuelos}
-    \label{fig:resultados_vuelos}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{images/ui/reservation_confirmation.png}
-    \caption{Confirmación de Reservación}
-    \label{fig:confirmacion_reservacion}
-\end{figure}
-
-\section{Pruebas del Sistema}
-
-\subsection{Estrategia de Pruebas}
-
-La estrategia de pruebas del sistema se basa en varios niveles de pruebas para asegurar la calidad y correcto funcionamiento de la aplicación. Los principales niveles de pruebas son:
-
-\begin{itemize}
-    \item \textbf{Pruebas Unitarias}: Pruebas individuales de componentes y funciones
-    \item \textbf{Pruebas de Integración}: Pruebas de la interacción entre componentes y servicios
-    \item \textbf{Pruebas Funcionales}: Pruebas de las funcionalidades de la aplicación según los requerimientos
-    \item \textbf{Pruebas de Rendimiento}: Pruebas de la capacidad de respuesta y estabilidad bajo carga
-    \item \textbf{Pruebas de Seguridad}: Pruebas de vulnerabilidades y protección de datos
-\end{itemize}
-
-\subsection{Herramientas de Pruebas}
-
-Se han utilizado las siguientes herramientas para la automatización y gestión de pruebas:
-
-\begin{itemize}
-    \item \textbf{JUnit}: Para la ejecución de pruebas unitarias en Java
-    \item \textbf{Mockito}: Para la creación de mocks y pruebas de integración
-    \item \textbf{Selenium}: Para pruebas automatizadas de la interfaz de usuario
-    \item \textbf{Postman}: Para pruebas de las API REST
-    \item \textbf{JMeter}: Para pruebas de rendimiento y carga
-\end{itemize}
-
-\subsection{Casos de Prueba}
-
-A continuación se presentan algunos ejemplos de casos de prueba relevantes:
-
-\subsubsection{Pruebas Unitarias}
-
-\begin{verbatim}
-// Prueba unitaria para la función de cálculo de precios en vuelos
-@Test
-public void testCalculatePrice() {
-    Flight flight = new Flight();
-    flight.setBasePrice(100);
-    flight.setDiscount(10);
-
-    double finalPrice = flight.calculatePrice();
-
-    assertEquals(90, finalPrice, 0.01);
-}
-\end{verbatim}
-
-\subsubsection{Pruebas de Integración}
-
-\begin{verbatim}
-// Prueba de integración entre vuelo y aeronave
-@Test
-public void testFlightAirplaneIntegration() throws SQLException {
-    FlightDAO flightDAO = new FlightDAO();
-    AirplaneDAO airplaneDAO = new AirplaneDAO();
-
-    Flight flight = flightDAO.getById(1);
-    Airplane airplane = airplaneDAO.getById(flight.getAirplane_FK());
-
-    assertNotNull(airplane);
-    assertEquals(flight.getAirplane_FK(), airplane.getId_PK());
-}
-\end{verbatim}
-
-\subsubsection{Pruebas Funcionales}
-
-\begin{verbatim}
-// Prueba funcional de búsqueda de vuelos
-@Test
-public void testSearchFlights() throws SQLException {
-    FlightDAO flightDAO = new FlightDAO();
-
-    ArrayList<Flight> flights = flightDAO.searchFlights(1, 2,
-                                                       Date.valueOf("2023-12-15"));
-
-    assertFalse(flights.isEmpty());
-    for (Flight flight : flights) {
-        assertEquals(1, flight.getOrigin_city_FK());
-        assertEquals(2, flight.getDestination_city_FK());
-    }
-}
-\end{verbatim}
-
-\subsubsection{Pruebas de Rendimiento}
-
-\begin{verbatim}
-// Prueba de rendimiento para la carga de vuelos
-@Test
-public void testLoadFlightsPerformance() {
-    long startTime = System.currentTimeMillis();
-
-    FlightDAO flightDAO = new FlightDAO();
-    flightDAO.getAll();
-
-    long endTime = System.currentTimeMillis();
-    long duration = endTime - startTime;
-
-    assertTrue(duration < 2000); // Debe cargar en menos de 2 segundos
-}
-\end{verbatim}
-
-\subsubsection{Pruebas de Seguridad}
-
-\begin{verbatim}
-// Prueba de seguridad para inyección SQL
-@Test
-public void testSQLInjection() {
-    UserDAO userDAO = new UserDAO();
-
-    String maliciousInput = "'; DROP TABLE users; --";
-    ArrayList<User> users = userDAO.getById(maliciousInput);
-
-    assertTrue(users.isEmpty()); // No debe retornar usuarios
-}
-\end{verbatim}
-
-\subsection{Resultados de Pruebas}
-
-Todos los casos de prueba fueron ejecutados con éxito, validando el correcto funcionamiento de la aplicación en los distintos niveles de prueba. Se generaron los siguientes informes:
-
-\begin{itemize}
-    \item \textbf{Informe de Pruebas Unitarias}: Detalla la ejecución de pruebas unitarias y resultados obtenidos
-    \item \textbf{Informe de Pruebas de Integración}: Resume las pruebas de integración realizadas entre componentes
-    \item \textbf{Informe de Pruebas Funcionales}: Presenta los resultados de las pruebas funcionales ejecutadas
-    \item \textbf{Informe de Pruebas de Rendimiento}: Muestra los resultados de las pruebas de carga y rendimiento
-    \item \textbf{Informe de Pruebas de Seguridad}: Detalla las pruebas de seguridad realizadas y vulnerabilidades encontradas
-\end{itemize}
-
-\subsection{Mantenimiento y Soporte}
-
-Se establece un plan de mantenimiento y soporte para asegurar el correcto funcionamiento y actualización de la aplicación:
-
-\begin{itemize}
-    \item \textbf{Mantenimiento Correctivo}: Resolución de errores y fallos detectados en producción
-    \item \textbf{Mantenimiento Adaptativo}: Actualización de la aplicación ante cambios en el entorno o requisitos
-    \item \textbf{Mantenimiento Perfectivo}: Mejoras y optimizaciones en la aplicación existentes
-    \item \textbf{Soporte Técnico}: Atención a usuarios para resolver dudas y problemas en el uso de la aplicación
-\end{itemize}
-
-\section{Documentación Adicional}
-
-\subsection{Manual de Usuario}
-
-Se proporciona un manual de usuario detallado que incluye:
-
-\begin{itemize}
-    \item Guía de inicio rápido
-    \item Descripción de funcionalidades
-    \item Instrucciones para la gestión de vuelos, reservaciones y usuarios
-    \item Solución de problemas comunes
-\end{itemize}
-
-\subsection{Guía de Instalación}
-
-La guía de instalación incluye los pasos necesarios para:
-
-\begin{itemize}
-    \item Configuración del entorno de desarrollo
-    \item Instalación de dependencias y herramientas requeridas
-    \item Despliegue de la aplicación en servidores locales o en la nube
-    \item Configuración de la base de datos y carga de datos iniciales
-\end{itemize}
-
-\subsection{Referencias}
-
-Se incluyen referencias a documentación relevante, como:
-
-\begin{itemize}
-    \item Documentación oficial de tecnologías utilizadas (Java, Spring, MySQL, etc.)
-    \item Enlaces a tutoriales y guías adicionales
-    \item Referencias a estándares y buenas prácticas seguidas en el desarrollo
-\end{itemize}
+    \maketitle
+
+    \begin{abstract}
+        This paper presents the comprehensive technical documentation of Airflow, a flight reservation management system. The system is designed to efficiently manage flight reservations, providing a robust platform that enables users to search, book, and manage their air travel. The application encompasses comprehensive flight management, from aircraft and seat administration to reservation and flight status control, delivering a complete experience for both end users and system administrators. This documentation details the database design methodology, entity-relationship modeling, system architecture, and implementation patterns used in the development process.
+    \end{abstract}
+
+    \begin{IEEEkeywords}
+        flight reservation system, database design, entity-relationship model, software architecture, data access objects, ontology-based development
+    \end{IEEEkeywords}
+
+    \section{Introduction}
+    Modern air travel management requires sophisticated software systems capable of handling complex operations including flight scheduling, seat management, user authentication, and reservation processing. This paper presents the technical documentation for Airflow, a comprehensive flight reservation management application designed to address these requirements through a well-structured, scalable architecture.
+
+    The system integrates multiple components including user management, aircraft inventory, flight scheduling, and reservation processing. The application serves both end users seeking to book flights and administrators requiring comprehensive system management capabilities.
+
+    \section{Data Persistence - Database Design}
+
+    \subsection{Development Methodology}
+    The development of the entity-relationship model is based on ontologies as a conceptual foundation. This methodology enables the creation of a more coherent and semantically rich database design, ensuring that relationships between entities accurately reflect the business domain logic.
+
+    The development process followed these stages:
+    \begin{enumerate}
+        \item \textbf{Entity Declaration}: Identification and definition of the system's main entities
+        \item \textbf{Attribute Definition}: Specification of each entity's properties with their respective data types
+        \item \textbf{Relationship Establishment}: Development of connections between entities through cardinality analysis
+        \item \textbf{Model Validation}: Verification of design integrity and consistency
+    \end{enumerate}
+
+    \subsection{System Entities}
+    The system comprises the following main entities:
+
+    \subsubsection{Users}
+    Represents both administrators and regular customers of the system. This entity centralizes user management with different privilege levels.
+
+    \textbf{Attributes:}
+    \begin{itemize}
+        \item \texttt{id\_PK}: Unique user identifier (int, primary key)
+        \item \texttt{name}: User's first name (varchar(40), not null)
+        \item \texttt{last\_name}: User's last name (varchar(40), not null)
+        \item \texttt{email}: Email address (varchar(200), not null)
+        \item \texttt{password}: Encrypted password (varchar(20), not null)
+        \item \texttt{isSuperUser}: Administrative privileges indicator (boolean, not null)
+        \item \texttt{created\_at}: Account creation timestamp (datetime, not null)
+    \end{itemize}
+
+    \subsubsection{Airplanes}
+    Manages information about aircraft available in the fleet.
+
+    \textbf{Attributes:}
+    \begin{itemize}
+        \item \texttt{id\_PK}: Unique aircraft identifier (int, primary key)
+        \item \texttt{airline}: Airline owner (varchar(20), not null)
+        \item \texttt{model}: Aircraft model (varchar(50), not null)
+        \item \texttt{code}: Aircraft identification code (varchar(10), not null)
+        \item \texttt{capacity}: Total passenger capacity (int, not null)
+        \item \texttt{year}: Manufacturing year (year)
+    \end{itemize}
+
+    \subsubsection{Cities}
+    Represents cities that are part of the flight network, used to implement route graph logic.
+
+    \textbf{Attributes:}
+    \begin{itemize}
+        \item \texttt{id\_PK}: Unique city identifier (int, primary key)
+        \item \texttt{name}: City name (varchar(100), not null)
+        \item \texttt{country}: Country where the city is located (varchar(100), not null)
+        \item \texttt{code}: Airport code of the city (varchar(10), not null)
+    \end{itemize}
+
+    \subsubsection{Flights}
+    Manages information about scheduled flights in the system.
+
+    \textbf{Attributes:}
+    \begin{itemize}
+        \item \texttt{id\_PK}: Unique flight identifier (int, primary key)
+        \item \texttt{airplane\_FK}: Reference to assigned aircraft (int, foreign key)
+        \item \texttt{status\_FK}: Current flight status (int, foreign key)
+        \item \texttt{origin\_city\_FK}: Origin city (int, foreign key)
+        \item \texttt{destination\_city\_FK}: Destination city (int, foreign key)
+        \item \texttt{code}: Flight identification code (varchar(10), not null)
+        \item \texttt{departure\_time}: Departure date and time (timestamp, not null)
+        \item \texttt{arrival\_time}: Arrival date and time (timestamp, not null)
+        \item \texttt{price\_base}: Base flight price (decimal(10,2), not null)
+    \end{itemize}
+
+    \subsubsection{Reservations}
+    Manages reservations made by users.
+
+    \textbf{Attributes:}
+    \begin{itemize}
+        \item \texttt{id\_PK}: Unique reservation identifier (int, primary key)
+        \item \texttt{user\_FK}: User who made the reservation (int, foreign key)
+        \item \texttt{status\_FK}: Current reservation status (int, foreign key)
+        \item \texttt{flight\_FK}: Reserved flight (int, foreign key)
+        \item \texttt{reserved\_at}: Reservation timestamp (timestamp, not null)
+    \end{itemize}
+
+    \subsubsection{Seats}
+    Manages available seats on aircraft.
+
+    \textbf{Attributes:}
+    \begin{itemize}
+        \item \texttt{id\_PK}: Unique seat identifier (int, primary key)
+        \item \texttt{airplane\_FK}: Aircraft to which it belongs (int, foreign key)
+        \item \texttt{reservation\_FK}: Associated reservation, if exists (int, foreign key, nullable)
+        \item \texttt{seat\_number}: Seat number (varchar(10), not null)
+        \item \texttt{seat\_class}: Seat class (enum: ECONOMY, BUSINESS, FIRST)
+        \item \texttt{is\_window}: Indicates if it's a window seat (boolean)
+    \end{itemize}
+
+    \subsubsection{Flight\_Status}
+    Catalog of possible states for flights.
+
+    \textbf{Attributes:}
+    \begin{itemize}
+        \item \texttt{id\_PK}: Unique status identifier (int, primary key)
+        \item \texttt{name}: Status name (varchar(15), not null)
+        \item \texttt{description}: Detailed status description (varchar(100))
+    \end{itemize}
+
+    \subsubsection{Reservations\_Status}
+    Catalog of possible states for reservations.
+
+    \textbf{Attributes:}
+    \begin{itemize}
+        \item \texttt{id\_PK}: Unique status identifier (int, primary key)
+        \item \texttt{name}: Status name (varchar(15), not null)
+        \item \texttt{description}: Detailed status description (varchar(100))
+    \end{itemize}
+
+    \subsection{Entity Relationships}
+    The system establishes the following relationships between identified entities:
+
+    \subsubsection{User-Reservation Relationships}
+    \textbf{Cardinality}: 1:M (One to Many)
+    \begin{itemize}
+        \item A user can make zero or multiple flight reservations
+        \item Each reservation is assigned to only one user
+        \item This relationship ensures reservation traceability
+    \end{itemize}
+
+    \subsubsection{Aircraft-Reservation Relationships}
+    \textbf{Cardinality}: 1:M (One to Many)
+    \begin{itemize}
+        \item An aircraft can be assigned to multiple reservations
+        \item Each reservation can have only one aircraft assigned
+        \item A reservation may initially have no aircraft assigned
+    \end{itemize}
+
+    \subsubsection{Aircraft-Seat Relationships}
+    \textbf{Cardinality}: 1:M (One to Many)
+    \begin{itemize}
+        \item An aircraft is composed of multiple seats
+        \item A seat belongs exclusively to a specific aircraft
+        \item This relationship defines the physical configuration of each aircraft
+    \end{itemize}
+
+    \subsubsection{Aircraft-Flight Relationships}
+    \textbf{Cardinality}: 1:M (One to Many)
+    \begin{itemize}
+        \item An aircraft may or may not be assigned to an active flight
+        \item A flight must have an aircraft assigned
+        \item This relationship manages flight operations
+    \end{itemize}
+
+    \subsubsection{Reservation-Seat Relationships}
+    \textbf{Cardinality}: 1:M (One to Many)
+    \begin{itemize}
+        \item A reservation can include one or multiple seats
+        \item A seat may or may not be assigned to a reservation
+        \item This relationship enables group reservations
+    \end{itemize}
+
+    \subsubsection{Reservation-Flight Relationships}
+    \textbf{Cardinality}: M:1 (Many to One)
+    \begin{itemize}
+        \item A reservation is assigned to a specific flight
+        \item A flight can have multiple registered reservations
+        \item This relationship links reservations with scheduled flights
+    \end{itemize}
+
+    \subsubsection{Status Relationships}
+    \textbf{Cardinality}: 1:M (One to Many)
+    \begin{itemize}
+        \item A reservation has a unique status at any given time
+        \item A status can be assigned to multiple reservations
+        \item A flight has a specific status
+        \item A flight status can apply to multiple flights
+    \end{itemize}
+
+    \subsubsection{City-Flight Relationships}
+    \textbf{Cardinality}: 1:M (One to Many)
+    \begin{itemize}
+        \item A flight must depart from an origin city
+        \item A flight must land at a destination city
+        \item A city can be the origin of multiple flights
+        \item A city can be the destination of multiple flights
+        \item This structure enables implementation of routing algorithms and graphs
+    \end{itemize}
+
+    \subsection{Design Considerations}
+
+    \subsubsection{Referential Integrity}
+    The design implements referential integrity constraints through foreign keys, ensuring data consistency and preventing references to non-existent entities.
+
+    \subsubsection{Normalization}
+    The model is in third normal form (3NF), eliminating redundancies and transitive dependencies, which optimizes storage and reduces update anomalies.
+
+    \subsubsection{Scalability}
+    The structure allows horizontal growth through implementation of appropriate indexes and partitioning of large tables such as \texttt{reservations} and \texttt{flights}.
+
+    \subsubsection{Flexibility}
+    The use of status tables (\texttt{flight\_status} and \texttt{reservations\_status}) provides flexibility to add new states without modifying the structure of main tables.
+
+    \section{Data Access Object (DAO) Pattern}
+
+    The system implements the DAO design pattern to abstract and encapsulate database access, clearly separating business logic from persistence logic. The implementation follows these principles:
+
+    \subsection{DAOMethods Interface}
+    A generic interface \texttt{DAOMethods<T>} is defined that establishes standard methods for CRUD operations:
+
+    \begin{itemize}
+        \item \texttt{ArrayList<T> getAll()}: Retrieves all objects of type T
+        \item \texttt{T getById(int id)}: Retrieves a specific object by its identifier
+        \item \texttt{void create(T object)}: Creates a new record in the database
+        \item \texttt{void update(int id, T toUpdate)}: Updates an existing record
+        \item \texttt{void delete(int id)}: Deletes a specific record
+    \end{itemize}
+
+    \subsection{Specific Implementations}
+    Each domain entity has its own DAO implementation that extends the generic interface:
+
+    \begin{itemize}
+        \item \texttt{FlightDAO}: Manages CRUD operations for flights
+        \item \texttt{ReservationDAO}: Manages CRUD operations for reservations
+        \item \texttt{UsersDAO}: Manages CRUD operations for users
+        \item \texttt{AirplaneDAO}: Manages CRUD operations for aircraft
+        \item \texttt{CityDAO}: Manages CRUD operations for cities
+        \item \texttt{SeatDAO}: Manages CRUD operations for seats
+    \end{itemize}
+
+    This structure ensures uniformity in data access and facilitates code maintainability by centralizing persistence logic.
+
+    \subsection{SQL Query Methods}
+    DAOs implement various SQL queries to satisfy system requirements. Below are some relevant examples:
+
+    \subsubsection{FlightDAO Queries}
+    The FlightDAO class implements complex queries including flight searches with status information and multi-criteria filtering based on origin, destination, and date parameters.
+
+    \subsubsection{ReservationDAO Queries}
+    The ReservationDAO handles user-specific reservation retrieval and seat availability verification through join operations between multiple tables.
+
+    \subsection{Database Connection Management}
+    Database connection management is centralized in the \texttt{ConnectionDB} class, following the Singleton pattern to optimize resources. The connection configuration includes Unicode support, SSL configuration, and comprehensive exception handling.
+
+    \subsubsection{Transaction Handling}
+    The system implements transaction control for critical operations such as flight reservations, ensuring data integrity even in complex operations affecting multiple tables through commit/rollback mechanisms.
+
+    \section{System Architecture}
+
+    \subsection{General Description}
+    The flight reservation application architecture is based on a layered structure that clearly separates the different system responsibilities. The main architectural layers are:
+
+    \begin{itemize}
+        \item \textbf{Presentation Layer}: User interface and interaction
+        \item \textbf{Model Layer}: Data representation in the application
+        \item \textbf{Persistence Layer}: Data access and management in the database
+        \item \textbf{Service Layer}: Business logic
+        \item \textbf{Utility Layer}: Tools for different layers
+    \end{itemize}
+
+    This layered architecture promotes separation of concerns, maintainability, and scalability while ensuring clear boundaries between different system components.
+
+    \section{User Interface Design}
+
+    \subsection{Design Philosophy}
+    The graphical user interface has been designed following principles of minimalism and simplicity, with the aim of providing an intuitive and modern user experience. The key elements that have guided the design are:
+
+    \begin{itemize}
+        \item \textbf{Simplicity}: Elimination of unnecessary elements to focus on essential functionality
+        \item \textbf{Consistency}: Coherent use of visual elements and interaction patterns throughout the application
+        \item \textbf{Accessibility}: Clear and intuitive interface that facilitates navigation for all users
+        \item \textbf{Modern aesthetics}: Implementation of a contemporary design using the FlatLaf library
+    \end{itemize}
+
+    \subsection{Technologies Used}
+
+    \begin{itemize}
+        \item \textbf{Java Swing}: Base framework for building graphical components
+        \item \textbf{FlatLaf}: External library that provides a modern and flat look to Swing components
+        \item \textbf{Responsive Design}: Implementation of layouts that adapt to different screen sizes
+    \end{itemize}
+
+    \subsection{Interface Structure}
+    The user interface is organized following a hierarchical component architecture:
+
+    \begin{enumerate}
+        \item \textbf{MainFrame}: Main window that contains all other components
+        \item \textbf{Horizontal Menu}: Top bar with logo, title and navigation options
+        \item \textbf{Content Panel}: Central area with card system to display different sections
+        \item \textbf{Specific Panels}: Components dedicated to specific functionalities
+    \end{enumerate}
+
+    \subsection{Main Components}
+
+    \subsubsection{Flight Search Panel}
+    Interface that allows users to search for available flights according to criteria such as origin, destination, and dates. Includes:
+    \begin{itemize}
+        \item Origin and destination city selectors
+        \item Travel date selector
+        \item Additional filters
+        \item Search button
+    \end{itemize}
+
+    \subsubsection{Flight Details Panel}
+    Displays detailed information about a selected flight, including:
+    \begin{itemize}
+        \item Airline information and flight number
+        \item Departure and arrival times
+        \item Airport details
+        \item Seat selection
+    \end{itemize}
+
+    \subsubsection{Confirmation Panel}
+    Allows the user to review and confirm their booking details before finalizing:
+    \begin{itemize}
+        \item Flight information summary
+        \item Passenger details
+        \item Payment information
+        \item Confirmation or cancellation buttons
+    \end{itemize}
+
+    \subsubsection{Dialog Components}
+    The application implements specific dialog components to handle user authentication:
+
+    \begin{itemize}
+        \item \textbf{Login Dialog}: Provides a secure interface for users to authenticate and access their accounts
+        \item \textbf{Register Dialog}: Allows new users to create accounts by entering their personal information
+    \end{itemize}
+
+    These dialog components follow the same minimalist design principles as the main interface, maintaining visual consistency throughout the application while serving their specialized functions.
+
+    \subsection{Visual Design Elements}
+
+    \begin{itemize}
+        \item \textbf{Color Palette}: Predominance of light tones with subtle accents to highlight important elements
+        \item \textbf{Typography}: Use of sans-serif fonts to improve readability
+        \item \textbf{Iconography}: Implementation of minimalist icons to represent common actions
+        \item \textbf{Spacing}: Design with sufficient white space to reduce visual overload
+    \end{itemize}
+
+    \subsection{User Interaction and Flow}
+    The navigation flow in the application follows a linear and predictable pattern:
+
+    \begin{enumerate}
+        \item Search for available flights
+        \item Selection and display of flight details
+        \item Selection of seats and additional options
+        \item Review and confirmation of the booking
+        \item Display of confirmation and booking details
+    \end{enumerate}
+
+    This sequential design guides the user through the booking process intuitively, reducing the learning curve and minimizing possible errors during the process.
+
+    \subsection{Interface Screenshots}
+    Below are screenshots of the application's main interfaces, demonstrating the implemented design principles and user flows:
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{docs/images/main_interface.png}
+        \caption{Main application interface showing the flight search panel}
+        \label{fig:main_interface}
+    \end{figure}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{docs/images/flight_details.png}
+        \caption{Flight details panel showing selected flight information}
+        \label{fig:flight_details}
+    \end{figure}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{docs/images/confirmation_panel.png}
+        \caption{Booking confirmation panel with reservation summary}
+        \label{fig:confirmation_panel}
+    \end{figure}
+
+    These screenshots demonstrate how the design principles of simplicity, consistency, and modern aesthetics have been applied throughout the application, resulting in a clean and intuitive user interface.
+
+
+
+    \begin{thebibliography}{00}
+        \bibitem{b1} Date, C.J., ``An Introduction to Database Systems,'' 8th ed. Boston: Addison-Wesley, 2004.
+        \bibitem{b2} Fowler, M., ``Patterns of Enterprise Application Architecture,'' Boston: Addison-Wesley, 2002.
+        \bibitem{b3} Silberschatz, A., Galvin, P.B., and Gagne, G., ``Database System Concepts,'' 7th ed. New York: McGraw-Hill, 2019.
+    \end{thebibliography}
 
 \end{document}
-

@@ -29,7 +29,6 @@ public class SearchFlightPanel extends JPanel {
 
     private JButton searchButton;
 
-
     /**
      * Constructor for the SearchFlightPanel class.
      * Initializes the panel with components for searching flights.
@@ -52,13 +51,12 @@ public class SearchFlightPanel extends JPanel {
         add(searchFlightPanel);
     }
 
-
     /**
      * Initializes the form panel with input fields and a search button.
      * The form includes fields for origin, destination, departure date,
      * return date, and a search button.
      */
-    public void startFormPanel() {
+    public void startFormPanel(){
         formPanel = new JPanel();
         formPanel.setLayout(new GridBagLayout());
         formPanel.setBackground(Color.WHITE);

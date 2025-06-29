@@ -4,6 +4,7 @@ import org.airflow.reservations.model.*;
 import org.airflow.reservations.utils.ConnectionDB;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 /**
@@ -259,6 +260,49 @@ public class FlightDAO implements DAOMethods<Flight> {
         return flights;
     }
 
+    /**
+     * Returns flights whose origin and destination cities are the same.
+     * @param originId the ID of the origin city
+     * @param destinyId the ID of the destination city
+     * @return an ArrayList of Flight objects with the specified origin and destination cities.
+     * @throws SQLException if a database access error occurs.
+     */
+
+    public ArrayList<Flight> getByDestinationAndOriginCity(int originId, int destinyId) throws SQLException {
+        String query = "SELECT f.*, fs.name as status_name, fs.description as status_description " +
+                "FROM flights f " +
+                "JOIN flight_status fs ON f.status_FK = fs.id_PK " +
+                "WHERE f.destination_city_FK = ? AND f.origin_city_FK = ?";
+
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setInt(1, destinyId);
+        statement.setInt(2, originId);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        ArrayList<Flight> flights = transformResultsToClassArray(resultSet);
+        statement.close();
+        return flights;
+    }
+
+    /**
+     * Returns flights whose departure time is equal or less than or equal to the specified date.
+     * @param Date LocalDateTime object with the date to be compared with the flight departure time.
+     * @return an ArrayList of Flight object with departure times less than or equal to the specified date.
+     * @throws SQLException if a database access error occurs.
+     */
+    public ArrayList<Flight> getByDepartureTime(LocalDateTime Date)throws SQLException{
+        String query = "SELECT f.*, fs.name as status_name, fs.description as status_description " +
+                "FROM flights f " +
+                "JOIN flight_status fs ON f.status_FK = fs.id_PK " +
+                "WHERE f.departure_time <= ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setTimestamp(1, Timestamp.valueOf(Date));
+        ResultSet resultSet = statement.executeQuery();
+        ArrayList<Flight> flights = transformResultsToClassArray(resultSet);
+        statement.close();
+        return flights;
+    }
     // Getters and Setters
     public Connection getConnection() {
         return connection;

@@ -273,6 +273,27 @@ public class SeatDAO implements DAOMethods<Seat> {
         return seats;
     }
 
+    /**
+     * Returns available seats (not reserved) for a specific airplane and class and if needed window seat.
+     * @param airplaneId the ID of the airplane
+     * @param Class the class of the seat to be returned.
+     * @param Window boolean that indicates if the seat is a window seat or not.
+     * @return an ArrayList of available Seat objects for the specified airplane and class and if needed window seat.
+     * @throws SQLException if a database access error occurs
+     */
+    public ArrayList<Seat> getByavailableSeatsByAirplaneIdClassAndWindow(int airplaneId, String Class ,
+                                                                         boolean Window) throws SQLException {
+        String query = "SELECT * FROM seats WHERE airplane_FK = ? AND reservation_FK IS NULL AND seat_class = ? AND is_window = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setInt(1, airplaneId);
+        statement.setString(2, Class);
+        statement.setBoolean(3, Window);
+        ResultSet resultSet = statement.executeQuery();
+        ArrayList<Seat> seats = transformResultsToClassArray(resultSet);
+        statement.close();
+        return seats;
+    }
+
     // Getters and Setters
     public Connection getConnection() {
         return connection;

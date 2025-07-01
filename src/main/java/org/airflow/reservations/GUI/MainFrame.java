@@ -135,6 +135,14 @@ public class MainFrame extends JFrame {
         add(scrollPane, BorderLayout.CENTER);
     }
 
+    /**
+     * Main method to run the application.
+     * Initializes the FlatLaf look and feel, creates the main frame,
+     * and sets it visible.
+     * Just for testing purposes, it shows the SearchFlightPanel by default.
+     *
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(new FlatLightLaf());

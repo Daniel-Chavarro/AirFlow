@@ -40,7 +40,7 @@ public class DetailsFlightPanel extends JPanel {
     private Airplane airplane;
 
     /**
-     * Constructor for the DetailsFlightPanel class.
+     * Constructor for DetailsFlightPanel.
      * Initializes the panel with a layout and sets up the main components.
      */
     public DetailsFlightPanel() {
@@ -52,14 +52,12 @@ public class DetailsFlightPanel extends JPanel {
     }
 
     /**
-     * Sets the data for the flight details panel.
-     * This method initializes the flight, origin city, destination city, and airplane,
-     * and then creates the necessary sub-panels to display the information.
+     * Sets the flight data and initializes the details panel with flight information.
      *
      * @param flight            The flight object containing flight details.
-     * @param originCity        The city of origin for the flight.
-     * @param destinationCity   The destination city for the flight.
-     * @param airplane          The airplane object associated with the flight.
+     * @param originCity        The city object representing the origin city.
+     * @param destinationCity   The city object representing the destination city.
+     * @param airplane          The airplane object containing airplane details.
      */
     public void setData(Flight flight, City originCity, City destinationCity, Airplane airplane) {
         this.flight = flight;
@@ -84,7 +82,6 @@ public class DetailsFlightPanel extends JPanel {
 
     /**
      * Initializes the details panel with a title and sets its layout.
-     * This panel will contain the flight details and other related information.
      */
     public void startDetailsPanel() {
         detailsPanel = new JPanel();
@@ -102,8 +99,6 @@ public class DetailsFlightPanel extends JPanel {
     }
 
     /**
-     * Creates the flight information panel with detailed flight data.
-     * This includes flight code, route, nonstop status, duration, times, date, airplane details, and status.
      * Creates the flight information panel that displays detailed flight information.
      * This includes flight code, route, nonstop status, duration, times, date, airplane details, and price.
      */
@@ -183,7 +178,7 @@ public class DetailsFlightPanel extends JPanel {
     }
 
     /**
-     * Creates the baggage allowance panel that displays information about baggage policies.
+     * Creates the baggage allowance panel with information about baggage policies.
      * This includes personal item, carry-on bag, and checked baggage details.
      */
     private void createBaggageAllowancePanel() {
@@ -223,7 +218,7 @@ public class DetailsFlightPanel extends JPanel {
     }
 
     /**
-     * Creates the buttons panel that contains navigation buttons.
+     * Creates the buttons panel with navigation buttons.
      * This includes a "Back" button and a "Continue to Book" button.
      */
     private void createButtonsPanel() {

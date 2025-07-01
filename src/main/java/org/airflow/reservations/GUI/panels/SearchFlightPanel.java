@@ -122,7 +122,6 @@ public class SearchFlightPanel extends JPanel {
         searchButton.setPreferredSize(inputSize);
         searchButton.setMaximumSize(inputSize);
         searchButton.setActionCommand("SEARCH_FLIGHTS");
-        searchButton.setActionCommand("SEARCH_FLIGHTS   ");
         gbc.gridy++;
         formPanel.add(searchButton, gbc);
 

@@ -17,6 +17,8 @@
         <jbcrypt>0.4</jbcrypt>
         <junit.version>5.9.2</junit.version>
         <mockito.version>5.3.1</mockito.version>
+        <flatlaf.version>3.2</flatlaf.version>
+        <datepicker.version>11.2.1</datepicker.version>
     </properties>
 
     <dependencies>
@@ -27,11 +29,20 @@
             <version>${sql-connector.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf</artifactId>
+            <version>${flatlaf.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
             <version>${jbcrypt}</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.github.lgooddatepicker</groupId>
+            <artifactId>LGoodDatePicker</artifactId>
+            <version>${datepicker.version}</version>
+        </dependency>
         <!-- JUnit 5 -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

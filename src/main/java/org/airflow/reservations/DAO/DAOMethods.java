@@ -27,7 +27,7 @@ public interface DAOMethods<T> {
      * @return the object of type T with the specified ID.
      * @throws SQLException if a database access error occurs.
      */
-    T getById(int id) throws SQLException;
+        T getById(int id) throws SQLException;
 
 
     /**

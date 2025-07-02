@@ -34,22 +34,77 @@ public class ReservationService {
     }
 
     /**
-     * Function to create a reservation.
+     * Function to check if the seat and flight given are able for reservation.
      * @param selectedFlight : the flight to be reserved.
      * @param selectedSeat : the seat to be reserved.
+     * @return : true if the reservation is able for be created
      * @throws SQLException : if a database access error occurs.
      */
 
-    public void createReservation(int selectedFlight, int selectedSeat) throws SQLException{
+    private boolean ableForReservation(int selectedFlight, int selectedSeat) throws SQLException{
+        try{
+            Flight flight= flightDAO.getById(selectedFlight);
+            Seat seat = SeatDAO.getById(selectedSeat);
+            long differenceHours = ChronoUnit.HOURS.between(LocalDateTime.now(),flight.getDeparture_time());
+            if (differenceHours > 3) return false;
+            if (flight.getStatus_FK() == 7 || flight.getStatus_FK() == 3) return false;
+            if ( seat.getAirplane_FK() != selectedFlight) return false;
+            if (seat.getReservation_FK() != null) return false;
+            return true;
+        }
+        catch(Exception e){
+            throw new IllegalArgumentException("Eror en la reserva");
+        }
+    }
+
+    /**
+     * Function to create a reservation.
+     * @param selectedFlightID : the flight Id to be reserved.
+     * @param selectedSeatIDs : the seats Ids to be reserved.
+     * @throws SQLException : if a database access error occurs.
+     * @throws IllegalArgumentException if no seats selected or any seat are not able for reserve.
+     */
+
+    public void createReservation(int selectedFlightID, int[] selectedSeatIDs) throws SQLException{
+        if (selectedSeatIDs.length == 0) throw new IllegalArgumentException("No hay asientos seleccionados");
+        for (int seatId : selectedSeatIDs) {
+            if (!ableForReservation(seatId,selectedFlightID)) {
+                throw new IllegalArgumentException("No se puede reservar este asiento" + seatId);
+            }
+        }
         Reservation reservation = new Reservation();
-        reservation.setFlight_FK(selectedFlight);
+        reservation.setFlight_FK(selectedFlightID);
         reservation.setUser_FK(User.getId());
         reservation.setStatus_FK(3);
         reservationDAO.create(reservation);
         reservation = reservationDAO.getById(reservation.getId());
-        seatService.updateSeatStatus(selectedSeat,reservation.getId());
+        int reservationID = reservation.getId();
+        for (int seatId : selectedSeatIDs) {
+            seatService.updateSeatStatus(seatId,reservationID);
+        }
     }
 
+    /**
+     * Function to find reservations by flight id
+     * @param flightId : Id of the reservation flight
+     * @return ArrayList of Ids of reservations found
+     * @throws SQLException If database access error occurs
+     * @throws IllegalArgumentException : if the reservation do not exist
+     */
+
+    public ArrayList<Integer> FindReservation(int flightId) throws SQLException{
+        ArrayList<Reservation> Reservations = reservationDAO.getByFlightIdAndUserId(User.getId(),flightId);
+        try{
+            ArrayList<Integer> reservations = new ArrayList<>();
+            for (Reservation reservation : Reservations){
+                reservations.add(reservation.getId());
+            }
+            return reservations;
+        }
+        catch(Exception e){
+            throw new IllegalArgumentException("No hay reservas para el vuelo seleccionado");
+        }
+    }
     /**
      * Function to check if a reservation can be canceled.
      * @param selectedReservation : the reservation to be canceled.
@@ -110,16 +165,18 @@ public class ReservationService {
 
     public void deleteSeatsfromReservation (int selectedReservation, ArrayList<Integer> seatsIdtoCancel) throws SQLException{
         try{
-            Reservation reservation = reservationDAO.getById(selectedReservation);
-            ArrayList<Seat> seat = SeatDAO.getByReservationId(selectedReservation);
-            for (Seat s : seat) {
-                if (seatsIdtoCancel.contains(s.getId())){
-                    seatService.updateSeatStatus(s.getId(),0);
-                    seat.remove(s);
+            if (ableForCancelation(selectedReservation)) {
+                Reservation reservation = reservationDAO.getById(selectedReservation);
+                ArrayList<Seat> seat = SeatDAO.getByReservationId(selectedReservation);
+                for (Seat s : seat) {
+                    if (seatsIdtoCancel.contains(s.getId())) {
+                        seatService.updateSeatStatus(s.getId(), 0);
+                        seat.remove(s);
+                    }
                 }
-            }
-            if (seat.isEmpty()){
-                reservationDAO.delete(selectedReservation);
+                if (seat.isEmpty()) {
+                    reservationDAO.delete(selectedReservation);
+                }
             }
         }
         catch(Exception e){

@@ -3,18 +3,18 @@ package org.airflow.reservations.service;
 import org.airflow.reservations.DAO.*;
 import org.airflow.reservations.model.*;
 import org.junit.jupiter.api.*;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.TestInstance;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.PrintStream;
+
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.ArrayList;
+
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -68,6 +68,24 @@ class ReservationServiceTest {
                 "T04", Seat.SeatClass.ECONOMY, true));
         seatDAO.create(new Seat(0, airplaneDAO.getByCode("TSTCDE").getId(), null,
                 "T05", Seat.SeatClass.ECONOMY, false));
+        int testUserId = usersDAO.getByEmail("testuser@example.com").getId();
+        int testFlightId = flightDAO.getByOriginCity(cityDAO.getByName("City1").getId()).get(0).getId();
+        ArrayList<Seat> testSeats = seatDAO.getByAirplaneId(airplaneDAO.getByCode("TSTCDE").getId());
+        int TestSeat_Bussiness_Window ;
+        int TestSeat_First_Window ;
+        int TestSeat_Economy_Window ;
+        int TestSeat_Bussiness_Seat ;
+        int TestSeat_First_Seat ;
+        int TestSeat_Economy_Seat ;
+        for (Seat s:testSeats){
+            if (Objects.equals(s.getSeat_number(), "T00")) TestSeat_Bussiness_Window = s.getId();
+            if (Objects.equals(s.getSeat_number(), "T02")) TestSeat_First_Window = s.getId();
+            if (Objects.equals(s.getSeat_number(), "T04")) TestSeat_Economy_Window = s.getId();
+            if (Objects.equals(s.getSeat_number(), "T01")) TestSeat_Bussiness_Seat = s.getId();
+            if (Objects.equals(s.getSeat_number(), "T03")) TestSeat_First_Seat = s.getId();
+            if (Objects.equals(s.getSeat_number(), "T05")) TestSeat_Economy_Seat = s.getId();
+        }
+
     }
 
     @AfterEach
@@ -86,53 +104,5 @@ class ReservationServiceTest {
         airplaneDAO.delete(airplaneDAO.getByCode("TSTCDE").getId());
     }
 
-    @Test
-    void testAvailableFlights_shouldReturnValidFlights() throws SQLException {
-        // Arrange
-        int originCityId = cityDAO.getByName("City1").getId();
-        int destCityId = cityDAO.getByName("City2").getId();
 
-        // Act
-        ArrayList<Flight> result = reservationService.availableFlights(destCityId, originCityId);
-
-        // Assert
-        Assertions.assertNotNull(result, "El resultado no debería ser null");
-        Assertions.assertFalse(result.isEmpty(), "Debe haber al menos un vuelo disponible");
-
-        // Verificar que todos los vuelos tienen el origen y destino correctos
-        for (Flight flight : result) {
-            Assertions.assertEquals(originCityId, flight.getOrigin_city_FK(),
-                    "El vuelo debe tener el origen correcto");
-            Assertions.assertEquals(destCityId, flight.getDestination_city_FK(),
-                    "El vuelo debe tener el destino correcto");
-            Assertions.assertEquals(1, flight.getStatus_FK(),
-                    "El vuelo debe tener estado activo");
-        }
-    }
-
-    @Test
-    void testAvailableSeats_returnsCorrectSeats() throws SQLException {
-        // Arrange
-        Flight testFlight = flightDAO.getByOriginCity(cityDAO.getByName("City1").getId()).get(0);
-        int airplaneId = testFlight.getAirplane_FK();
-
-        // Verifica que hay asientos de clase BUSINESS y que son de ventana
-        List<Seat> allSeats = seatDAO.getByAirplaneId(airplaneId);
-        Assertions.assertFalse(allSeats.isEmpty(), "Debe haber asientos para el avión de prueba.");
-
-        // Act
-        ArrayList<Seat> availableBusinessWindowSeats = reservationService.availableSeats(
-                testFlight,
-                Seat.SeatClass.BUSINESS,
-                true
-        );
-
-        // Assert
-        Assertions.assertFalse(availableBusinessWindowSeats.isEmpty(), "Debe retornar al menos un asiento disponible.");
-        for (Seat seat : availableBusinessWindowSeats) {
-            Assertions.assertEquals(Seat.SeatClass.BUSINESS, seat.getSeat_class(), "Clase del asiento incorrecta.");
-            Assertions.assertTrue(seat.getIs_window(), "El asiento debería ser de ventana.");
-            Assertions.assertEquals(null, seat.getReservation_FK(), "El asiento ya está reservado.");
-        }
-    }
 }

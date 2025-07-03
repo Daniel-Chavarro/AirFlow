@@ -120,6 +120,7 @@ public class FlightService {
      */
     public void deleteFlight(int id) throws SQLException {
         flightDAO.delete(id);
+    }
         
     /**
      * Function to get all the available flights between two cities.
@@ -141,6 +142,7 @@ public class FlightService {
      * @throws SQLException : if a database access error occurs.
      * @throws IllegalArgumentException : if there are no flights to be checked.
      */
+
     private ArrayList<String> avilableFlightsToString(ArrayList<Flight> flights) throws SQLException{
         try {
             ArrayList<String> availableFlights = new ArrayList<>();

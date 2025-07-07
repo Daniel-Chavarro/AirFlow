@@ -5,6 +5,7 @@ import org.airflow.reservations.DAO.FlightDAO;
 import org.airflow.reservations.model.Flight;
 
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 /**
@@ -154,5 +155,9 @@ public class FlightService {
         catch(Exception e){
             throw new IllegalArgumentException("No hay vuelos disponibles");
         }
+    }
+
+    public ArrayList<Flight> getBydepartureTimeRange(LocalDateTime bottomRange , LocalDateTime TopRange) throws SQLException{
+        return flightDAO.getByDepartureTimeRange(bottomRange,TopRange);
     }
 }

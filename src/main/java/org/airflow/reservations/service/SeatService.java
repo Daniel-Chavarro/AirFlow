@@ -75,13 +75,25 @@ public class SeatService {
         try{
             if(Status == 0){
                 seat.setReservation_FK(null);
-                return;
             }
-            seat.setReservation_FK(Status);
+            else seat.setReservation_FK(Status);
+            SeatDAO.update(seatId,seat);
         }
-        catch(Exception e){
+        catch(Exception e) {
             throw new IllegalArgumentException("El asiento no existe");
         }
-        SeatDAO.update(seatId,seat);
+    }
+
+    /**
+     * Function to find seats with a reservation Id.
+     * @param reservationId: Id of the reservation.
+     * @return ArrayList of the seats related to the reservation.
+     * @throws SQLException : if a database access error occurs.
+     */
+    public ArrayList<Seat> getSeatsByReservationId(int reservationId) throws SQLException{
+        return SeatDAO.getByReservationId(reservationId);
+    }
+    public Seat getSeatById(int seatId) throws SQLException{
+        return SeatDAO.getById(seatId);
     }
 }

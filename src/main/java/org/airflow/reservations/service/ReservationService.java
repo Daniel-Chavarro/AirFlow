@@ -42,19 +42,16 @@ public class ReservationService {
      */
 
     private boolean ableForReservation(int selectedFlight, int selectedSeat) throws SQLException{
-        try{
-            Flight flight= flightDAO.getById(selectedFlight);
-            Seat seat = SeatDAO.getById(selectedSeat);
-            long differenceHours = ChronoUnit.HOURS.between(LocalDateTime.now(),flight.getDeparture_time());
-            if (differenceHours < 3) return false;
-            if (flight.getStatus_FK() == 7 || flight.getStatus_FK() == 3) return false;
-            if ( seat.getAirplane_FK() != flight.getAirplane_FK()) return false;
-            if (seat.getReservation_FK() != null) return false;
-            return true;
-        }
-        catch(Exception e){
-            throw new IllegalArgumentException("Eror en la reserva");
-        }
+        Flight flight= flightDAO.getById(selectedFlight);
+        if (flight.getId() == 0) throw new IllegalArgumentException("El vuelo no existe");
+        Seat seat = SeatDAO.getById(selectedSeat);
+        if (seat.getId() == 0) throw new IllegalArgumentException("El asiento no existe");
+        long differenceHours = ChronoUnit.HOURS.between(LocalDateTime.now(),flight.getDeparture_time());
+        if (differenceHours < 3) return false;
+        if (flight.getStatus_FK() == 7 || flight.getStatus_FK() == 3) return false;
+        if ( seat.getAirplane_FK() != flight.getAirplane_FK()) return false;
+        if (seat.getReservation_FK() != null) return false;
+        return true;
     }
 
     /**
@@ -68,23 +65,31 @@ public class ReservationService {
      */
 
     public Reservation createReservation(int selectedFlightID, int[] selectedSeatIDs) throws SQLException{
-        if (selectedSeatIDs.length == 0) throw new IllegalArgumentException("No hay asientos seleccionados");
-        for (int seatId : selectedSeatIDs) {
-            if (!ableForReservation(seatId,selectedFlightID)) {
-                throw new IllegalArgumentException("No se puede reservar este asiento" + seatId);
+        //try {
+            if (selectedFlightID == 0) throw new IllegalArgumentException("No hay vuelo seleccionado");
+            if (selectedSeatIDs.length == 0) throw new IllegalArgumentException("No hay asientos seleccionados");
+            for (int seatId : selectedSeatIDs) {
+                if (!ableForReservation(selectedFlightID,seatId)) {
+                    throw new IllegalArgumentException("No se puede reservar este asiento  " + seatId);
+                }
             }
-        }
-        Reservation reservation = new Reservation();
-        reservation.setFlight_FK(selectedFlightID);
-        reservation.setUser_FK(User.getId());
-        reservation.setStatus_FK(3);
-        reservationDAO.create(reservation);
-        reservation = reservationDAO.getById(reservation.getId());
-        int reservationID = reservation.getId();
-        for (int seatId : selectedSeatIDs) {
-            seatService.updateSeatStatus(seatId,reservationID);
-        }
-        return reservation;
+            Reservation reservation = new Reservation();
+            reservation.setFlight_FK(selectedFlightID);
+            reservation.setUser_FK(User.getId());
+            reservation.setStatus_FK(3);
+            reservationDAO.create(reservation);
+            ArrayList<Reservation> reservations = reservationDAO.getByFlightIdAndUserId(selectedFlightID,User.getId());
+            reservation = reservations.get(reservations.size()-1);
+            int reservationID = reservation.getId();
+            for (int seatId : selectedSeatIDs) {
+                seatService.updateSeatStatus(seatId,reservationID);
+            }
+            return reservation;
+        //}
+        //catch (Exception e){
+            //if (e instanceof IllegalArgumentException){throw e;}
+          //  else{throw new IllegalArgumentException("Datos no válidos");}
+        //}
     }
 
     /**
@@ -121,20 +126,14 @@ public class ReservationService {
      * @throws IllegalArgumentException : if the reservation do not exist
      */
     private boolean ableForCancelation(int selectedReservation) throws SQLException{
-        try{
-            Reservation reservation = reservationDAO.getById(selectedReservation);
-            Flight flight= flightDAO.getById(reservation.getFlight_FK());
-            long differenceHours = ChronoUnit.HOURS.between(LocalDateTime.now(),flight.getDeparture_time());
-            if (differenceHours < 12){
-                return true;
-            }
-            else{
-                return false;
-            }
-        }
-        catch(Exception e){
-            throw new IllegalArgumentException("La reserva no existe");
-        }
+
+        Reservation reservation = reservationDAO.getById(selectedReservation);
+        if (reservation.getId() == 0) throw new IllegalArgumentException("La reserva no existe");
+        Flight flight= flightDAO.getById(reservation.getFlight_FK());
+        if(flight.getId() == 0) throw new IllegalArgumentException("El vuelo no existe");
+        long differenceHours = ChronoUnit.HOURS.between(LocalDateTime.now(),flight.getDeparture_time());
+        return differenceHours > 12;
+
     }
 
     /**
@@ -145,21 +144,21 @@ public class ReservationService {
      */
 
     public void cancelReservation(int selectedReservation) throws SQLException{
-        try{
-            if (ableForCancelation(selectedReservation)){
+        try {
+            if (ableForCancelation(selectedReservation)) {
                 Reservation reservation = reservationDAO.getById(selectedReservation);
                 ArrayList<Seat> seat = SeatDAO.getByReservationId(selectedReservation);
                 for (Seat s : seat) {
-                    seatService.updateSeatStatus(s.getId(),0);
+                    seatService.updateSeatStatus(s.getId(), 0);
                 }
                 reservationDAO.delete(selectedReservation);
-            }
-            else{
+            } else {
                 throw new IllegalArgumentException("No se puede cancelar la reserva porque la hora de salida es menor a 12 horas");
             }
         }
-        catch(Exception e){
-            throw new IllegalArgumentException("La reserva no existe");
+        catch (Exception e){
+            if (e instanceof IllegalArgumentException){throw e;}
+            else{throw new IllegalArgumentException("Datos no válidos");}
         }
     }
 
@@ -168,27 +167,38 @@ public class ReservationService {
      * @param selectedReservation : the reservation to be canceled.
      * @param seatsIdtoCancel : the seats to be deleted.
      * @throws SQLException : if a database access error occurs.
-     * @throws IllegalArgumentException : if the reservation do not exist
+     * @throws IllegalArgumentException : if the reservation does not exist
      */
 
     public void deleteSeatsfromReservation (int selectedReservation, ArrayList<Integer> seatsIdtoCancel) throws SQLException{
         try{
+            if (reservationDAO.getById(selectedReservation) == null) throw new IllegalArgumentException("La reserva no existe");
             if (ableForCancelation(selectedReservation)) {
-                Reservation reservation = reservationDAO.getById(selectedReservation);
-                ArrayList<Seat> seat = SeatDAO.getByReservationId(selectedReservation);
-                for (Seat s : seat) {
+                ArrayList<Seat> seats = SeatDAO.getByReservationId(selectedReservation);
+                if (seatsIdtoCancel.isEmpty()) {
+                    throw new IllegalArgumentException("No hay asientos seleccionados");
+                }
+
+                for (Seat s : seats) {
                     if (seatsIdtoCancel.contains(s.getId())) {
                         seatService.updateSeatStatus(s.getId(), 0);
-                        seat.remove(s);
+                        seatsIdtoCancel.remove(Integer.valueOf(s.getId()));
                     }
                 }
-                if (seat.isEmpty()) {
-                    reservationDAO.delete(selectedReservation);
+                if (!seatsIdtoCancel.isEmpty()) {
+                    throw new IllegalArgumentException("Hay asientos que no pertenecen a la reserva");
                 }
+                if (SeatDAO.getByReservationId(selectedReservation).isEmpty()) {
+                    cancelReservation(selectedReservation);
+                }
+            }
+            else{
+                throw new IllegalArgumentException("Error al cancelar asientos");
             }
         }
         catch(Exception e){
-            throw new IllegalArgumentException("La reserva no existe");
+            if (e instanceof IllegalArgumentException){throw e;}
+            else{throw new IllegalArgumentException("Datos no válidos");}
         }
 
     }
@@ -202,6 +212,8 @@ public class ReservationService {
 
     public void confirmReservation(int reservationId)throws SQLException{
         try{
+            if (reservationDAO.getById(reservationId) == null) throw new IllegalArgumentException("La reserva no existe");
+
             if (reservationDAO.getById(reservationId).getStatus_FK() == 3) {
                 Reservation reservation = reservationDAO.getById(reservationId);
                 reservation.setStatus_FK(1);
@@ -212,7 +224,8 @@ public class ReservationService {
             }
         }
         catch(Exception e){
-            throw new IllegalArgumentException("La reserva no existe");
+            if (e instanceof IllegalArgumentException){throw e;}
+            else{throw new IllegalArgumentException("Datos no válidos");}
         }
     }
 
@@ -225,19 +238,16 @@ public class ReservationService {
      */
 
     private boolean ableForCheckIn(int selectedReservation) throws SQLException{
-        try{
-            Reservation reservation = reservationDAO.getById(selectedReservation);
-            Flight flight= flightDAO.getById(reservation.getFlight_FK());
-            long differenceHours = ChronoUnit.HOURS.between(LocalDateTime.now(),flight.getDeparture_time());
-            if (differenceHours < 2 && reservation.getStatus_FK()==1){
-                return true;
-            }
-            else{
-                return false;
-            }
+        Reservation reservation = reservationDAO.getById(selectedReservation);
+        if (reservation.getId() == 0) throw new IllegalArgumentException("La reserva no existe");
+        Flight flight= flightDAO.getById(reservation.getFlight_FK());
+        if(flight.getId() == 0) throw new IllegalArgumentException("El vuelo no existe");
+        long differenceHours = ChronoUnit.HOURS.between(LocalDateTime.now(),flight.getDeparture_time());
+        if (differenceHours > 2 && reservation.getStatus_FK()==1){
+            return true;
         }
-        catch(Exception e){
-            throw new IllegalArgumentException("La reserva no existe");
+        else{
+            return false;
         }
     }
 
@@ -265,7 +275,8 @@ public class ReservationService {
             }
         }
         catch(Exception e){
-            throw new IllegalArgumentException("La reserva no existe");
+            if (e instanceof IllegalArgumentException){throw e;}
+            else{throw new IllegalArgumentException("Datos no válidos");}
         }
     }
 
@@ -277,8 +288,10 @@ public class ReservationService {
      */
     public void completed_reservations(int FlightId)throws SQLException{
         try{
+            if (flightDAO.getById(FlightId) == null) throw new IllegalArgumentException("El vuelo no existe");
             if (flightDAO.getById(FlightId).getStatus_FK() == 7) {
                 ArrayList<Reservation> reservations = reservationDAO.getByFlightId(FlightId);
+
                 for (Reservation reservation : reservations) {
                     if (reservation.getStatus_FK() == 4) {
                         reservation.setStatus_FK(5);
@@ -288,7 +301,8 @@ public class ReservationService {
             }
         }
         catch(Exception e){
-            throw new IllegalArgumentException("El vuelo no existe");
+            if (e instanceof IllegalArgumentException){throw e;}
+            else{throw new IllegalArgumentException("Datos no válidos");}
         }
 
 
@@ -301,18 +315,14 @@ public class ReservationService {
      * @throws SQLException : if a database access error occurs.
      * @throws IllegalArgumentException : if the reservation do not exist.
      */
-    private boolean ableToCanel(int reservationId)throws SQLException{
-        try{
-            Reservation reservation = reservationDAO.getById(reservationId);
-            if (reservation.getStatus_FK() == 4 || reservation.getStatus_FK() == 5){
-               return false;
-            }
-            else{
-                return true;
-            }
+    private boolean ableToCanelAutomatically(int reservationId)throws SQLException{
+        Reservation reservation = reservationDAO.getById(reservationId);
+        if (reservation.getId() == 0) throw new IllegalArgumentException("La reserva no existe");
+        if (reservation.getStatus_FK() == 4 || reservation.getStatus_FK() == 5){
+           return false;
         }
-        catch(Exception e){
-            throw new IllegalArgumentException("La reserva no existe");
+        else{
+            return true;
         }
     }
 
@@ -324,16 +334,13 @@ public class ReservationService {
      * @throws IllegalArgumentException : if the reservation do not exist.
      */
     private void cancel_reservation(int ReservationId)throws SQLException{
-    try{
-        if (ableToCanel(ReservationId)){
+
+        if (ableToCanelAutomatically(ReservationId)){
             Reservation reservation = reservationDAO.getById(ReservationId);
             reservation.setStatus_FK(2);
             reservationDAO.update(ReservationId,reservation);
         }
-    }
-    catch(Exception e){
-        throw new IllegalArgumentException("La reserva no existe");
-    }
+
 }
 
     /**
@@ -345,8 +352,9 @@ public class ReservationService {
 
 public void reservations_control()throws SQLException{
     try {
-        LocalDateTime now = LocalDateTime.now().plusHours(2);
-        ArrayList<Flight> flights_near_departure = flightDAO.getByDepartureTime(now);
+        LocalDateTime topRange = LocalDateTime.now().plusHours(2);
+        LocalDateTime bottomRange = LocalDateTime.now().minusMinutes(15);
+        ArrayList<Flight> flights_near_departure = flightDAO.getByDepartureTimeRange(bottomRange,topRange);
         for (Flight flight : flights_near_departure) {
             ArrayList<Reservation> reservations = reservationDAO.getByFlightId(flight.getId());
             for (Reservation reservation : reservations) {
@@ -355,7 +363,8 @@ public void reservations_control()throws SQLException{
         }
     }
     catch (Exception e){
-        throw new IllegalArgumentException("No hay vuelos para verificar por ahora");
+        if (e instanceof IllegalArgumentException){throw e;}
+        else{throw new IllegalArgumentException("Datos no válidos");}
     }
 
 }

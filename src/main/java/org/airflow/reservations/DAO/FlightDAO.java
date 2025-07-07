@@ -314,17 +314,19 @@ public class FlightDAO implements DAOMethods<Flight> {
 
     /**
      * Returns flights whose departure time is equal or less than or equal to the specified date.
-     * @param Date LocalDateTime object with the date to be compared with the flight departure time.
+     * @param bottomRange LocalDateTime object with the date to be compared with the flight departure time.
+     * @param topRange LocalDateTime object with the date to be compared with the flight departure time.
      * @return an ArrayList of Flight object with departure times less than or equal to the specified date.
      * @throws SQLException if a database access error occurs.
      */
-    public ArrayList<Flight> getByDepartureTime(LocalDateTime Date)throws SQLException{
+    public ArrayList<Flight> getByDepartureTimeRange(LocalDateTime bottomRange , LocalDateTime topRange)throws SQLException{
         String query = "SELECT f.*, fs.name as status_name, fs.description as status_description " +
                 "FROM flights f " +
                 "JOIN flight_status fs ON f.status_FK = fs.id_PK " +
-                "WHERE f.departure_time <= ?";
+                "WHERE f.departure_time <= ? AND f.departure_time >= ?";
         PreparedStatement statement = connection.prepareStatement(query);
-        statement.setTimestamp(1, Timestamp.valueOf(Date));
+        statement.setTimestamp(1, Timestamp.valueOf(topRange));
+        statement.setTimestamp(2,Timestamp.valueOf(bottomRange));
         ResultSet resultSet = statement.executeQuery();
         ArrayList<Flight> flights = transformResultsToClassArray(resultSet);
         statement.close();

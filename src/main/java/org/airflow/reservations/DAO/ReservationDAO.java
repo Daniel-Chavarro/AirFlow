@@ -97,7 +97,6 @@ public class ReservationDAO implements DAOMethods<Reservation> {
         statement.setInt(2, object.getStatus_FK());
         statement.setInt(3, object.getFlight_FK());
         statement.setTimestamp(4, Timestamp.valueOf(object.getReserved_at()));
-
         statement.executeUpdate();
         statement.close();
     }
@@ -243,7 +242,8 @@ public class ReservationDAO implements DAOMethods<Reservation> {
         String query = "SELECT r.*, rs.name as status_name, rs.description as status_description " +
                 "FROM reservations r " +
                 "JOIN reservations_status rs ON r.status_FK = rs.id_PK " +
-                "WHERE r.flight_FK = ? AND r.user_FK = ?";
+                "WHERE r.flight_FK = ? AND r.user_FK = ? "+
+                "ORDER BY r.reserved_at DESC ";
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setInt(1, flightId);
         statement.setInt(2, userId);

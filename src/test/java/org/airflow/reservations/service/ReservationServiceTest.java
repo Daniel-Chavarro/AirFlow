@@ -2,10 +2,12 @@ package org.airflow.reservations.service;
 
 import org.airflow.reservations.DAO.*;
 import org.airflow.reservations.model.*;
+import org.airflow.reservations.utils.ConnectionDB;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.TestInstance;
 
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.Year;
@@ -20,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ReservationServiceTest {
+    private Connection connection;
     private AirplaneDAO airplaneDAO;
     private CityDAO cityDAO;
     private FlightDAO flightDAO;
@@ -28,6 +31,8 @@ class ReservationServiceTest {
     private User testUser;
     private ReservationService reservationService;
     private ReservationDAO reservationDAO;
+    private SeatService seatService;
+
 
     private int testSeat_Bussiness_Window ;
     private int testSeat_First_Window ;
@@ -42,18 +47,22 @@ class ReservationServiceTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        airplaneDAO = new AirplaneDAO();
-        cityDAO = new CityDAO();
-        flightDAO = new FlightDAO();
-        seatDAO = new SeatDAO();
-        usersDAO = new UsersDAO();
-        reservationDAO = new ReservationDAO();
+        connection = ConnectionDB.getConnection();
+        airplaneDAO = new AirplaneDAO(connection);
+        cityDAO = new CityDAO(connection);
+        flightDAO = new FlightDAO(connection);
+        seatDAO = new SeatDAO(connection);
+        usersDAO = new UsersDAO(connection);
+        reservationDAO = new ReservationDAO(connection);
 
         testUser = new User(0, "Test", "User", "testuser@example.com",
                 "password", true, LocalDateTime.now());
         usersDAO.create(testUser);
+        testUser = usersDAO.getByEmail("testuser@example.com");
 
-        reservationService = new ReservationService(testUser);
+        seatService = new SeatService(seatDAO);
+        reservationService = new ReservationService(testUser,reservationDAO,flightDAO,seatDAO,cityDAO,seatService);
+
 
         // Insert test cities
         cityDAO.create(new City(0, "City1", "testCountry1", "testCode1"));
@@ -111,17 +120,17 @@ class ReservationServiceTest {
     @AfterEach
     void tearDown() throws SQLException {
         // Delete test data
-        for (Reservation reservation : reservationDAO.getByUserId(testUser.getId())) {
-            reservationDAO.delete(reservation.getId());
-        }
-
         ArrayList<Seat> testSeats = seatDAO.getByAirplaneId(airplaneDAO.getByCode("TSTCDE1").getId());
-        ArrayList<Seat> testSeats1 = seatDAO.getByAirplaneId(airplaneDAO.getByCode("TSTCDE1").getId());
+        ArrayList<Seat> testSeats1 = seatDAO.getByAirplaneId(airplaneDAO.getByCode("TSTCDE2").getId());
         testSeats.addAll(testSeats1);
 
         for (Seat seat : testSeats) {
             seatDAO.delete(seat.getId());
         }
+        for (Reservation reservation : reservationDAO.getByUserId(testUser.getId())) {
+            reservationDAO.delete(reservation.getId());
+        }
+
         usersDAO.delete(usersDAO.getByEmail("testuser@example.com").getId());
         flightDAO.delete(flightDAO.getByOriginCity(cityDAO.getByName("City1").getId()).get(0).getId());
         flightDAO.delete(flightDAO.getByOriginCity(cityDAO.getByName("City2").getId()).get(0).getId());
@@ -204,7 +213,7 @@ class ReservationServiceTest {
         Reservation reservation = reservationService.FindReservation_byUserId().get(0);
 
         Exception ex = assertThrows(IllegalArgumentException.class, () -> reservationService.cancelReservation(reservation.getId()));
-        assertTrue(ex.getMessage().contains("No se puede cancelar"));
+        assertTrue(ex.getMessage().contains("No se puede cancelar la reserva"));
     }
 
     @Test
@@ -218,12 +227,12 @@ class ReservationServiceTest {
         Reservation reservation = reservationService.FindReservation_byUserId().get(0);
 
         reservationService.cancelReservation(reservation.getId());
-        Reservation updated = reservationService.FindReservation_byUserId().get(0);
-        assertNull(updated);
+        ArrayList<Reservation> updated = reservationService.FindReservation_byUserId();
+        assertTrue(updated.isEmpty());
     }
 
     @Test
-    void test8_cancelReservationAfterDeleting2Of3Seats_shouldSucceed() throws SQLException {
+    void test8_Deleting2Of3Seats_shouldSucceed() throws SQLException {
         Flight flight = flightDAO.getById(testFlight1Id);
         flight.setDeparture_time(LocalDateTime.now().plusHours(20));
         flightDAO.update(flight.getId(), flight);
@@ -234,9 +243,9 @@ class ReservationServiceTest {
 
         ArrayList<Integer> delete = new ArrayList<>(List.of(testSeat_Bussiness_Seat, testSeat_First_Seat));
         reservationService.deleteSeatsfromReservation(reservation.getId(), delete);
-
-        reservationService.cancelReservation(reservation.getId());
-        assertEquals(2, reservationService.FindByReservationId(reservation.getId()).getStatus_FK());
+        reservation = reservationService.FindReservation_byUserId().get(0);
+        assertEquals(3, reservation.getStatus_FK());
+        assertEquals(1,seatService.getSeatsByReservationId(reservation.getId()).size());
     }
 
     @Test
@@ -252,8 +261,9 @@ class ReservationServiceTest {
                 testSeat_Economy_Seat));
 
         reservationService.deleteSeatsfromReservation(reservation.getId(), delete);
-        reservationService.cancelReservation(reservation.getId());
-        assertEquals(2, reservationService.FindByReservationId(reservation.getId()).getStatus_FK());
+
+        assertEquals(0, reservationService.FindByReservationId(reservation.getId()).getId());
+
     }
 
     @Test
@@ -268,13 +278,13 @@ class ReservationServiceTest {
         ArrayList<Integer> delete = new ArrayList<>(List.of(testSeat_Bussiness_Seat));
 
         Exception ex = assertThrows(IllegalArgumentException.class, () -> reservationService.deleteSeatsfromReservation(reservation.getId(), delete));
-        assertTrue(ex.getMessage().contains("No se pueden borrar"));
+        assertTrue(ex.getMessage().contains("Error al cancelar asientos"));
     }
 
     @Test
     void test11_confirmReservation() throws Exception {
         Reservation reservation = reservationService.createReservation(
-                flightDAO.getAll().get(0).getId(),
+                flightDAO.getById(testFlight1Id).getId(),
                 new int[]{testSeat_Economy_Seat});
 
         reservationService.confirmReservation(reservation.getId());
@@ -285,7 +295,7 @@ class ReservationServiceTest {
     @Test
     void test12_departureTimeChanged_thenCancelledByControl() throws Exception {
         Reservation reservation = reservationService.createReservation(
-                flightDAO.getAll().get(0).getId(),
+                flightDAO.getById(testFlight1Id).getId(),
                 new int[]{testSeat_Economy_Seat});
 
         Flight flight = flightDAO.getById(reservation.getFlight_FK());
@@ -301,52 +311,51 @@ class ReservationServiceTest {
     @Test
     void test13_cancelThenTryToConfirm() throws Exception {
         Reservation reservation = reservationService.createReservation(
-                flightDAO.getAll().get(0).getId(),
+                flightDAO.getById(testFlight1Id).getId(),
                 new int[]{testSeat_Economy_Seat});
 
         Flight flight = flightDAO.getById(reservation.getFlight_FK());
-        flight.setDeparture_time(LocalDateTime.now().plusDays(2));
+        flight.setDeparture_time(LocalDateTime.now());
         flightDAO.update(flight.getId(), flight);
 
         reservationService.reservations_control();
-
-        assertThrows(IllegalStateException.class, () ->
+        Exception ex = assertThrows(IllegalArgumentException.class, () ->
                 reservationService.confirmReservation(reservation.getId()));
+        assertTrue(ex.getMessage().contains("No es posible confirmar"));
     }
 
     @Test
-    void test14_checkIn() throws Exception {
+    void test14_checkInWithNoConfirmation() throws Exception {
         Reservation reservation = reservationService.createReservation(
-                flightDAO.getAll().get(0).getId(),
+                flightDAO.getById(testFlight1Id).getId(),
                 new int[]{testSeat_Economy_Seat});
 
-        reservationService.confirmReservation(reservation.getId());
-        reservationService.check_inReservation(reservation.getId());
-
-        Reservation checkedIn = reservationService.FindReservation_byUserId().get(0);
-        assertEquals(4, checkedIn.getStatus_FK());
+        Exception ex = assertThrows(IllegalArgumentException.class, () ->
+                reservationService.check_inReservation(reservation.getId()));
+        assertTrue(ex.getMessage().contains("No se puede confirmar el check in"));
     }
     @Test
     void test15_confirmThenCancelViaControlThenTryCheckIn() throws Exception {
         Reservation reservation = reservationService.createReservation(
-                flightDAO.getAll().get(0).getId(),
+                flightDAO.getById(testFlight1Id).getId(),
                 new int[]{testSeat_Economy_Seat});
 
         reservationService.confirmReservation(reservation.getId());
 
         Flight flight = flightDAO.getById(reservation.getFlight_FK());
-        flight.setDeparture_time(LocalDateTime.now().plusDays(2));
+        flight.setDeparture_time(LocalDateTime.now());
         flightDAO.update(flight.getId(), flight);
 
         reservationService.reservations_control();
 
-        assertThrows(IllegalStateException.class, () ->
+        Exception ex = assertThrows(IllegalArgumentException.class, () ->
                 reservationService.check_inReservation(reservation.getId()));
+        assertTrue(ex.getMessage().contains("No se puede confirmar el check in"));
     }
     @Test
     void test16_confirmAndCheckIn() throws Exception {
         Reservation reservation = reservationService.createReservation(
-                flightDAO.getAll().get(0).getId(),
+                flightDAO.getById(testFlight1Id).getId(),
                 new int[]{testSeat_Economy_Seat});
 
         reservationService.confirmReservation(reservation.getId());
@@ -358,14 +367,29 @@ class ReservationServiceTest {
     @Test
     void test17_completeThreeReservations() throws Exception {
         List<Reservation> reservations = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            Reservation r = reservationService.createReservation(
-                    flightDAO.getAll().get(0).getId(),
-                    new int[]{testSeat_Economy_Seat});
-            reservationService.confirmReservation(r.getId());
-            reservationService.check_inReservation(r.getId());
-            reservations.add(r);
-        }
+        Reservation r;
+
+         r = reservationService.createReservation(
+                flightDAO.getById(testFlight1Id).getId(),
+                new int[]{testSeat_Economy_Seat});
+        reservationService.confirmReservation(r.getId());
+        reservationService.check_inReservation(r.getId());
+        reservations.add(r);
+
+         r = reservationService.createReservation(
+                flightDAO.getById(testFlight1Id).getId(),
+                new int[]{testSeat_Bussiness_Seat});
+        reservationService.confirmReservation(r.getId());
+        reservationService.check_inReservation(r.getId());
+        reservations.add(r);
+
+        r = reservationService.createReservation(
+                flightDAO.getById(testFlight1Id).getId(),
+                new int[]{testSeat_First_Seat});
+        reservationService.confirmReservation(r.getId());
+        reservationService.check_inReservation(r.getId());
+        reservations.add(r);
+
 
         Flight flight = flightDAO.getById(reservations.get(0).getFlight_FK());
         flight.setStatus_FK(7); // Completed
@@ -373,14 +397,14 @@ class ReservationServiceTest {
 
         reservationService.completed_reservations(flight.getId());
 
-        for (Reservation r :  reservationService.FindReservation_byUserId()) {
-            assertEquals(7, r.getStatus_FK());
+        for (Reservation s :  reservationService.FindReservation_byUserId()) {
+            assertEquals(5, s.getStatus_FK());
         }
     }
     @Test
     void test18_incompleteReservationsShouldNotBeCompleted() throws Exception {
         reservationService.createReservation(
-                flightDAO.getAll().get(0).getId(),
+                flightDAO.getById(testFlight1Id).getId(),
                 new int[]{testSeat_Economy_Seat});
 
         Flight flight = flightDAO.getAll().get(0);
@@ -390,25 +414,26 @@ class ReservationServiceTest {
         reservationService.completed_reservations(flight.getId());
 
         Reservation r =  reservationService.FindReservation_byUserId().get(0);
-        assertNotEquals(7, r.getStatus_FK());
+        assertNotEquals(5, r.getStatus_FK());
     }
     @Test
     void test19_checkedInShouldNotBeCancelledByControl() throws Exception {
         Reservation reservation = reservationService.createReservation(
-                flightDAO.getAll().get(0).getId(),
+                flightDAO.getById(testFlight1Id).getId(),
                 new int[]{testSeat_Economy_Seat});
 
         reservationService.confirmReservation(reservation.getId());
         reservationService.check_inReservation(reservation.getId());
 
         Flight flight = flightDAO.getById(reservation.getFlight_FK());
-        flight.setDeparture_time(LocalDateTime.now().plusDays(2));
+        flight.setDeparture_time(LocalDateTime.now());
         flightDAO.update(flight.getId(), flight);
 
         reservationService.reservations_control();
 
         Reservation r = reservationService.FindReservation_byUserId().get(0);
         assertNotEquals(2, r.getStatus_FK());
+        assertEquals(4, r.getStatus_FK());
     }
 
 

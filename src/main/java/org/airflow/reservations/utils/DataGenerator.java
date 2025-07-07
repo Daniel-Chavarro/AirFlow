@@ -50,6 +50,9 @@ public class DataGenerator {
      */
     public void generateAllData() {
         try {
+            // Ensure recovery tokens table exists.
+            initializePasswordResetTokensTable();
+            
             // Clean up existing data if needed
             cleanupDatabase();
 
@@ -88,11 +91,29 @@ public class DataGenerator {
             stmt.execute("TRUNCATE TABLE users");
             stmt.execute("TRUNCATE TABLE flight_status");
             stmt.execute("TRUNCATE TABLE reservations_status");
+            stmt.execute("TRUNCATE TABLE password_reset_tokens");
 
             // Re-enable foreign key checks
             stmt.execute("SET FOREIGN_KEY_CHECKS = 1");
         }
     }
+    
+    /**
+    * Ensures password recovery tokens table exists.
+    */
+    private void initializePasswordResetTokensTable() throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute(
+                "CREATE TABLE IF NOT EXISTS password_reset_tokens (" +
+                "  token VARCHAR(255) PRIMARY KEY, " +
+                "  user_id INT NOT NULL, " +
+                "  expires_at TIMESTAMP NOT NULL, " +
+                "  FOREIGN KEY (user_id) REFERENCES users(id_PK)" +
+                ")"
+            );
+        }
+    }
+
 
     /**
      * Initialize flight status reference data

@@ -115,7 +115,6 @@ public class FlightDAO implements DAOMethods<Flight> {
      * @param toUpdate the Flight object containing updated data
      * @throws SQLException if a database access error occurs
      */
-    @Override
     public void update(int id, Flight toUpdate) throws SQLException {
         String query = "UPDATE flights SET airplane_FK = ?, status_FK = ?, origin_city_FK = ?, " +
                 "destination_city_FK = ?, code = ?, departure_time = ?, scheduled_arrival_time = ?, arrival_time = ?, price_base = ? " +
@@ -293,5 +292,10 @@ public class FlightDAO implements DAOMethods<Flight> {
 
     public void setConnection(Connection connection) {
         this.connection = connection;
+    }
+
+    @Override
+    public void update(Flight toUpdate) throws SQLException {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

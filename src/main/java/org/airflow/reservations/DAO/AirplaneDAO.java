@@ -106,7 +106,6 @@ public class AirplaneDAO implements DAOMethods<Airplane> {
      * @param toUpdate the Airplane object containing updated data
      * @throws SQLException if a database access error occurs
      */
-    @Override
     public void update(int id, Airplane toUpdate) throws SQLException {
         String query = "UPDATE airplanes SET airline = ?, model = ?, code = ?, capacity = ?, year = ? WHERE id_PK = ?";
 
@@ -209,5 +208,10 @@ public class AirplaneDAO implements DAOMethods<Airplane> {
 
     public void setConnection(Connection connection) {
         this.connection = connection;
+    }
+
+    @Override
+    public void update(Airplane toUpdate) throws SQLException {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

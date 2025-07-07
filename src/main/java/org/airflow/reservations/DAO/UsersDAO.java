@@ -16,6 +16,7 @@ Data Access Object (DAO) class for managing User entities.
  * @see User */
 public class UsersDAO implements DAOMethods<User> {
     private Connection connection;
+    private int id;
 
     /**
      * Default constructor for UsersDAO class.
@@ -107,12 +108,10 @@ public class UsersDAO implements DAOMethods<User> {
     /**
      * Updates an existing user in the database.
      *
-     * @param id       the unique identifier of the user to be updated
      * @param toUpdate the User object containing updated data
      * @throws SQLException if a database access error occurs
      */
-    @Override
-    public void update(int id, User toUpdate) throws SQLException {
+    public void update(User toUpdate) throws SQLException {
         String query =
                 "UPDATE users " +
                 "SET name = ?, last_name = ?, email = ?, password = ?, isSuperUser = ?, created_at = ? " +
@@ -164,6 +163,26 @@ public class UsersDAO implements DAOMethods<User> {
         statement.close();
         return user;
     }
+    /**
+    * Searchs for an user based on the username.
+    *
+    * @param username the name of the user we are looking for.
+    * @return the corresponding user, or null if it doesn't exists.
+    * @throws SQLException if there's an error related to db access.
+    */
+    public User getByUsername(String username) throws SQLException {
+        String query = "SELECT * FROM users WHERE name = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, username);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                // Reutilizamos el transformResultsToClass para mapear el primer registro
+                return transformResultsToClass(resultSet);
+            }
+        }
+    }
+
+    
 
     /**
      * Transforms the results from a ResultSet into a User object.

@@ -103,7 +103,6 @@ public class CityDAO implements DAOMethods<City> {
      * @param toUpdate the City object containing updated data
      * @throws SQLException if a database access error occurs
      */
-    @Override
     public void update(int id, City toUpdate) throws SQLException {
         String query = "UPDATE cities SET name = ?, country = ?, code = ? WHERE id_PK = ?";
 
@@ -207,5 +206,10 @@ public class CityDAO implements DAOMethods<City> {
 
     public void setConnection(Connection connection) {
         this.connection = connection;
+    }
+
+    @Override
+    public void update(City toUpdate) throws SQLException {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

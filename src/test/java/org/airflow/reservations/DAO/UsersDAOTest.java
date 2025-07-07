@@ -170,7 +170,7 @@ public class UsersDAOTest {
         user.setName("UpdatedUser");
         user.setLast_name("UpdatedLastName");
 
-        usersDAO.update(testUserId, user);
+        usersDAO.update(user);
 
         User updatedUser = usersDAO.getById(testUserId);
         assertEquals("UpdatedUser", updatedUser.getName());

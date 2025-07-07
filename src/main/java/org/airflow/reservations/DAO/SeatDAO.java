@@ -112,7 +112,6 @@ public class SeatDAO implements DAOMethods<Seat> {
      * @param toUpdate the Seat object containing updated data
      * @throws SQLException if a database access error occurs
      */
-    @Override
     public void update(int id, Seat toUpdate) throws SQLException {
         String query = "UPDATE seats SET airplane_FK = ?, reservation_FK = ?, seat_number = ?, seat_class = ?, is_window = ? " +
                 "WHERE id_PK = ?";
@@ -280,5 +279,10 @@ public class SeatDAO implements DAOMethods<Seat> {
 
     public void setConnection(Connection connection) {
         this.connection = connection;
+    }
+
+    @Override
+    public void update(Seat toUpdate) throws SQLException {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

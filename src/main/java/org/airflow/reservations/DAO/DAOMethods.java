@@ -45,7 +45,7 @@ public interface DAOMethods<T> {
      * @param toUpdate the object containing updated data.
      * @throws SQLException if a database access error occurs.
      */
-    void update(int id, T toUpdate) throws SQLException;
+    void update(T toUpdate) throws SQLException;
 
     /**
      * Generic method to delete an object of type T by its ID.

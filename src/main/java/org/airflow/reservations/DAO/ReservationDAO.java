@@ -109,7 +109,6 @@ public class ReservationDAO implements DAOMethods<Reservation> {
      * @param toUpdate the Reservation object containing updated data
      * @throws SQLException if a database access error occurs
      */
-    @Override
     public void update(int id, Reservation toUpdate) throws SQLException {
         String query = "UPDATE reservations SET user_FK = ?, status_FK = ?, flight_FK = ?, reserved_at = ? WHERE id_PK = ?";
 
@@ -249,5 +248,10 @@ public class ReservationDAO implements DAOMethods<Reservation> {
 
     public void setConnection(Connection connection) {
         this.connection = connection;
+    }
+
+    @Override
+    public void update(Reservation toUpdate) throws SQLException {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

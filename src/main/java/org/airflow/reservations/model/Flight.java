@@ -73,9 +73,23 @@ public class Flight {
         this.status_description = "";
     }
 
+    @Override
+    public String toString() {
+        return (
+                "------------------------------------------"+"\n " +
+                "Flight: " + id + "\n " +
+                "Code :" + code + "\n " +
+                "Departure time :" + departure_time +  "\n "+
+                "Arrival time :" + arrival_time + "\n " +
+                "Base Price :" + price_base+ "\n " +
+                "------------------------------------------"+"\n ");
+    }
+
+
     public Duration getScheduledDuration() {
         return Duration.between(departure_time, scheduled_arrival_time);
     }
+
 
     // Getters and Setters
     public int getId() {

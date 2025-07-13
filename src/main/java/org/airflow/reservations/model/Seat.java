@@ -53,6 +53,19 @@ public class Seat {
         this.is_window = false;
     }
 
+    @Override
+    public String toString() {
+        String ventana = is_window?"YES":"NO";
+        return (
+                "------------------------------------------"+"\n " +
+                "Seat: " + id + "\n " +
+                "Airplane :" + airplane_FK + "\n " +
+                "Number:" + seat_number +  "\n "+
+                "Class :" + seat_class + "\n " +
+                "is_window :" + ventana + "\n " +
+                "------------------------------------------"+"\n ");
+    }
+
     // Getters and Setters
     public int getId() {
         return id;

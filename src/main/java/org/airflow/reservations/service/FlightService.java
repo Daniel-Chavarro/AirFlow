@@ -133,7 +133,7 @@ public class FlightService {
 
     public ArrayList<String> availableFlights(int Destiny_id, int Origin_id) throws SQLException{
         ArrayList<Flight> flights = flightDAO.getByDestinationAndOriginCity(Destiny_id,Origin_id);
-        return avilableFlightsToString(flights);
+        return availableFlightsToString(flights);
     }
 
     /**

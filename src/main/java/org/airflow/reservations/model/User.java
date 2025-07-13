@@ -110,5 +110,6 @@ public class User {
     }
 
     public void setLastName(String lastName) {
+        this.last_name = lastName;
     }
 }

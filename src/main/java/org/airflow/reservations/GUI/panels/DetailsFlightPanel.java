@@ -9,11 +9,6 @@ import java.awt.*;
 import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 
-/**
- * DetailsFlightPanel is a JPanel that displays detailed information about a flight.
- * It includes flight details, baggage allowance, and buttons for navigation.
- * The panel is designed to be used in a GUI application for flight reservations.
- */
 public class DetailsFlightPanel extends JPanel {
     private final JPanel detailsFlightPanel;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
@@ -39,10 +34,6 @@ public class DetailsFlightPanel extends JPanel {
     private City destinationCity;
     private Airplane airplane;
 
-    /**
-     * Constructor for DetailsFlightPanel.
-     * Initializes the panel with a layout and sets up the main components.
-     */
     public DetailsFlightPanel() {
         setLayout(new BorderLayout());
         detailsFlightPanel = new JPanel();
@@ -51,14 +42,6 @@ public class DetailsFlightPanel extends JPanel {
         detailsFlightPanel.setBackground(Color.WHITE);
     }
 
-    /**
-     * Sets the flight data and initializes the details panel with flight information.
-     *
-     * @param flight            The flight object containing flight details.
-     * @param originCity        The city object representing the origin city.
-     * @param destinationCity   The city object representing the destination city.
-     * @param airplane          The airplane object containing airplane details.
-     */
     public void setData(Flight flight, City originCity, City destinationCity, Airplane airplane) {
         this.flight = flight;
         this.originCity = originCity;
@@ -80,9 +63,6 @@ public class DetailsFlightPanel extends JPanel {
         repaint();
     }
 
-    /**
-     * Initializes the details panel with a title and sets its layout.
-     */
     public void startDetailsPanel() {
         detailsPanel = new JPanel();
         detailsPanel.setLayout(new GridBagLayout());
@@ -97,6 +77,7 @@ public class DetailsFlightPanel extends JPanel {
         flightDetailsLabel.setFont(new Font("SansSerif", Font.BOLD, 22));
         detailsPanel.add(flightDetailsLabel, gbc);
     }
+
 
     /**
      * Creates the flight information panel that displays detailed flight information.
@@ -177,10 +158,6 @@ public class DetailsFlightPanel extends JPanel {
         flightInfoPanel.add(priceLabel, gbc);
     }
 
-    /**
-     * Creates the baggage allowance panel with information about baggage policies.
-     * This includes personal item, carry-on bag, and checked baggage details.
-     */
     private void createBaggageAllowancePanel() {
         baggagePanel = new JPanel();
         baggagePanel.setLayout(new GridBagLayout());
@@ -217,10 +194,6 @@ public class DetailsFlightPanel extends JPanel {
         baggagePanel.add(checkedBaggageLabel, gbc);
     }
 
-    /**
-     * Creates the buttons panel with navigation buttons.
-     * This includes a "Back" button and a "Continue to Book" button.
-     */
     private void createButtonsPanel() {
         buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -249,12 +222,6 @@ public class DetailsFlightPanel extends JPanel {
         buttonsPanel.add(continueButton);
     }
 
-    /**
-     * Main method to run the DetailsFlightPanel in a JFrame for testing purposes.
-     * This method is not part of the panel's functionality but is used for demonstration.
-     *
-     * @param args command line arguments (not used)
-     */
     public static void main(String[] args) {
         JFrame frame = new JFrame("Flight Details");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -410,16 +410,12 @@ public class BookSeatsPanel extends JPanel {
     }
     
     private Color getSeatClassColor(Seat.SeatClass seatClass) {
-        switch (seatClass) {
-            case FIRST:
-                return new Color(220, 120, 120); // Light red/pink for first class
-            case BUSINESS:
-                return new Color(255, 200, 120); // Light orange for business/plus
-            case ECONOMY:
-                return new Color(120, 160, 220); // Light blue for economy
-            default:
-                return new Color(200, 200, 200); // Light gray as fallback
-        }
+        return switch (seatClass) {
+            case FIRST -> new Color(220, 120, 120); // Light red/pink for first class
+            case BUSINESS -> new Color(255, 200, 120); // Light orange for business/plus
+            case ECONOMY -> new Color(120, 160, 220); // Light blue for economy
+            default -> new Color(200, 200, 200); // Light gray as fallback
+        };
     }
     
     private void createSummaryComponents() {
@@ -535,18 +531,11 @@ public class BookSeatsPanel extends JPanel {
                 }
                 
                 // Calculate price based on seat class
-                double seatPrice = flight.getPrice_base();
-                switch (seat.getSeat_class()) {
-                    case FIRST:
-                        seatPrice = 193.60; // Premium price from screenshot
-                        break;
-                    case BUSINESS:
-                        seatPrice = 193.60; // Plus price from screenshot  
-                        break;
-                    case ECONOMY:
-                        seatPrice = 80.70; // Economy price from screenshot
-                        break;
-                }
+                double seatPrice = switch (seat.getSeat_class()) {
+                    case FIRST -> 193.60; // Premium price from screenshot
+                    case BUSINESS -> 193.60; // Plus price from screenshot
+                    case ECONOMY -> 80.70; // Economy price from screenshot
+                };
                 totalPrice += seatPrice;
             }
             
@@ -601,7 +590,135 @@ public class BookSeatsPanel extends JPanel {
         }
         return currencyFormat.format(totalPrice);
     }
-    
+
+    public void setFlight(Flight flight) {
+        this.flight = flight;
+    }
+
+    public Airplane getAirplane() {
+        return airplane;
+    }
+
+    public void setAirplane(Airplane airplane) {
+        this.airplane = airplane;
+    }
+
+    public ArrayList<Seat> getSeats() {
+        return seats;
+    }
+
+    public void setSeats(ArrayList<Seat> seats) {
+        this.seats = seats;
+    }
+
+    public void setSelectedSeats(ArrayList<Seat> selectedSeats) {
+        this.selectedSeats = selectedSeats;
+    }
+
+    public Map<String, JButton> getSeatButtons() {
+        return seatButtons;
+    }
+
+    public void setSeatButtons(Map<String, JButton> seatButtons) {
+        this.seatButtons = seatButtons;
+    }
+
+    public JPanel getMainPanel() {
+        return mainPanel;
+    }
+
+    public void setMainPanel(JPanel mainPanel) {
+        this.mainPanel = mainPanel;
+    }
+
+    public JPanel getFlightInfoPanel() {
+        return flightInfoPanel;
+    }
+
+    public void setFlightInfoPanel(JPanel flightInfoPanel) {
+        this.flightInfoPanel = flightInfoPanel;
+    }
+
+    public JPanel getSeatMapPanel() {
+        return seatMapPanel;
+    }
+
+    public void setSeatMapPanel(JPanel seatMapPanel) {
+        this.seatMapPanel = seatMapPanel;
+    }
+
+    public JPanel getSummaryPanel() {
+        return summaryPanel;
+    }
+
+    public void setSummaryPanel(JPanel summaryPanel) {
+        this.summaryPanel = summaryPanel;
+    }
+
+    public JPanel getButtonPanel() {
+        return buttonPanel;
+    }
+
+    public void setButtonPanel(JPanel buttonPanel) {
+        this.buttonPanel = buttonPanel;
+    }
+
+    public JLabel getPriceLabel() {
+        return priceLabel;
+    }
+
+    public void setPriceLabel(JLabel priceLabel) {
+        this.priceLabel = priceLabel;
+    }
+
+    public JLabel getSelectedSeatsLabel() {
+        return selectedSeatsLabel;
+    }
+
+    public void setSelectedSeatsLabel(JLabel selectedSeatsLabel) {
+        this.selectedSeatsLabel = selectedSeatsLabel;
+    }
+
+    public JLabel getTotalPriceLabel() {
+        return totalPriceLabel;
+    }
+
+    public void setTotalPriceLabel(JLabel totalPriceLabel) {
+        this.totalPriceLabel = totalPriceLabel;
+    }
+
+    public JButton getConfirmButton() {
+        return confirmButton;
+    }
+
+    public void setConfirmButton(JButton confirmButton) {
+        this.confirmButton = confirmButton;
+    }
+
+    public JButton getCancelButton() {
+        return cancelButton;
+    }
+
+    public void setCancelButton(JButton cancelButton) {
+        this.cancelButton = cancelButton;
+    }
+
+    public JButton getClearSeatsButton() {
+        return clearSeatsButton;
+    }
+
+    public void setClearSeatsButton(JButton clearSeatsButton) {
+        this.clearSeatsButton = clearSeatsButton;
+    }
+
+    public NumberFormat getCurrencyFormat() {
+        return currencyFormat;
+    }
+
+    public void setCurrencyFormat(NumberFormat currencyFormat) {
+        this.currencyFormat = currencyFormat;
+    }
+
     /**
      * Inner class to handle seat selection events.
      */

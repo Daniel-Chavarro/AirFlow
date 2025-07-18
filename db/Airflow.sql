@@ -57,6 +57,13 @@ CREATE TABLE IF NOT EXISTS `flights` (
   FOREIGN KEY (`destination_city_FK`) REFERENCES `cities` (`id_PK`)
 );
 
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    `token` VARCHAR(255) PRIMARY KEY,
+    `user_id` INT NOT NULL,
+    `expires_at` TIMESTAMP NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id_PK)
+);
+
 CREATE TABLE IF NOT EXISTS `reservations` (
   `id_PK` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `user_FK` int NOT NULL,

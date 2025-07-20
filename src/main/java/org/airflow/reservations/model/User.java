@@ -4,6 +4,7 @@ import org.airflow.reservations.utils.PasswordUtils;
 
 import java.time.LocalDateTime;
 
+
 public class User {
     private int id;
     private String name;
@@ -12,6 +13,7 @@ public class User {
     private String password;
     private Boolean isSuperUser;
     private LocalDateTime created_at;
+    private Priority priority;
 
 
     /**

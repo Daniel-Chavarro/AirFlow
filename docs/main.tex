@@ -270,7 +270,8 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
     \section{Data Access Object (DAO) Pattern}
 
-    The system implements the DAO design pattern to abstract and encapsulate database access, clearly separating business logic from persistence logic. The implementation follows these principles:
+    The system implements the DAO design pattern to abstract and encapsulate database access, clearly separating business logic from persistence logic.
+    The implementation follows these principles:
 
     \subsection{DAOMethods Interface}
     A generic interface \texttt{DAOMethods<T>} is defined that establishes standard methods for CRUD operations:
@@ -455,6 +456,43 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
     These screenshots demonstrate how the design principles of simplicity, consistency, and modern aesthetics have been applied throughout the application, resulting in a clean and intuitive user interface.
 
+    \section{GUI Implementation with Bridge and Command Patterns}
+    To enhance the modularity and maintainability of the user interface, the Bridge and Command design patterns were implemented. This section details how these patterns were integrated into the GUI architecture.
+
+    \subsection{Bridge Pattern for Decoupling}
+    The Bridge pattern was used to decouple the user interface (the "View") from its controlling logic (the "Controller"). This separation allows the UI and the business logic to evolve independently.
+
+    \begin{itemize}
+        \item \textbf{Abstraction (\texttt{View} Interface)}: An interface named \texttt{View} was created to define all the operations that the user interface must support. This includes methods for displaying panels, retrieving data from forms, and setting data for display. This interface acts as the "bridge" between the UI implementation and the controller.
+
+        \item \textbf{Concrete Implementor (\texttt{MainFrame})}: The \texttt{MainFrame} class implements the \texttt{View} interface, providing the concrete implementation of the UI. It manages a \texttt{CardLayout} to switch between different panels like \texttt{SearchFlightPanel}, \texttt{DetailsFlightPanel}, etc.
+    \end{itemize}
+
+    This structure allows the controller to interact with the UI through the \texttt{View} interface, without being coupled to the specific implementation details of \texttt{MainFrame} or jego sub-components.
+
+    \subsection{Command Pattern for UI Actions}
+    The Command pattern was used to encapsulate all the information needed to perform an action or trigger an event. In the context of the GUI, this means that each user action (e.g., clicking a button) is treated as a command.
+
+    \begin{itemize}
+        \item \textbf{Commands}: A set of string constants (e.g., \texttt{SEARCH\_FLIGHT\_CMD}, \texttt{BOOK\_SEAT\_CMD}) are defined in the \texttt{View} interface. These constants represent the different commands that can be triggered by the user.
+
+        \item \textbf{Invokers}: UI components like \texttt{JButton} act as invokers. Each interactive component is assigned a specific action command using the \texttt{setActionCommand()} method.
+
+        \item \textbf{Receiver and Controller}: A single \texttt{ActionListener} in the (yet to be implemented) controller will act as the receiver for all these commands. It will inspect the action command of the event and delegate the request to the appropriate handler method, effectively executing the command.
+    \end{itemize}
+
+    By using the Command pattern, the UI components are completely decoupled from the logic that is executed. The buttons don't know what happens when they are clicked; they only know to send a specific command to the listener.
+
+    \subsection{Dynamic Flight Display}
+    The flight search results are now displayed dynamically as a series of cards.
+
+    \begin{itemize}
+        \item \textbf{\texttt{FlightCardPanel}}: A new component, \texttt{FlightCardPanel}, was created to represent a single flight in the search results. This panel displays key information like the route, time, duration, and price, along with a "View Details" button.
+
+        \item \textbf{Dynamic Population}: The \texttt{SearchFlightPanel} now contains a method, \texttt{displayFlights()}, which takes a list of flights and dynamically creates a \texttt{FlightCardPanel} for each one. These cards are added to a results panel, which is displayed to the user.
+    \end{itemize}
+
+    This approach makes the search results more interactive and visually appealing, and it further demonstrates the flexibility of the implemented architecture. The main frame delegates the responsibility of displaying the flights to the search panel, which in turn uses the specialized card panel for the rendering of each flight.
 
 
     \begin{thebibliography}{00}

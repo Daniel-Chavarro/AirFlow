@@ -1,6 +1,9 @@
 package org.airflow.reservations.GUI.frames;
 
 
+import com.formdev.flatlaf.FlatLightLaf;
+import org.airflow.reservations.GUI.Bridge.View;
+import org.airflow.reservations.GUI.panels.*;
 import org.airflow.reservations.model.Airplane;
 import org.airflow.reservations.model.City;
 import org.airflow.reservations.model.Flight;
@@ -14,34 +17,42 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 
-import com.formdev.flatlaf.FlatLightLaf;
-import org.airflow.reservations.GUI.Bridge.View;
-import org.airflow.reservations.GUI.panels.*;
-
 
 /**
  * MainFrame class represents the main window of the Airflow Reservations application.
  * It contains a horizontal menu with a logo and buttons, and a content panel that
  * displays different panels for searching flights, viewing flight details, and confirming reservations.
  */
-public class MainFrame extends JFrame implements View{
+public class MainFrame extends JFrame implements View {
+    /** The panel for the top menu. */
     private JPanel menuPanel;
+    /** The panel for the logo. */
     private JPanel logoPanel;
+    /** The panel for the navigation buttons. */
     private JPanel buttonsPanel;
+    /** The panel that holds the different content panels. */
     private JPanel contentPanel;
+    /** The scroll pane for the content panel. */
     private JScrollPane scrollPane;
 
 
+    /** The layout manager for the content panel. */
     private CardLayout cardLayout;
+    /** The label for the logo image. */
     private JLabel imageLabel;
+    /** The label for the application title. */
     private JLabel titleLabel;
 
+    /** The panel for booking seats. */
     private BookSeatsPanel bookSeatsPanel;
+    /** The panel for confirming reservations. */
     private ConfirmPanel confirmPanel;
+    /** The panel for viewing flight details. */
     private DetailsFlightPanel detailsFlightPanel;
+    /** The panel for searching flights. */
     private SearchFlightPanel searchFlightPanel;
-
-
+    /** The action listener for the view's components. */
+    private ActionListener actionListener;
 
 
     /**
@@ -71,7 +82,7 @@ public class MainFrame extends JFrame implements View{
      * Creates the horizontal menu at the top of the main frame.
      * The menu includes a logo, title, and buttons for different sections.
      */
-    public void createHorizontalMenu(){
+    public void createHorizontalMenu() {
         menuPanel = new JPanel();
         menuPanel.setLayout(new BorderLayout());
         menuPanel.setBackground(Color.WHITE);
@@ -80,7 +91,7 @@ public class MainFrame extends JFrame implements View{
 
         // Logo panel
         logoPanel = new JPanel();
-        logoPanel.setLayout(new FlowLayout(FlowLayout.LEFT,10,0));
+        logoPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 0));
         logoPanel.setBackground(Color.WHITE);
 
         imageLabel = new JLabel();
@@ -143,7 +154,6 @@ public class MainFrame extends JFrame implements View{
         contentPanel.add(confirmPanel, "ConfirmPanel");
 
 
-
         scrollPane = new JScrollPane(contentPanel);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -155,6 +165,7 @@ public class MainFrame extends JFrame implements View{
 
     @Override
     public void addActionListener(ActionListener listener) {
+        this.actionListener = listener;
         searchFlightPanel.getSearchButton().addActionListener(listener);
         detailsFlightPanel.getBackButton().addActionListener(listener);
         detailsFlightPanel.getContinueButton().addActionListener(listener);
@@ -224,10 +235,8 @@ public class MainFrame extends JFrame implements View{
     }
 
     @Override
-    public void displayFlights(ArrayList<Flight> flights) {
-        // This method should be implemented to display the flights in the results panel
-        // For now, it will just print the flights to the console
-        System.out.println("Flights found: " + flights.size());
+    public void displayFlights(ArrayList<Flight> flights, City origin, City destination) {
+        searchFlightPanel.displayFlights(flights, origin, destination, this.actionListener);
     }
 
     /**
@@ -250,82 +259,162 @@ public class MainFrame extends JFrame implements View{
         mainFrame.setVisible(true);
     }
 
+    /**
+     * Gets the menu panel.
+     * @return The menu panel.
+     */
     public JPanel getMenuPanel() {
         return menuPanel;
     }
 
+    /**
+     * Sets the menu panel.
+     * @param menuPanel The menu panel.
+     */
     public void setMenuPanel(JPanel menuPanel) {
         this.menuPanel = menuPanel;
     }
 
+    /**
+     * Gets the logo panel.
+     * @return The logo panel.
+     */
     public JPanel getLogoPanel() {
         return logoPanel;
     }
 
+    /**
+     * Sets the logo panel.
+     * @param logoPanel The logo panel.
+     */
     public void setLogoPanel(JPanel logoPanel) {
         this.logoPanel = logoPanel;
     }
 
+    /**
+     * Gets the buttons panel.
+     * @return The buttons panel.
+     */
     public JPanel getButtonsPanel() {
         return buttonsPanel;
     }
 
+    /**
+     * Sets the buttons panel.
+     * @param buttonsPanel The buttons panel.
+     */
     public void setButtonsPanel(JPanel buttonsPanel) {
         this.buttonsPanel = buttonsPanel;
     }
 
+    /**
+     * Gets the content panel.
+     * @return The content panel.
+     */
     public JPanel getContentPanel() {
         return contentPanel;
     }
 
+    /**
+     * Sets the content panel.
+     * @param contentPanel The content panel.
+     */
     public void setContentPanel(JPanel contentPanel) {
         this.contentPanel = contentPanel;
     }
 
+    /**
+     * Gets the scroll pane.
+     * @return The scroll pane.
+     */
     public JScrollPane getScrollPane() {
         return scrollPane;
     }
 
+    /**
+     * Sets the scroll pane.
+     * @param scrollPane The scroll pane.
+     */
     public void setScrollPane(JScrollPane scrollPane) {
         this.scrollPane = scrollPane;
     }
 
+    /**
+     * Gets the image label.
+     * @return The image label.
+     */
     public JLabel getImageLabel() {
         return imageLabel;
     }
 
+    /**
+     * Sets the image label.
+     * @param imageLabel The image label.
+     */
     public void setImageLabel(JLabel imageLabel) {
         this.imageLabel = imageLabel;
     }
 
+    /**
+     * Gets the title label.
+     * @return The title label.
+     */
     public JLabel getTitleLabel() {
         return titleLabel;
     }
 
+    /**
+     * Sets the title label.
+     * @param titleLabel The title label.
+     */
     public void setTitleLabel(JLabel titleLabel) {
         this.titleLabel = titleLabel;
     }
 
+    /**
+     * Gets the confirm panel.
+     * @return The confirm panel.
+     */
     public ConfirmPanel getConfirmPanel() {
         return confirmPanel;
     }
 
+    /**
+     * Sets the confirm panel.
+     * @param confirmPanel The confirm panel.
+     */
     public void setConfirmPanel(ConfirmPanel confirmPanel) {
         this.confirmPanel = confirmPanel;
     }
 
+    /**
+     * Gets the details flight panel.
+     * @return The details flight panel.
+     */
     public DetailsFlightPanel getDetailsFlightPanel() {
         return detailsFlightPanel;
     }
 
+    /**
+     * Sets the details flight panel.
+     * @param detailsFlightPanel The details flight panel.
+     */
     public void setDetailsFlightPanel(DetailsFlightPanel detailsFlightPanel) {
         this.detailsFlightPanel = detailsFlightPanel;
     }
 
+    /**
+     * Gets the search flight panel.
+     * @return The search flight panel.
+     */
     public SearchFlightPanel getSearchFlightPanel() {
         return searchFlightPanel;
     }
 
+    /**
+     * Sets the search flight panel.
+     * @param searchFlightPanel The search flight panel.
+     */
     public void setSearchFlightPanel(SearchFlightPanel searchFlightPanel) {
         this.searchFlightPanel = searchFlightPanel;
     }

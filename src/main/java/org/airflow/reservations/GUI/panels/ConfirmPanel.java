@@ -1,5 +1,6 @@
 package org.airflow.reservations.GUI.panels;
 
+import org.airflow.reservations.GUI.Bridge.View;
 import org.airflow.reservations.model.Airplane;
 import org.airflow.reservations.model.City;
 import org.airflow.reservations.model.Flight;
@@ -435,6 +436,7 @@ public class ConfirmPanel extends JPanel {
         ));
         backButton.setFont(new Font("SansSerif", Font.BOLD, 14));
         backButton.setFocusPainted(false);
+        backButton.setActionCommand(View.BACK_TO_SEAT_SELECTION_CMD);
         
         // Confirm button
         confirmButton = new JButton("Confirm Reservation");
@@ -444,6 +446,7 @@ public class ConfirmPanel extends JPanel {
         confirmButton.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
         confirmButton.setFont(new Font("SansSerif", Font.BOLD, 14));
         confirmButton.setFocusPainted(false);
+        confirmButton.setActionCommand(View.CONFIRM_RESERVATION_CMD);
         
         // Add action listeners
         backButton.addActionListener(new ActionListener() {
@@ -568,5 +571,245 @@ public class ConfirmPanel extends JPanel {
             frame.add(confirmPanel);
             frame.setVisible(true);
         });
+    }
+
+    public JPanel getMainPanel() {
+        return mainPanel;
+    }
+
+    public DateTimeFormatter getTimeFormatter() {
+        return timeFormatter;
+    }
+
+    public DateTimeFormatter getDateFormatter() {
+        return dateFormatter;
+    }
+
+    public JPanel getHeaderPanel() {
+        return headerPanel;
+    }
+
+    public void setHeaderPanel(JPanel headerPanel) {
+        this.headerPanel = headerPanel;
+    }
+
+    public JPanel getFlightSummaryPanel() {
+        return flightSummaryPanel;
+    }
+
+    public void setFlightSummaryPanel(JPanel flightSummaryPanel) {
+        this.flightSummaryPanel = flightSummaryPanel;
+    }
+
+    public JPanel getSeatSummaryPanel() {
+        return seatSummaryPanel;
+    }
+
+    public void setSeatSummaryPanel(JPanel seatSummaryPanel) {
+        this.seatSummaryPanel = seatSummaryPanel;
+    }
+
+    public JPanel getPricingPanel() {
+        return pricingPanel;
+    }
+
+    public void setPricingPanel(JPanel pricingPanel) {
+        this.pricingPanel = pricingPanel;
+    }
+
+    public JPanel getButtonsPanel() {
+        return buttonsPanel;
+    }
+
+    public void setButtonsPanel(JPanel buttonsPanel) {
+        this.buttonsPanel = buttonsPanel;
+    }
+
+    public JLabel getTitleLabel() {
+        return titleLabel;
+    }
+
+    public void setTitleLabel(JLabel titleLabel) {
+        this.titleLabel = titleLabel;
+    }
+
+    public JLabel getConfirmationLabel() {
+        return confirmationLabel;
+    }
+
+    public void setConfirmationLabel(JLabel confirmationLabel) {
+        this.confirmationLabel = confirmationLabel;
+    }
+
+    public JLabel getFlightSummaryTitle() {
+        return flightSummaryTitle;
+    }
+
+    public void setFlightSummaryTitle(JLabel flightSummaryTitle) {
+        this.flightSummaryTitle = flightSummaryTitle;
+    }
+
+    public JLabel getFlightRouteLabel() {
+        return flightRouteLabel;
+    }
+
+    public void setFlightRouteLabel(JLabel flightRouteLabel) {
+        this.flightRouteLabel = flightRouteLabel;
+    }
+
+    public JLabel getFlightTimeLabel() {
+        return flightTimeLabel;
+    }
+
+    public void setFlightTimeLabel(JLabel flightTimeLabel) {
+        this.flightTimeLabel = flightTimeLabel;
+    }
+
+    public JLabel getFlightDateLabel() {
+        return flightDateLabel;
+    }
+
+    public void setFlightDateLabel(JLabel flightDateLabel) {
+        this.flightDateLabel = flightDateLabel;
+    }
+
+    public JLabel getAircraftLabel() {
+        return aircraftLabel;
+    }
+
+    public void setAircraftLabel(JLabel aircraftLabel) {
+        this.aircraftLabel = aircraftLabel;
+    }
+
+    public JLabel getFlightCodeLabel() {
+        return flightCodeLabel;
+    }
+
+    public void setFlightCodeLabel(JLabel flightCodeLabel) {
+        this.flightCodeLabel = flightCodeLabel;
+    }
+
+    public JLabel getSeatSummaryTitle() {
+        return seatSummaryTitle;
+    }
+
+    public void setSeatSummaryTitle(JLabel seatSummaryTitle) {
+        this.seatSummaryTitle = seatSummaryTitle;
+    }
+
+    public JPanel getSeatListPanel() {
+        return seatListPanel;
+    }
+
+    public void setSeatListPanel(JPanel seatListPanel) {
+        this.seatListPanel = seatListPanel;
+    }
+
+    public JLabel getPricingTitle() {
+        return pricingTitle;
+    }
+
+    public void setPricingTitle(JLabel pricingTitle) {
+        this.pricingTitle = pricingTitle;
+    }
+
+    public JLabel getSubtotalLabel() {
+        return subtotalLabel;
+    }
+
+    public void setSubtotalLabel(JLabel subtotalLabel) {
+        this.subtotalLabel = subtotalLabel;
+    }
+
+    public JLabel getTaxesLabel() {
+        return taxesLabel;
+    }
+
+    public void setTaxesLabel(JLabel taxesLabel) {
+        this.taxesLabel = taxesLabel;
+    }
+
+    public JLabel getTotalLabel() {
+        return totalLabel;
+    }
+
+    public void setTotalLabel(JLabel totalLabel) {
+        this.totalLabel = totalLabel;
+    }
+
+    public JButton getBackButton() {
+        return backButton;
+    }
+
+    public void setBackButton(JButton backButton) {
+        this.backButton = backButton;
+    }
+
+    public JButton getConfirmButton() {
+        return confirmButton;
+    }
+
+    public void setConfirmButton(JButton confirmButton) {
+        this.confirmButton = confirmButton;
+    }
+
+    public Flight getFlight() {
+        return flight;
+    }
+
+    public void setFlight(Flight flight) {
+        this.flight = flight;
+    }
+
+    public City getOriginCity() {
+        return originCity;
+    }
+
+    public void setOriginCity(City originCity) {
+        this.originCity = originCity;
+    }
+
+    public City getDestinationCity() {
+        return destinationCity;
+    }
+
+    public void setDestinationCity(City destinationCity) {
+        this.destinationCity = destinationCity;
+    }
+
+    public Airplane getAirplane() {
+        return airplane;
+    }
+
+    public void setAirplane(Airplane airplane) {
+        this.airplane = airplane;
+    }
+
+    public void setSelectedSeats(ArrayList<Seat> selectedSeats) {
+        this.selectedSeats = selectedSeats;
+    }
+
+    public Map<Seat.SeatClass, Double> getClassMultipliers() {
+        return classMultipliers;
+    }
+
+    public void setClassMultipliers(Map<Seat.SeatClass, Double> classMultipliers) {
+        this.classMultipliers = classMultipliers;
+    }
+
+    public double getBasePrice() {
+        return basePrice;
+    }
+
+    public void setBasePrice(double basePrice) {
+        this.basePrice = basePrice;
+    }
+
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
     }
 }

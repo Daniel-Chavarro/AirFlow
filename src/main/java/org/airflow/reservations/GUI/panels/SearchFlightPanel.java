@@ -1,5 +1,7 @@
 package org.airflow.reservations.GUI.panels;
 
+import org.airflow.reservations.GUI.Bridge.View;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -121,7 +123,7 @@ public class SearchFlightPanel extends JPanel {
         searchButton.setForeground(Color.WHITE);
         searchButton.setPreferredSize(inputSize);
         searchButton.setMaximumSize(inputSize);
-        searchButton.setActionCommand("SEARCH_FLIGHTS");
+        searchButton.setActionCommand(View.SEARCH_FLIGHT_CMD);
         gbc.gridy++;
         formPanel.add(searchButton, gbc);
 

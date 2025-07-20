@@ -1,5 +1,6 @@
 package org.airflow.reservations.GUI.panels;
 
+import org.airflow.reservations.GUI.Bridge.View;
 import org.airflow.reservations.model.Airplane;
 import org.airflow.reservations.model.City;
 import org.airflow.reservations.model.Flight;
@@ -208,6 +209,7 @@ public class DetailsFlightPanel extends JPanel {
         backButton.setBorderPainted(false);
         backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         backButton.setPreferredSize(new Dimension(120, 40));
+        backButton.setActionCommand(View.BACK_TO_FLIGHTS_CMD);
         buttonsPanel.add(backButton);
 
         // Continue to Book Button (similar to the one in the image)
@@ -219,6 +221,7 @@ public class DetailsFlightPanel extends JPanel {
         continueButton.setBorderPainted(false);
         continueButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         continueButton.setPreferredSize(new Dimension(180, 40));
+        continueButton.setActionCommand(View.BOOK_SEAT_CMD);
         buttonsPanel.add(continueButton);
     }
 

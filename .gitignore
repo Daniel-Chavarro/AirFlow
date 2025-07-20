@@ -46,3 +46,5 @@ build/
 *.tar.gz
 *.rar
 /secrets.yml
+/.env
+/docs/images/

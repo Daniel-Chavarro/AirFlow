@@ -1,5 +1,6 @@
 package org.airflow.reservations.GUI.panels;
 
+import org.airflow.reservations.GUI.Bridge.View;
 import org.airflow.reservations.model.Seat;
 import org.airflow.reservations.model.Flight;
 import org.airflow.reservations.model.Airplane;
@@ -442,6 +443,7 @@ public class BookSeatsPanel extends JPanel {
         confirmButton.setForeground(Color.WHITE);
         confirmButton.setPreferredSize(new Dimension(150, 40));
         confirmButton.setEnabled(false);
+        confirmButton.setActionCommand(View.GO_TO_PAYMENT_CMD);
         
         clearSeatsButton = new JButton("Clear Seats");
         clearSeatsButton.setFont(new Font("SansSerif", Font.PLAIN, 14));
@@ -449,11 +451,13 @@ public class BookSeatsPanel extends JPanel {
         clearSeatsButton.setForeground(Color.WHITE);
         clearSeatsButton.setPreferredSize(new Dimension(120, 40));
         clearSeatsButton.setEnabled(false);
+        clearSeatsButton.setActionCommand(View.CLEAR_SEATS_CMD);
         
         cancelButton = new JButton("Back");
         cancelButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
         cancelButton.setBackground(Color.LIGHT_GRAY);
         cancelButton.setPreferredSize(new Dimension(100, 40));
+        cancelButton.setActionCommand(View.BACK_TO_FLIGHTS_CMD);
         
         buttonPanel.add(cancelButton);
         buttonPanel.add(Box.createHorizontalStrut(10));

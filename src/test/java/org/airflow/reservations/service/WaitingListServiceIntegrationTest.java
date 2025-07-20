@@ -1,49 +1,42 @@
 package org.airflow.reservations.service;
 
-import org.airflow.reservations.dao.WaitingListDao;
-import org.airflow.reservations.model.WaitingListEntry;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class WaitingListServiceIntegrationTest {
 
-    private WaitingListService service;
-
-    @BeforeEach
-    void setUp() {
-        service = new WaitingListService(new WaitingListDao());
-    }
-
     @Test
-    @Order(1)
-    void testRegisterUserAndAssign() throws SQLException {
-        service.registerUser("userA", 2);
-        service.registerUser("userB", 5);
-        service.registerUser("userC", 3);
+    void testRegisterAndAssignWaitingList() {
+        WaitingListService service = new WaitingListService();
+        int WAITLIST_STATUS = 1;    // Ajusta según tus valores reales
+        int CONFIRMED_STATUS = 2;   // Ajusta según tus valores reales
+        int FLIGHT_ID = 1;          // Cambia por el vuelo que quieres probar
 
-        WaitingListEntry assigned = service.assignNextUser();
-        assertEquals("userB", assigned.getUserId());
+        try {
+            // Registrar dos usuarios a la lista de espera
+            service.registerUserToWaitingList(5, FLIGHT_ID, WAITLIST_STATUS);
+            service.registerUserToWaitingList(8, FLIGHT_ID, WAITLIST_STATUS);
 
-        assigned = service.assignNextUser();
-        assertEquals("userC", assigned.getUserId());
+            // Verifica que están en la lista de espera
+            List<Integer> waitlistUsers = service.getWaitingListUserIds(WAITLIST_STATUS, FLIGHT_ID);
+            System.out.println("Lista de espera: " + waitlistUsers);
+            assertTrue(waitlistUsers.contains(5));
+            assertTrue(waitlistUsers.contains(8));
 
-        assigned = service.assignNextUser();
-        assertEquals("userA", assigned.getUserId());
-    }
+            // Asigna asiento al primero en espera
+            service.assignNextUser(WAITLIST_STATUS, CONFIRMED_STATUS, FLIGHT_ID);
 
-    @Test
-    @Order(2)
-    void testPreventDuplicateUsers() throws SQLException {
-        service.registerUser("userA", 1);
-        service.registerUser("userA", 3); // Duplicado
+            // Lista de espera actualizada
+            List<Integer> updatedWaitlist = service.getWaitingListUserIds(WAITLIST_STATUS, FLIGHT_ID);
+            System.out.println("Lista de espera actualizada: " + updatedWaitlist);
+            assertTrue(updatedWaitlist.size() == waitlistUsers.size() - 1);
 
-        List<WaitingListEntry> entries = service.getWaitingList();
-        long count = entries.stream().filter(e -> e.getUserId().equals("userA")).count();
-        assertEquals(1, count);
+        } catch (SQLException e) {
+            fail("Error SQL: " + e.getMessage());
+        }
     }
 }

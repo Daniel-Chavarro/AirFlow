@@ -644,6 +644,10 @@ public class DetailsFlightPanel extends JPanel {
         this.airplane = airplane;
     }
 
+    /**
+     * Sets the main details flight panel.
+     * @param detailsFlightPanel The details flight panel to set.
+     */
     public void setDetailsFlightPanel(JPanel detailsFlightPanel) {
         this.detailsFlightPanel = detailsFlightPanel;
     }

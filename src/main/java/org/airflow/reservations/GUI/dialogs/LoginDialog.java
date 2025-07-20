@@ -100,6 +100,10 @@ public class LoginDialog extends JDialog {
         getContentPane().setBackground(new Color(245, 245, 245));
     }
 
+    /**
+     * Main method for testing the LoginDialog.
+     * @param args Command line arguments.
+     */
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(new FlatLightLaf());
@@ -110,50 +114,98 @@ public class LoginDialog extends JDialog {
         SwingUtilities.invokeLater(() -> new LoginDialog(new JFrame()).setVisible(true));
     }
 
+    /**
+     * Gets the main panel of the dialog.
+     * @return The main panel.
+     */
     public JPanel getMainPane() {
         return mainPane;
     }
 
+    /**
+     * Sets the main panel of the dialog.
+     * @param mainPane The main panel to set.
+     */
     public void setMainPane(JPanel mainPane) {
         this.mainPane = mainPane;
     }
 
+    /**
+     * Gets the welcome label.
+     * @return The welcome label.
+     */
     public JLabel getWelcomeLabel() {
         return welcomeLabel;
     }
 
+    /**
+     * Sets the welcome label.
+     * @param welcomeLabel The welcome label to set.
+     */
     public void setWelcomeLabel(JLabel welcomeLabel) {
         this.welcomeLabel = welcomeLabel;
     }
 
+    /**
+     * Gets the signup link label.
+     * @return The signup link label.
+     */
     public JLabel getSignup() {
         return signup;
     }
 
+    /**
+     * Sets the signup link label.
+     * @param signup The signup link label to set.
+     */
     public void setSignup(JLabel signup) {
         this.signup = signup;
     }
 
+    /**
+     * Gets the email text field.
+     * @return The email text field.
+     */
     public JTextField getEmailField() {
         return emailField;
     }
 
+    /**
+     * Sets the email text field.
+     * @param emailField The email text field to set.
+     */
     public void setEmailField(JTextField emailField) {
         this.emailField = emailField;
     }
 
+    /**
+     * Gets the password field.
+     * @return The password field.
+     */
     public JPasswordField getPasswordField() {
         return passwordField;
     }
 
+    /**
+     * Sets the password field.
+     * @param passwordField The password field to set.
+     */
     public void setPasswordField(JPasswordField passwordField) {
         this.passwordField = passwordField;
     }
 
+    /**
+     * Gets the login button.
+     * @return The login button.
+     */
     public JButton getLoginButton() {
         return loginButton;
     }
 
+    /**
+     * Sets the login button.
+     * @param loginButton The login button to set.
+     */
     public void setLoginButton(JButton loginButton) {
         this.loginButton = loginButton;
     }

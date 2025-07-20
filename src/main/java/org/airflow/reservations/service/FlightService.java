@@ -153,7 +153,7 @@ public class FlightService {
             return availableFlights;
         }
         catch(Exception e){
-            throw new IllegalArgumentException("No hay vuelos disponibles");
+            throw new IllegalArgumentException("No available flights");
         }
     }
 

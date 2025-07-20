@@ -25,7 +25,7 @@ public class SeatService {
         try {
             Seat.SeatClass seatClass = Seat.SeatClass.valueOf(seatClassStr.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Clase de asiento inválida: " + seatClassStr);
+            throw new IllegalArgumentException("No a valid seat class: " + seatClassStr);
         }
     }
 
@@ -58,7 +58,7 @@ public class SeatService {
             return availableSeats;
         }
         catch(Exception e){
-            throw new IllegalArgumentException("No hay asientos disponibles");
+            throw new IllegalArgumentException("No available seats");
         }
 
     }

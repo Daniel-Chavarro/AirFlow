@@ -240,6 +240,51 @@ public class ReservationDAO implements DAOMethods<Reservation> {
         return reservations;
     }
 
+    /**
+     * Returns all reservations in the waitlist (status_FK = 1) ordered by reserved_at ASC.
+     *
+     * @return an ArrayList of Reservation objects representing the waitlist
+     * @throws SQLException if a database access error occurs
+     */
+    public ArrayList<Reservation> getWaitlistReservations() throws SQLException {
+        String query = "SELECT r.*, rs.name as status_name, rs.description as status_description " +
+                "FROM reservations r " +
+                "JOIN reservations_status rs ON r.status_FK = rs.id_PK " +
+                "WHERE r.status_FK = 1 " +
+                "ORDER BY r.reserved_at ASC";
+
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+
+        ArrayList<Reservation> reservations = transformResultsToClassArray(resultSet);
+        statement.close();
+        return reservations;
+    }
+
+    /**
+     * Returns waitlist reservations for a specific flight (status_FK = 1) ordered by reserved_at ASC.
+     *
+     * @param flightId the ID of the flight
+     * @return an ArrayList of Reservation objects representing the waitlist for the flight
+     * @throws SQLException if a database access error occurs
+     */
+    public ArrayList<Reservation> getWaitlistReservationsByFlight(int flightId) throws SQLException {
+        String query = "SELECT r.*, rs.name as status_name, rs.description as status_description " +
+                "FROM reservations r " +
+                "JOIN reservations_status rs ON r.status_FK = rs.id_PK " +
+                "WHERE r.status_FK = 1 AND r.flight_FK = ? " +
+                "ORDER BY r.reserved_at ASC";
+
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setInt(1, flightId);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        ArrayList<Reservation> reservations = transformResultsToClassArray(resultSet);
+        statement.close();
+        return reservations;
+    }
+
 
 
     // Getters and Setters

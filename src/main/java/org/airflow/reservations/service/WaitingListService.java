@@ -1,51 +1,32 @@
 package org.airflow.reservations.service;
 
-import org.airflow.reservations.model.WaitingList;
+import org.airflow.reservations.dao.WaitingListDao;
 import org.airflow.reservations.model.WaitingListEntry;
 
+import java.sql.SQLException;
 import java.util.List;
 
-/**
- * Servicio para manejar la lógica de la lista de espera.
- */
 public class WaitingListService {
-    private final WaitingList waitingList;
+    private final WaitingListDao dao;
 
-    public WaitingListService(WaitingList waitingList) {
-        this.waitingList = waitingList;
+    public WaitingListService(WaitingListDao dao) {
+        this.dao = dao;
     }
 
-    /**
-     * Registra un usuario en la lista de espera con prioridad.
-     */
-    public void registerUser(String userId, int priority) {
-        long timestamp = System.currentTimeMillis();
-        WaitingListEntry entry = new WaitingListEntry(userId, priority, timestamp);
-        waitingList.addEntry(entry);
-    }
-
-    /**
-     * Asigna asiento al usuario con mayor prioridad (si hay asientos disponibles).
-     * Retorna el usuario asignado o null si la lista está vacía.
-     */
-    public WaitingListEntry assignNextUser() {
-        if (!waitingList.isEmpty()) {
-            return waitingList.pollNext();
+    public void registerUser(String userId, int priority) throws SQLException {
+        if (dao.userExists(userId)) {
+            System.out.println("El usuario ya está en la lista de espera.");
+            return;
         }
-        return null;
+        long timestamp = System.currentTimeMillis();
+        dao.addEntry(new WaitingListEntry(userId, priority, timestamp));
     }
 
-    /**
-     * Consulta todos los usuarios en la lista de espera.
-     */
-    public List<WaitingListEntry> getWaitingList() {
-        return waitingList.getAllEntries();
+    public WaitingListEntry assignNextUser() throws SQLException {
+        return dao.pollNext();
     }
 
-    /**
-     * Verifica si la lista de espera está vacía.
-     */
-    public boolean isEmpty() {
-        return waitingList.isEmpty();
+    public List<WaitingListEntry> getWaitingList() throws SQLException {
+        return dao.getAllEntries();
     }
 }

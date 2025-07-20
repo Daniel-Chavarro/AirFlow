@@ -293,6 +293,28 @@ public class SeatDAO implements DAOMethods<Seat> {
         statement.close();
         return seats;
     }
+    
+    /**
+     * Retrieves a Seat object based on the provided airplane ID and seat number.
+     *
+     * @param airplaneId The ID of the airplane to which the seat belongs.
+     * @param seatNumber The unique identifier of the seat within the airplane (e.g., "11B").
+     * @return A Seat object if found, otherwise null.
+     * @throws SQLException if a database access error occurs.
+     */
+    public Seat getByAirplaneIdSeatNumber(int airplaneId, String seatNumber) throws SQLException {
+        String query = "SELECT id_PK, airplane_FK, reservation_FK, seat_number, seat_class, is_window " +
+                       "FROM seats WHERE airplane_FK = ? AND seat_number = ?";
+        
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setInt(1, airplaneId);
+        statement.setString(2, seatNumber);
+
+        ResultSet resultSet = statement.executeQuery();
+        Seat seat = transformResultsToClass(resultSet); 
+        statement.close();
+        return seat;
+    }
 
     // Getters and Setters
     public Connection getConnection() {

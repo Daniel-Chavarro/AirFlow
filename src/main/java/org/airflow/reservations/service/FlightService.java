@@ -144,7 +144,7 @@ public class FlightService {
      * @throws IllegalArgumentException : if there are no flights to be checked.
      */
 
-    private ArrayList<String> avilableFlightsToString(ArrayList<Flight> flights) throws SQLException{
+    private ArrayList<String> availableFlightsToString(ArrayList<Flight> flights) throws SQLException{
         try {
             ArrayList<String> availableFlights = new ArrayList<>();
             for (Flight flight : flights) {

@@ -85,12 +85,14 @@ public class CityDAO implements DAOMethods<City> {
      */
     @Override
     public void create(City object) throws SQLException {
-        String query = "INSERT INTO cities (name, country, code) VALUES (?, ?, ?)";
+        String query = "INSERT INTO cities (name, country, code,lat,lng) VALUES (?, ?, ?,?,?)";
 
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setString(1, object.getName());
         statement.setString(2, object.getCountry());
         statement.setString(3, object.getCode());
+        statement.setFloat(4, object.getLatitude());
+        statement.setFloat(5, object.getLongitude());
 
         statement.executeUpdate();
         statement.close();
@@ -173,6 +175,8 @@ public class CityDAO implements DAOMethods<City> {
             city.setName(resultSet.getString("name"));
             city.setCountry(resultSet.getString("country"));
             city.setCode(resultSet.getString("code"));
+            city.setLatitude(resultSet.getFloat("lat"));
+            city.setLatitude(resultSet.getFloat("lng"));
         }
 
         return city;
@@ -194,10 +198,21 @@ public class CityDAO implements DAOMethods<City> {
             city.setName(resultSet.getString("name"));
             city.setCountry(resultSet.getString("country"));
             city.setCode(resultSet.getString("code"));
+            city.setLatitude(resultSet.getFloat("lat"));
+            city.setLatitude(resultSet.getFloat("lng"));
             cities.add(city);
         }
 
         return cities;
+    }
+    public boolean cityExists(String code) throws SQLException {
+        String query = "SELECT * FROM cities WHERE code = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, code);
+        ResultSet resultSet = statement.executeQuery();
+        boolean exists = resultSet.next();
+        statement.close();
+        return exists;
     }
 
     // Getters and Setters

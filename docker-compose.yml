@@ -3,6 +3,7 @@ services:
     image: mysql:8.0.33
     container_name: mysql-airflow
     restart: always
+    command: --local-infile=1
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: airflow
@@ -12,6 +13,8 @@ services:
       - "3306:3306"
     volumes:
       - ./db/Airflow.sql:/docker-entrypoint-initdb.d/Airflow.sql
+      - ./db/import-cities.sql:/docker-entrypoint-initdb.d/import-cities.sql
+      - ./db/worldcities.csv:/var/lib/mysql-files/worldcities.csv
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
       interval: 5s

@@ -9,6 +9,8 @@ public class City {
     private String name;
     private String country;
     private String code;
+    private float latitude;
+    private float longitude;
 
     /**
      * Constructor for City class.
@@ -19,11 +21,13 @@ public class City {
      * @param country the country where the city is located
      * @param code    the airport code of the city
      */
-    public City(int id, String name, String country, String code) {
+    public City(int id, String name, String country, String code, float latitude, float longitude) {
         this.id = id;
         this.name = name;
         this.country = country;
         this.code = code;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     /**
@@ -36,6 +40,8 @@ public class City {
         this.name = "";
         this.country = "";
         this.code = "";
+        this.latitude = 0.0f;
+        this.longitude = 0.0f;
     }
 
     // Getters and Setters
@@ -70,4 +76,13 @@ public class City {
     public void setCode(String code) {
         this.code = code;
     }
+
+    public float getLatitude() {return latitude;}
+
+    public void setLatitude(float latitude) {this.latitude = latitude;}
+
+    public float getLongitude() {return longitude;}
+
+    public void setLongitude(float longitude) {this.longitude = longitude;}
 }
+

@@ -60,7 +60,6 @@ public class DataGenerator {
             // Generate and insert main data
             generateUsers(20);
             generateAirplanes(10);
-            generateCities(30);
             generateFlights(50);
             generateReservationsAndSeats(100);
 
@@ -83,7 +82,6 @@ public class DataGenerator {
             stmt.execute("TRUNCATE TABLE seats");
             stmt.execute("TRUNCATE TABLE reservations");
             stmt.execute("TRUNCATE TABLE flights");
-            stmt.execute("TRUNCATE TABLE cities");
             stmt.execute("TRUNCATE TABLE airplanes");
             stmt.execute("TRUNCATE TABLE users");
             stmt.execute("TRUNCATE TABLE flight_status");
@@ -276,71 +274,6 @@ public class DataGenerator {
             }
         }
     }
-
-    /**
-     * Generate fake cities
-     */
-    private void generateCities(int count) throws SQLException {
-        String[][] cityData = {
-            {"Ciudad de México", "México", "MEX"},
-            {"Guadalajara", "México", "GDL"},
-            {"Monterrey", "México", "MTY"},
-            {"Cancún", "México", "CUN"},
-            {"Los Ángeles", "Estados Unidos", "LAX"},
-            {"Nueva York", "Estados Unidos", "JFK"},
-            {"Miami", "Estados Unidos", "MIA"},
-            {"Chicago", "Estados Unidos", "ORD"},
-            {"Toronto", "Canadá", "YYZ"},
-            {"Vancouver", "Canadá", "YVR"},
-            {"Madrid", "España", "MAD"},
-            {"Barcelona", "España", "BCN"},
-            {"París", "Francia", "CDG"},
-            {"Londres", "Reino Unido", "LHR"},
-            {"Roma", "Italia", "FCO"},
-            {"Amsterdam", "Países Bajos", "AMS"},
-            {"Berlín", "Alemania", "BER"},
-            {"Tokio", "Japón", "NRT"},
-            {"Sídney", "Australia", "SYD"},
-            {"Río de Janeiro", "Brasil", "GIG"},
-            {"Buenos Aires", "Argentina", "EZE"},
-            {"Lima", "Perú", "LIM"},
-            {"Bogotá", "Colombia", "BOG"},
-            {"Santiago", "Chile", "SCL"},
-            {"Dubai", "Emiratos Árabes Unidos", "DXB"},
-            {"Singapur", "Singapur", "SIN"},
-            {"Hong Kong", "China", "HKG"},
-            {"Johannesburgo", "Sudáfrica", "JNB"},
-            {"El Cairo", "Egipto", "CAI"},
-            {"Moscú", "Rusia", "SVO"}
-        };
-
-        try (PreparedStatement pstmt = connection.prepareStatement(
-                "INSERT INTO cities (name, country, code) VALUES (?, ?, ?)",
-                Statement.RETURN_GENERATED_KEYS)) {
-
-            for (int i = 0; i < Math.min(count, cityData.length); i++) {
-                pstmt.setString(1, cityData[i][0]);
-                pstmt.setString(2, cityData[i][1]);
-                pstmt.setString(3, cityData[i][2]);
-
-                pstmt.executeUpdate();
-
-                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        City city = new City();
-                        city.setId(generatedKeys.getInt(1));
-                        city.setName(cityData[i][0]);
-                        city.setCountry(cityData[i][1]);
-                        city.setCode(cityData[i][2]);
-                        cities.add(city);
-                    }
-                }
-            }
-        }
-
-        System.out.println("Generated " + cities.size() + " cities");
-    }
-
     /**
      * Generate fake flights
      */
@@ -349,7 +282,7 @@ public class DataGenerator {
                 "INSERT INTO flights (airplane_FK, status_FK, origin_city_FK, destination_city_FK, code, " +
                 "departure_time, scheduled_arrival_time, arrival_time, price_base) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 Statement.RETURN_GENERATED_KEYS)) {
-
+            cities = cityDAO.getAll();
             for (int i = 0; i < count; i++) {
                 Airplane airplane = airplanes.get(random.nextInt(airplanes.size()));
 

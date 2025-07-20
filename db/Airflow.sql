@@ -20,12 +20,14 @@ CREATE TABLE IF NOT EXISTS `airplanes` (
   `capacity` int NOT NULL,
   `year` year
 );
-
+DroP TABLE IF EXISTS `cities`;
 CREATE TABLE IF NOT EXISTS `cities` (
   `id_PK` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `country` varchar(100) NOT NULL,
-  `code` varchar(10) NOT NULL
+  `code` varchar(10) UNIQUE NOT NULL ,
+  `lat` DECIMAL(9,5) NOT NULL,
+  `lng` DECIMAL(9,5) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS `flight_status` (

@@ -9,12 +9,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 public class ReservationService {
-    private ReservationDAO reservationDAO;
-    private FlightDAO flightDAO;
-    private SeatDAO SeatDAO;
-    private CityDAO cityDAO;
-    private User User;
-    private SeatService seatService;
+    private final ReservationDAO reservationDAO;
+    private final FlightDAO flightDAO;
+    private final SeatDAO SeatDAO;
+    private final CityDAO cityDAO;
+    private final User User;
+    private final SeatService seatService;
 
     public ReservationService(User User) throws Exception {
         this.flightDAO = new FlightDAO();
@@ -50,8 +50,7 @@ public class ReservationService {
         if (differenceHours < 3) return false;
         if (flight.getStatus_FK() == 7 || flight.getStatus_FK() == 3) return false;
         if ( seat.getAirplane_FK() != flight.getAirplane_FK()) return false;
-        if (seat.getReservation_FK() != null) return false;
-        return true;
+        return seat.getReservation_FK() == null;
     }
 
     /**
@@ -243,12 +242,7 @@ public class ReservationService {
         Flight flight= flightDAO.getById(reservation.getFlight_FK());
         if(flight.getId() == 0) throw new IllegalArgumentException("El vuelo no existe");
         long differenceHours = ChronoUnit.HOURS.between(LocalDateTime.now(),flight.getDeparture_time());
-        if (differenceHours > 2 && reservation.getStatus_FK()==1){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return differenceHours > 2 && reservation.getStatus_FK() == 1;
     }
 
     /**
@@ -318,12 +312,7 @@ public class ReservationService {
     private boolean ableToCanelAutomatically(int reservationId)throws SQLException{
         Reservation reservation = reservationDAO.getById(reservationId);
         if (reservation.getId() == 0) throw new IllegalArgumentException("La reserva no existe");
-        if (reservation.getStatus_FK() == 4 || reservation.getStatus_FK() == 5){
-           return false;
-        }
-        else{
-            return true;
-        }
+        return reservation.getStatus_FK() != 4 && reservation.getStatus_FK() != 5;
     }
 
     /**

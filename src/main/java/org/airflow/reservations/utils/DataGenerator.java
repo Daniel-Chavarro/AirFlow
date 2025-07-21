@@ -27,10 +27,10 @@ public class DataGenerator {
     private final SeatDAO seatDAO;
 
     // Lists to store generated entities for relationships
-    private ArrayList<User> users = new ArrayList<>();
-    private ArrayList<Airplane> airplanes = new ArrayList<>();
-    private ArrayList<City> cities = new ArrayList<>();
-    private ArrayList<Flight> flights = new ArrayList<>();
+    private final ArrayList<User> users = new ArrayList<>();
+    private final ArrayList<Airplane> airplanes = new ArrayList<>();
+    private final ArrayList<City> cities = new ArrayList<>();
+    private final ArrayList<Flight> flights = new ArrayList<>();
 
     /**
      * Constructor initializes connection and DAOs

@@ -122,19 +122,7 @@ public class FlightService {
     public void deleteFlight(int id) throws SQLException {
         flightDAO.delete(id);
     }
-        
-    /**
-     * Function to get all the available flights between two cities.
-     *@param Destiny_id: id of the destination city
-     *@param Origin_id: id of the origin city
-     *@return: an arraylist of flights that are available between the two cities.
-     *@throws SQLException: if a database access error occurs.
-     */
 
-    public ArrayList<String> availableFlights(int Destiny_id, int Origin_id) throws SQLException{
-        ArrayList<Flight> flights = flightDAO.getByDestinationAndOriginCity(Destiny_id,Origin_id);
-        return availableFlightsToString(flights);
-    }
 
     /**
      * Function to return all the codes of the available flights.

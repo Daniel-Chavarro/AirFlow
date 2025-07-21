@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+
 /**
  * RegisterDialog class provides a dialog for user registration.
  * It includes fields for first name, last name, email, and password,
@@ -125,46 +126,81 @@ public class RegisterDialog extends JDialog {
         setLocationRelativeTo(parent);
     }
 
+    /**
+     * Main method for testing the RegisterDialog.
+     * @param args Command line arguments.
+     */
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(new FlatLightLaf());
         } catch (Exception ex) {
             System.err.println("Failed to initialize FlatLaf");
         }
-
         SwingUtilities.invokeLater((() -> new RegisterDialog(new JFrame()).setVisible(true)));
     }
 
     //Getters and Setters
 
+    /**
+     * Gets the main panel of the dialog.
+     * @return The main panel.
+     */
     public JPanel getMainPane() {
         return mainPane;
     }
 
+    /**
+     * Gets the create account label.
+     * @return The create account label.
+     */
     public JLabel getCreateAccountLabel() {
         return createAccountLabel;
     }
 
+    /**
+     * Gets the login link label.
+     * @return The login link label.
+     */
     public JLabel getLoginLabel() {
         return loginLabel;
     }
 
+    /**
+     * Gets the first name text field.
+     * @return The first name text field.
+     */
     public JTextField getFirstNameTextField() {
         return firstNameTextField;
     }
 
+    /**
+     * Gets the last name text field.
+     * @return The last name text field.
+     */
     public JTextField getLastNameTextField() {
         return lastNameTextField;
     }
 
+    /**
+     * Gets the email text field.
+     * @return The email text field.
+     */
     public JTextField getEmailTextField() {
         return emailTextField;
     }
 
+    /**
+     * Gets the password field.
+     * @return The password field.
+     */
     public JPasswordField getPasswordField() {
         return passwordField;
     }
 
+    /**
+     * Gets the register button.
+     * @return The register button.
+     */
     public JButton getRegisterButton() {
         return registerButton;
     }

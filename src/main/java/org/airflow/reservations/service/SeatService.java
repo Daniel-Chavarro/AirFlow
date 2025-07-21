@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class SeatService {
-    private SeatDAO SeatDAO;
+    private final SeatDAO SeatDAO;
 
     public SeatService() throws Exception {
         this.SeatDAO = new SeatDAO();

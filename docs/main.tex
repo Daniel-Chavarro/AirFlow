@@ -9,49 +9,77 @@
 \usepackage{xcolor}
 \usepackage{array}
 \usepackage{booktabs}
+\usepackage{hyperref}
 \usepackage{float}
 \usepackage{url}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
 T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+}
+
 \begin{document}
 
     \title{Technical Documentation and System Architecture for Airflow: A Flight Reservation Management Application}
 
-    \author{\IEEEauthorblockN{Development Team}
-    \IEEEauthorblockA{\textit{Software Engineering Department} \\
-    \textit{University/Organization Name}\\
-    City, Country \\
-    email@domain.com}
+    \author{\IEEEauthorblockN{Leonardo Acevedo Monroy \\
+    Daniel Alonso Chavarro Chipatecua \\
+    Andrés Felipe Gómez Durán \\
+    Oscar Daniel Aguas Quiroz}
+    \IEEEauthorblockA{\textit{Careers of System Engineering and Computer Science} \\
+    \textit{Universidad Nacional de Colombia}\\
+    Bogota, Colombia}
     }
 
     \maketitle
 
     \begin{abstract}
-        This paper presents the comprehensive technical documentation of Airflow, a flight reservation management system. The system is designed to efficiently manage flight reservations, providing a robust platform that enables users to search, book, and manage their air travel. The application encompasses comprehensive flight management, from aircraft and seat administration to reservation and flight status control, delivering a complete experience for both end users and system administrators. This documentation details the database design methodology, entity-relationship modeling, system architecture, and implementation patterns used in the development process.
+        This paper presents the comprehensive technical documentation of Airflow, a flight reservation management system. The system is designed to efficiently manage flight reservations, providing a robust platform that enables users to search, book, and manage their air travel. The application encompasses comprehensive flight management, from aircraft and seat administration to reservation and flight status control, providinga complete experience for both end users and system administrators. This document details the database design methodology, entity-relationship modeling, system architecture, and implementation patterns used in the development process.
     \end{abstract}
 
     \begin{IEEEkeywords}
-        flight reservation system, database design, entity-relationship model, software architecture, data access objects, ontology-based development
-    \end{IEEEkeywords}
+        flight reservation system, database design, entity-relationship model, software architecture, data access objects, ontology-based development \end{IEEEkeywords}
 
     \section{Introduction}
-    Modern air travel management requires sophisticated software systems capable of handling complex operations including flight scheduling, seat management, user authentication, and reservation processing. This paper presents the technical documentation for Airflow, a comprehensive flight reservation management application designed to address these requirements through a well-structured, scalable architecture.
+    Modern air travel management requires sophisticated software systems capable of handling complex operations, including flight scheduling, seat management, user authentication, and reservation processing. This paper presents the technical documentation for Airflow, a comprehensive flight reservation management application designed to address these requirements through a well-structured, scalable architecture.
 
     The system integrates multiple components including user management, aircraft inventory, flight scheduling, and reservation processing. The application serves both end users seeking to book flights and administrators requiring comprehensive system management capabilities.
+
+    \section{Project Repository}
+    The code of the entire project is in this Github repository:\\
+    \url{https://github.com/Daniel-Chavarro/AirFlow}
+
+    \section{System Architecture}
+
+    \subsection{General Description}
+    The flight reservation application architecture is based on a layered structure that clearly separates the different responsibilities of the system. The main architectural layers are as follows:
+
+    \begin{itemize}
+        \item \textbf{Presentation Layer}: User interface and interaction
+        \item \textbf{Model Layer}: Data representation in the application
+        \item \textbf{Persistence Layer}: Data access and management in the database
+        \item \textbf{Service Layer}: Business logic
+        \item \textbf{Utility Layer}: Tools for different layers \end{itemize}
+
+    This layered architecture promotes the separation of concerns, maintainability, and scalability while ensuring clear boundaries between different system components.
 
     \section{Data Persistence - Database Design}
 
     \subsection{Development Methodology}
-    The development of the entity-relationship model is based on ontologies as a conceptual foundation. This methodology enables the creation of a more coherent and semantically rich database design, ensuring that relationships between entities accurately reflect the business domain logic.
+    The development of the entity-relationship model is based on ontologies as a conceptual foundation. This methodology enables the creation of a more coherent and semantically rich database design, ensuring that the relationships between entities accurately reflect the logic of the business domain.
 
     The development process followed these stages:
     \begin{enumerate}
         \item \textbf{Entity Declaration}: Identification and definition of the system's main entities
         \item \textbf{Attribute Definition}: Specification of each entity's properties with their respective data types
         \item \textbf{Relationship Establishment}: Development of connections between entities through cardinality analysis
-        \item \textbf{Model Validation}: Verification of design integrity and consistency
-    \end{enumerate}
+        \item \textbf{Model Validation}: Verification of the integrity and consistency of the design \end{enumerate}
 
     \subsection{System Entities}
     The system comprises the following main entities:
@@ -106,7 +134,8 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
         \item \texttt{destination\_city\_FK}: Destination city (int, foreign key)
         \item \texttt{code}: Flight identification code (varchar(10), not null)
         \item \texttt{departure\_time}: Departure date and time (timestamp, not null)
-        \item \texttt{arrival\_time}: Arrival date and time (timestamp, not null)
+        \item \texttt{scheduled\_arrival\_time): Scheduled arrival date and time (timestamp NOT NULL)}
+        \item \texttt{arrival\_time}: Arrival date and time (timestamp, null)
         \item \texttt{price\_base}: Base flight price (decimal(10,2), not null)
     \end{itemize}
 
@@ -123,7 +152,7 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
     \end{itemize}
 
     \subsubsection{Seats}
-    Manages available seats on aircraft.
+    Manages the available seats on the aircraft.
 
     \textbf{Attributes:}
     \begin{itemize}
@@ -132,7 +161,7 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
         \item \texttt{reservation\_FK}: Associated reservation, if exists (int, foreign key, nullable)
         \item \texttt{seat\_number}: Seat number (varchar(10), not null)
         \item \texttt{seat\_class}: Seat class (enum: ECONOMY, BUSINESS, FIRST)
-        \item \texttt{is\_window}: Indicates if it's a window seat (boolean)
+        \item \texttt{is\_window}: Indicates if it is a window seat (boolean)
     \end{itemize}
 
     \subsubsection{Flight\_Status}
@@ -156,7 +185,7 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
     \end{itemize}
 
     \subsection{Entity Relationships}
-    The system establishes the following relationships between identified entities:
+    The system establishes the following relationships between the identified entities:
 
     \subsubsection{User-Reservation Relationships}
     \textbf{Cardinality}: 1:M (One to Many)
@@ -241,7 +270,8 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
     \section{Data Access Object (DAO) Pattern}
 
-    The system implements the DAO design pattern to abstract and encapsulate database access, clearly separating business logic from persistence logic. The implementation follows these principles:
+    The system implements the DAO design pattern to abstract and encapsulate database access, clearly separating business logic from persistence logic.
+    The implementation follows these principles:
 
     \subsection{DAOMethods Interface}
     A generic interface \texttt{DAOMethods<T>} is defined that establishes standard methods for CRUD operations:
@@ -283,20 +313,6 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
     \subsubsection{Transaction Handling}
     The system implements transaction control for critical operations such as flight reservations, ensuring data integrity even in complex operations affecting multiple tables through commit/rollback mechanisms.
 
-    \section{System Architecture}
-
-    \subsection{General Description}
-    The flight reservation application architecture is based on a layered structure that clearly separates the different system responsibilities. The main architectural layers are:
-
-    \begin{itemize}
-        \item \textbf{Presentation Layer}: User interface and interaction
-        \item \textbf{Model Layer}: Data representation in the application
-        \item \textbf{Persistence Layer}: Data access and management in the database
-        \item \textbf{Service Layer}: Business logic
-        \item \textbf{Utility Layer}: Tools for different layers
-    \end{itemize}
-
-    This layered architecture promotes separation of concerns, maintainability, and scalability while ensuring clear boundaries between different system components.
 
     \section{User Interface Design}
 
@@ -348,6 +364,25 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
         \item Seat selection
     \end{itemize}
 
+    \subsubsection{Seat Selection Panel (BookSeatsPanel)}
+    Interactive interface that allows users to visualize and select specific seats on the chosen aircraft.
+
+    \textbf{Visualization features:}
+    \begin{itemize}
+        \item Graphical representation of the aircraft
+        \item Visual differentiation by service class
+        \item Real-time availability indicators
+        \item Legend of symbols and colors
+    \end{itemize}
+
+    \textbf{Selection functionalities:}
+    \begin{itemize}
+        \item Multiple seat selection
+        \item Availability validation
+        \item Automatic price calculation
+        \item Seat recommendations
+    \end{itemize}
+
     \subsubsection{Confirmation Panel}
     Allows the user to review and confirm their booking details before finalizing:
     \begin{itemize}
@@ -373,11 +408,10 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
         \item \textbf{Color Palette}: Predominance of light tones with subtle accents to highlight important elements
         \item \textbf{Typography}: Use of sans-serif fonts to improve readability
         \item \textbf{Iconography}: Implementation of minimalist icons to represent common actions
-        \item \textbf{Spacing}: Design with sufficient white space to reduce visual overload
-    \end{itemize}
+        \item \textbf{Spacing}: Design with sufficient white space to reduce visual overload \end{itemize}
 
     \subsection{User Interaction and Flow}
-    The navigation flow in the application follows a linear and predictable pattern:
+    The navigation flow in the application follows a linear and predictable pattern.
 
     \begin{enumerate}
         \item Search for available flights
@@ -390,31 +424,75 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
     This sequential design guides the user through the booking process intuitively, reducing the learning curve and minimizing possible errors during the process.
 
     \subsection{Interface Screenshots}
-    Below are screenshots of the application's main interfaces, demonstrating the implemented design principles and user flows:
+    Below are screenshots of the application's main interfaces demonstrating the implemented design principles and user flows.
 
     \begin{figure}[H]
         \centering
-        \includegraphics[width=0.8\textwidth]{docs/images/main_interface.png}
+        \includegraphics[width=\linewidth]{images/UI/MainPanel.png}
         \caption{Main application interface showing the flight search panel}
         \label{fig:main_interface}
     \end{figure}
 
     \begin{figure}[H]
         \centering
-        \includegraphics[width=0.8\textwidth]{docs/images/flight_details.png}
+        \includegraphics[width=\linewidth]{images/UI/DetailsPanel.png}
         \caption{Flight details panel showing selected flight information}
         \label{fig:flight_details}
     \end{figure}
 
     \begin{figure}[H]
         \centering
-        \includegraphics[width=0.8\textwidth]{docs/images/confirmation_panel.png}
-        \caption{Booking confirmation panel with reservation summary}
-        \label{fig:confirmation_panel}
+        \includegraphics[width=\linewidth]{images/UI/BookSeatsPanel.png}
+        \caption{Book Seats panel showing available seats}
+        \label{fig:book_seats}
     \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\linewidth]{images/UI/ConfirmationPanel.png}
+        \caption{Confirmation panel showing details of reservation}
+        \label{fig:confirm_interface}
+    \end{figure}
+
 
     These screenshots demonstrate how the design principles of simplicity, consistency, and modern aesthetics have been applied throughout the application, resulting in a clean and intuitive user interface.
 
+    \section{GUI Implementation with Bridge and Command Patterns}
+    To enhance the modularity and maintainability of the user interface, the Bridge and Command design patterns were implemented. This section details how these patterns were integrated into the GUI architecture.
+
+    \subsection{Bridge Pattern for Decoupling}
+    The Bridge pattern was used to decouple the user interface (the "View") from its controlling logic (the "Controller"). This separation allows the UI and the business logic to evolve independently.
+
+    \begin{itemize}
+        \item \textbf{Abstraction (\texttt{View} Interface)}: An interface named \texttt{View} was created to define all the operations that the user interface must support. This includes methods for displaying panels, retrieving data from forms, and setting data for display. This interface acts as the "bridge" between the UI implementation and the controller.
+
+        \item \textbf{Concrete Implementor (\texttt{MainFrame})}: The \texttt{MainFrame} class implements the \texttt{View} interface, providing the concrete implementation of the UI. It manages a \texttt{CardLayout} to switch between different panels like \texttt{SearchFlightPanel}, \texttt{DetailsFlightPanel}, etc.
+    \end{itemize}
+
+    This structure allows the controller to interact with the UI through the \texttt{View} interface, without being coupled to the specific implementation details of \texttt{MainFrame} or jego sub-components.
+
+    \subsection{Command Pattern for UI Actions}
+    The Command pattern was used to encapsulate all the information needed to perform an action or trigger an event. In the context of the GUI, this means that each user action (e.g., clicking a button) is treated as a command.
+
+    \begin{itemize}
+        \item \textbf{Commands}: A set of string constants (e.g., \texttt{SEARCH\_FLIGHT\_CMD}, \texttt{BOOK\_SEAT\_CMD}) are defined in the \texttt{View} interface. These constants represent the different commands that can be triggered by the user.
+
+        \item \textbf{Invokers}: UI components like \texttt{JButton} act as invokers. Each interactive component is assigned a specific action command using the \texttt{setActionCommand()} method.
+
+        \item \textbf{Receiver and Controller}: A single \texttt{ActionListener} in the (yet to be implemented) controller will act as the receiver for all these commands. It will inspect the action command of the event and delegate the request to the appropriate handler method, effectively executing the command.
+    \end{itemize}
+
+    By using the Command pattern, the UI components are completely decoupled from the logic that is executed. The buttons don't know what happens when they are clicked; they only know to send a specific command to the listener.
+
+    \subsection{Dynamic Flight Display}
+    The flight search results are now displayed dynamically as a series of cards.
+
+    \begin{itemize}
+        \item \textbf{\texttt{FlightCardPanel}}: A new component, \texttt{FlightCardPanel}, was created to represent a single flight in the search results. This panel displays key information like the route, time, duration, and price, along with a "View Details" button.
+
+        \item \textbf{Dynamic Population}: The \texttt{SearchFlightPanel} now contains a method, \texttt{displayFlights()}, which takes a list of flights and dynamically creates a \texttt{FlightCardPanel} for each one. These cards are added to a results panel, which is displayed to the user.
+    \end{itemize}
+
+    This approach makes the search results more interactive and visually appealing, and it further demonstrates the flexibility of the implemented architecture. The main frame delegates the responsibility of displaying the flights to the search panel, which in turn uses the specialized card panel for the rendering of each flight.
 
 
     \begin{thebibliography}{00}

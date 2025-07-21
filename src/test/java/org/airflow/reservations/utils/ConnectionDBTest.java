@@ -20,7 +20,7 @@ public class ConnectionDBTest {
         try {
             Connection connection = ConnectionDB.getConnection();
             assertNotNull(connection, "Connection should not be null");
-            assertTrue(!connection.isClosed(), "Connection should be open");
+            assertFalse(connection.isClosed(), "Connection should be open");
             connection.close();
         } catch (SQLException e) {
             fail("Failed to establish database connection: " + e.getMessage());

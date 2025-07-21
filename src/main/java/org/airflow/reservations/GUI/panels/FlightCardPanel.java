@@ -93,7 +93,7 @@ public class FlightCardPanel extends JPanel {
         viewDetailsButton.setBackground(new Color(0, 122, 255));
         viewDetailsButton.setForeground(Color.WHITE);
         viewDetailsButton.setFocusPainted(false);
-        viewDetailsButton.setActionCommand(View.DETAILS_FLIGHT_CMD + "_" + flight.getId());
+        viewDetailsButton.setActionCommand(View.DETAILS_FLIGHT_CMD + ":" + flight.getId());
         actionPanel.add(viewDetailsButton, BorderLayout.SOUTH);
 
         add(infoPanel, BorderLayout.CENTER);

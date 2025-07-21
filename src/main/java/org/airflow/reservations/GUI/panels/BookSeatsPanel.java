@@ -4,14 +4,17 @@ import org.airflow.reservations.GUI.Bridge.View;
 import org.airflow.reservations.model.Seat;
 import org.airflow.reservations.model.Flight;
 import org.airflow.reservations.model.Airplane;
+import org.airflow.reservations.model.City;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.Comparator;
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -31,6 +34,12 @@ public class BookSeatsPanel extends JPanel {
     private ArrayList<Seat> selectedSeats;
     /** A map of seat numbers to their corresponding buttons. */
     private Map<String, JButton> seatButtons;
+    /** The origin city information. */
+    private City originCity;
+    /** The destination city information. */
+    private City destinationCity;
+    /** The action listener for seat and button interactions. */
+    private ActionListener actionListener;
 
     /** The main panel containing all components. */
     private JPanel mainPanel;
@@ -58,6 +67,72 @@ public class BookSeatsPanel extends JPanel {
 
     /** Formatter for currency values. */
     private static final NumberFormat CURRENCY_FORMAT = NumberFormat.getCurrencyInstance(Locale.US);
+
+    /**
+     * Sets the flight data and rebuilds the entire panel with real data.
+     *
+     * @param flight   The flight for which seats are being booked
+     * @param airplane The airplane information
+     * @param seats    The list of available seats from database
+     */
+    public void setFlightData(Flight flight, Airplane airplane, ArrayList<Seat> seats) {
+        this.flight = flight;
+        this.airplane = airplane;
+        this.seats = seats;
+        this.selectedSeats = new ArrayList<>();
+        this.seatButtons = new HashMap<>();
+        this.originCity = null;
+        this.destinationCity = null;
+
+        // Clear existing content
+        removeAll();
+
+        // Reinitialize with real data
+        initializeComponents();
+        layoutComponents();
+        
+        // Re-add action listener if one was previously set
+        if (actionListener != null) {
+            addActionListener(actionListener);
+        }
+        
+        revalidate();
+        repaint();
+    }
+
+    /**
+     * Sets the flight data and rebuilds the entire panel with real data including city information.
+     *
+     * @param flight   The flight for which seats are being booked
+     * @param airplane The airplane information
+     * @param seats    The list of available seats from database
+     * @param originCity The origin city information
+     * @param destinationCity The destination city information
+     */
+    public void setFlightData(Flight flight, Airplane airplane, ArrayList<Seat> seats, City originCity, City destinationCity) {
+        this.flight = flight;
+        this.airplane = airplane;
+        this.seats = seats;
+        this.selectedSeats = new ArrayList<>();
+        this.seatButtons = new HashMap<>();
+        this.originCity = originCity;
+        this.destinationCity = destinationCity;
+
+        // Clear existing content
+        removeAll();
+
+        // Reinitialize with real data
+        initializeComponents();
+        layoutComponents();
+        
+        // Re-add action listener if one was previously set
+        if (actionListener != null) {
+            addActionListener(actionListener);
+        }
+        
+        revalidate();
+        repaint();
+    }
 
     /**
      * Constructor for BookSeatsPanel with flight data.
@@ -184,7 +259,7 @@ public class BookSeatsPanel extends JPanel {
     private void initializeComponents() {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // Main panel
         mainPanel = new JPanel();
@@ -207,7 +282,7 @@ public class BookSeatsPanel extends JPanel {
         summaryPanel.setBorder(BorderFactory.createTitledBorder("Booking Summary"));
 
         // Button panel
-        buttonPanel = new JPanel(new FlowLayout());
+        buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         buttonPanel.setBackground(Color.WHITE);
 
         createFlightInfoComponents();
@@ -224,15 +299,25 @@ public class BookSeatsPanel extends JPanel {
         gbc.insets = new Insets(5, 10, 5, 10);
         gbc.anchor = GridBagConstraints.WEST;
 
-        // Flight route
-        JLabel routeLabel = new JLabel("BOG - LIM");
+        // Flight route - use real city data if available, otherwise use flight code
+        String routeText;
+        String fromToText;
+        if (originCity != null && destinationCity != null) {
+            routeText = originCity.getCode() + " - " + destinationCity.getCode();
+            fromToText = originCity.getName() + " to " + destinationCity.getName();
+        } else {
+            routeText = "Flight " + flight.getCode();
+            fromToText = "Flight Route";
+        }
+        
+        JLabel routeLabel = new JLabel(routeText);
         routeLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
         flightInfoPanel.add(routeLabel, gbc);
 
         // Flight details
         gbc.gridwidth = 1;
-        JLabel fromLabel = new JLabel("Bogotá to Lima");
+        JLabel fromLabel = new JLabel(fromToText);
         fromLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
         gbc.gridx = 0; gbc.gridy = 1;
         flightInfoPanel.add(fromLabel, gbc);
@@ -377,50 +462,62 @@ public class BookSeatsPanel extends JPanel {
      * @return The seat grid panel.
      */
     private JPanel createSeatGridPanel() {
-        JPanel gridPanel = new JPanel();
+        JPanel gridPanel = new JPanel(new GridBagLayout());
         gridPanel.setBackground(Color.WHITE);
-        gridPanel.setLayout(new GridBagLayout());
-
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(2, 2, 2, 2);
 
-        // Group seats by row
-        Map<String, ArrayList<Seat>> seatsByRow = new HashMap<>();
+        // Group seats by row number (e.g., "1", "2", "3")
+        Map<String, List<Seat>> seatsByRow = new TreeMap<>((s1, s2) -> {
+            // Allow proper numeric sorting for row keys
+            return Integer.compare(Integer.parseInt(s1), Integer.parseInt(s2));
+        });
+
         for (Seat seat : seats) {
-            String rowNumber = seat.getSeat_number().replaceAll("[A-Z]", "");
-            seatsByRow.computeIfAbsent(rowNumber, k -> new ArrayList<>()).add(seat);
+            String seatNumber = seat.getSeat_number();
+            String row = seatNumber.replaceAll("[A-Z]", "");
+            seatsByRow.computeIfAbsent(row, k -> new ArrayList<>()).add(seat);
         }
 
-        // Sort rows numerically
-        String[] sortedRows = seatsByRow.keySet().toArray(new String[0]);
-        java.util.Arrays.sort(sortedRows, (a, b) -> Integer.compare(Integer.parseInt(a), Integer.parseInt(b)));
+        // Define the desired order of seat columns
+        List<String> columnOrder = List.of("A", "B", "C", "D", "E", "F");
 
-        int rowIndex = 0;
-        for (String rowNumber : sortedRows) {
-            ArrayList<Seat> rowSeats = seatsByRow.get(rowNumber);
-            rowSeats.sort((a, b) -> a.getSeat_number().compareTo(b.getSeat_number()));
+        int gridY = 0;
+        for (Map.Entry<String, List<Seat>> entry : seatsByRow.entrySet()) {
+            String rowNumber = entry.getKey();
+            List<Seat> rowSeats = entry.getValue();
 
-            // Row number label
+            // Sort seats in the row according to the defined column order
+            rowSeats.sort(Comparator.comparing(seat -> {
+                String col = seat.getSeat_number().replaceAll("[0-9]", "");
+                return columnOrder.indexOf(col);
+            }));
+
+            // Add row label
             JLabel rowLabel = new JLabel(rowNumber);
             rowLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
-            gbc.gridx = 0; gbc.gridy = rowIndex;
+            gbc.gridx = 0;
+            gbc.gridy = gridY;
             gridPanel.add(rowLabel, gbc);
 
-            // Add seats for this row
-            for (int i = 0; i < rowSeats.size(); i++) {
-                Seat seat = rowSeats.get(i);
+            // Add seat buttons
+            int gridX = 1;
+            for (Seat seat : rowSeats) {
+                String column = seat.getSeat_number().replaceAll("[0-9]", "");
+                
+                // Add aisle gap after column C
+                if (column.equals("D")) {
+                    gridX++; // Leave a column empty for the aisle
+                }
+
                 JButton seatButton = createSeatButton(seat);
-
-                gbc.gridx = i + 1;
-                if (i == 2) gbc.gridx++; // Add space for aisle
-
+                gbc.gridx = gridX++;
+                gbc.gridy = gridY;
                 gridPanel.add(seatButton, gbc);
                 seatButtons.put(seat.getSeat_number(), seatButton);
             }
-
-            rowIndex++;
+            gridY++;
         }
-
         return gridPanel;
     }
 
@@ -431,7 +528,6 @@ public class BookSeatsPanel extends JPanel {
      */
     private JButton createSeatButton(Seat seat) {
         JButton button = new JButton(seat.getSeat_number());
-        button.setPreferredSize(new Dimension(45, 35));
         button.setFont(new Font("SansSerif", Font.PLAIN, 10));
 
         // Set button color based on seat status and class
@@ -446,10 +542,14 @@ public class BookSeatsPanel extends JPanel {
             button.setBackground(seatColor);
             button.setForeground(Color.BLACK);
             button.setEnabled(true);
+            // This internal listener provides immediate visual feedback.
+            button.addActionListener(e -> {
+                toggleSeatSelection(seat);
+            });
         }
 
-        // Add action listener for seat selection
-        button.addActionListener(new SeatSelectionListener(seat));
+        // This allows the main controller to also listen to the event if needed.
+        button.setActionCommand(View.SELECT_SEAT + ":" + seat.getSeat_number());
 
         return button;
     }
@@ -459,7 +559,7 @@ public class BookSeatsPanel extends JPanel {
      * @param seatClass The seat class.
      * @return The color for the seat class.
      */
-    private Color getSeatClassColor(Seat.SeatClass seatClass) {
+    public Color getSeatClassColor(Seat.SeatClass seatClass) {
         return switch (seatClass) {
             case FIRST -> new Color(220, 120, 120); // Light red/pink for first class
             case BUSINESS -> new Color(255, 200, 120); // Light orange for business/plus
@@ -492,24 +592,24 @@ public class BookSeatsPanel extends JPanel {
      * Creates the components for the button panel.
      */
     private void createButtonComponents() {
-        confirmButton = new JButton("Go to Payment");
-        confirmButton.setFont(new Font("SansSerif", Font.BOLD, 16));
+        confirmButton = new JButton("Confirm Booking");
+        confirmButton.setFont(new Font("SansSerif", Font.BOLD, 14));
         confirmButton.setBackground(new Color(0, 122, 255));
         confirmButton.setForeground(Color.WHITE);
-        confirmButton.setPreferredSize(new Dimension(150, 40));
+        confirmButton.setPreferredSize(new Dimension(180, 40));
         confirmButton.setEnabled(false);
-        confirmButton.setActionCommand(View.GO_TO_PAYMENT_CMD);
+        confirmButton.setActionCommand(View.CONFIRM_RESERVATION_CMD);
 
-        clearSeatsButton = new JButton("Clear Seats");
-        clearSeatsButton.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        clearSeatsButton = new JButton("Clear Selection");
+        clearSeatsButton.setFont(new Font("SansSerif", Font.PLAIN, 12));
         clearSeatsButton.setBackground(new Color(255, 140, 0));
         clearSeatsButton.setForeground(Color.WHITE);
-        clearSeatsButton.setPreferredSize(new Dimension(120, 40));
+        clearSeatsButton.setPreferredSize(new Dimension(140, 40));
         clearSeatsButton.setEnabled(false);
         clearSeatsButton.setActionCommand(View.CLEAR_SEATS_CMD);
 
         cancelButton = new JButton("Back");
-        cancelButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        cancelButton.setFont(new Font("SansSerif", Font.PLAIN, 14));
         cancelButton.setBackground(Color.LIGHT_GRAY);
         cancelButton.setPreferredSize(new Dimension(100, 40));
         cancelButton.setActionCommand(View.BACK_TO_FLIGHTS_CMD);
@@ -526,11 +626,11 @@ public class BookSeatsPanel extends JPanel {
      */
     private void layoutComponents() {
         mainPanel.add(flightInfoPanel);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         mainPanel.add(seatMapPanel);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         mainPanel.add(summaryPanel);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         mainPanel.add(buttonPanel);
 
         add(mainPanel, BorderLayout.CENTER);
@@ -539,7 +639,7 @@ public class BookSeatsPanel extends JPanel {
     /**
      * Updates the summary panel with the current selection.
      */
-    private void updateSummary() {
+    public void updateSummary() {
         if (selectedSeats.isEmpty()) {
             selectedSeatsLabel.setText("Selected Seats: None");
             totalPriceLabel.setText("Total Price: " + CURRENCY_FORMAT.format(0.0));
@@ -555,14 +655,7 @@ public class BookSeatsPanel extends JPanel {
                 if (i < selectedSeats.size() - 1) {
                     seatsText.append(", ");
                 }
-
-                // Calculate price based on seat class
-                double seatPrice = switch (seat.getSeat_class()) {
-                    case FIRST -> 193.60; // Premium price from screenshot
-                    case BUSINESS -> 193.60; // Plus price from screenshot
-                    case ECONOMY -> 80.70; // Economy price from screenshot
-                };
-                totalPrice += seatPrice;
+                totalPrice += flight.getPrice_base();
             }
 
             selectedSeatsLabel.setText(seatsText.toString());
@@ -576,18 +669,39 @@ public class BookSeatsPanel extends JPanel {
      * Clears all seat selections.
      */
     public void clearAllSelections() {
-        for (Seat seat : selectedSeats) {
-            JButton button = seatButtons.get(seat.getSeat_number());
-            if (button != null) {
-                // Restore original seat class color
-                Color originalColor = getSeatClassColor(seat.getSeat_class());
-                button.setBackground(originalColor);
-                button.setForeground(Color.BLACK);
-            }
+        for (Seat seat : new ArrayList<>(selectedSeats)) {
+            toggleSeatSelection(seat);
         }
-        selectedSeats.clear();
         updateSummary();
     }
+
+    public void toggleSeatSelection(Seat seat) {
+        JButton button = seatButtons.get(seat.getSeat_number());
+        if (selectedSeats.contains(seat)) {
+            selectedSeats.remove(seat);
+            if (button != null) {
+                button.setBackground(getSeatClassColor(seat.getSeat_class()));
+                button.setForeground(Color.BLACK);
+            }
+        } else {
+            selectedSeats.add(seat);
+            if (button != null) {
+                button.setBackground(new Color(60, 120, 60));
+                button.setForeground(Color.WHITE);
+            }
+        }
+        updateSummary();
+    }
+
+    public Seat getSeatByNumber(String seatNumber) {
+        for (Seat seat : seats) {
+            if (seat.getSeat_number().equals(seatNumber)) {
+                return seat;
+            }
+        }
+        return null;
+    }
+
 
     /**
      * Sets the flight for the panel.
@@ -837,34 +951,41 @@ public class BookSeatsPanel extends JPanel {
         return CURRENCY_FORMAT;
     }
 
-    /**
-     * Inner class to handle seat selection events.
-     */
-    private class SeatSelectionListener implements ActionListener {
-        private final Seat seat;
+    public void addActionListener(ActionListener listener) {
+        this.actionListener = listener;
 
-        public SeatSelectionListener(Seat seat) {
-            this.seat = seat;
+        // --- Remove existing listeners to prevent duplicates ---
+        for(ActionListener al : confirmButton.getActionListeners()) {
+            confirmButton.removeActionListener(al);
+        }
+        for(ActionListener al : clearSeatsButton.getActionListeners()) {
+            clearSeatsButton.removeActionListener(al);
+        }
+        for(ActionListener al : cancelButton.getActionListeners()) {
+            cancelButton.removeActionListener(al);
+        }
+        for (JButton button : seatButtons.values()) {
+            for(ActionListener al : button.getActionListeners()) {
+                button.removeActionListener(al);
+            }
         }
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            JButton button = (JButton) e.getSource();
+        // --- Add listeners ---
 
-            if (selectedSeats.contains(seat)) {
-                // Deselect seat - restore original color
-                selectedSeats.remove(seat);
-                Color originalColor = getSeatClassColor(seat.getSeat_class());
-                button.setBackground(originalColor);
-                button.setForeground(Color.BLACK);
-            } else {
-                // Select seat - use selected color
-                selectedSeats.add(seat);
-                button.setBackground(new Color(60, 120, 60));
-                button.setForeground(Color.WHITE);
+        // Add internal listener for immediate visual feedback on seat clicks
+        for (JButton button : seatButtons.values()) {
+            Seat seat = getSeatByNumber(button.getText());
+            if (seat != null && seat.getReservation_FK() == null) {
+                button.addActionListener(e -> toggleSeatSelection(seat));
             }
+        }
 
-            updateSummary();
+        // Add the main controller listener to all buttons
+        confirmButton.addActionListener(listener);
+        clearSeatsButton.addActionListener(listener);
+        cancelButton.addActionListener(listener);
+        for (JButton button : seatButtons.values()) {
+            button.addActionListener(listener);
         }
     }
 
@@ -897,6 +1018,19 @@ public class BookSeatsPanel extends JPanel {
             frame.setLocationRelativeTo(null);
 
             BookSeatsPanel bookSeatsPanel = new BookSeatsPanel();
+            
+            // Example of how an external listener (like the Controller) would work
+            bookSeatsPanel.addActionListener(e -> {
+                String command = e.getActionCommand();
+                if (command != null && command.startsWith(View.SELECT_SEAT)) {
+                    System.out.println("Seat action detected: " + command);
+                    // The internal listener already handles the color toggle,
+                    // but the main controller would handle other logic here.
+                } else {
+                    System.out.println("Action detected: " + command);
+                }
+            });
+
             frame.add(bookSeatsPanel);
             frame.setVisible(true);
         });

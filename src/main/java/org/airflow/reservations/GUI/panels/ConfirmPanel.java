@@ -105,11 +105,42 @@ public class ConfirmPanel extends JPanel {
     public ConfirmPanel() {
         setLayout(new BorderLayout());
         mainPanel = new JPanel();
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBackground(Color.WHITE);
 
         selectedSeats = new ArrayList<>();
+
+        // Initialize buttons early so they can be accessed by MainFrame
+        initializeButtons();
+    }
+
+    /**
+     * Initializes the buttons that need to be accessible immediately.
+     */
+    private void initializeButtons() {
+        // Initialize back button
+        backButton = new JButton("Back to Seat Selection");
+        backButton.setPreferredSize(new Dimension(180, 40));
+        backButton.setBackground(Color.WHITE);
+        backButton.setForeground(new Color(0, 102, 204));
+        backButton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(0, 102, 204), 2),
+                BorderFactory.createEmptyBorder(5, 15, 5, 15)
+        ));
+        backButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+        backButton.setFocusPainted(false);
+        backButton.setActionCommand(View.BACK_TO_SEAT_SELECTION_CMD);
+
+        // Initialize confirm button
+        confirmButton = new JButton("Confirm Reservation");
+        confirmButton.setPreferredSize(new Dimension(180, 40));
+        confirmButton.setBackground(new Color(0, 102, 204));
+        confirmButton.setForeground(Color.WHITE);
+        confirmButton.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+        confirmButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+        confirmButton.setFocusPainted(false);
+        confirmButton.setActionCommand(View.CONFIRM_RESERVATION_CMD);
     }
 
     /**
@@ -166,13 +197,13 @@ public class ConfirmPanel extends JPanel {
         createButtonsPanel();
 
         mainPanel.add(headerPanel);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         mainPanel.add(flightSummaryPanel);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         mainPanel.add(seatSummaryPanel);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         mainPanel.add(pricingPanel);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
         mainPanel.add(buttonsPanel);
     }
 
@@ -466,29 +497,7 @@ public class ConfirmPanel extends JPanel {
         buttonsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 0));
         buttonsPanel.setBackground(Color.WHITE);
 
-        // Back button
-        backButton = new JButton("Back to Seat Selection");
-        backButton.setPreferredSize(new Dimension(180, 40));
-        backButton.setBackground(Color.WHITE);
-        backButton.setForeground(new Color(0, 102, 204));
-        backButton.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(0, 102, 204), 2),
-                BorderFactory.createEmptyBorder(5, 15, 5, 15)
-        ));
-        backButton.setFont(new Font("SansSerif", Font.BOLD, 14));
-        backButton.setFocusPainted(false);
-        backButton.setActionCommand(View.BACK_TO_SEAT_SELECTION_CMD);
-
-        // Confirm button
-        confirmButton = new JButton("Confirm Reservation");
-        confirmButton.setPreferredSize(new Dimension(180, 40));
-        confirmButton.setBackground(new Color(0, 102, 204));
-        confirmButton.setForeground(Color.WHITE);
-        confirmButton.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
-        confirmButton.setFont(new Font("SansSerif", Font.BOLD, 14));
-        confirmButton.setFocusPainted(false);
-        confirmButton.setActionCommand(View.CONFIRM_RESERVATION_CMD);
-
+        // Add the already initialized buttons to the panel
         buttonsPanel.add(backButton);
         buttonsPanel.add(confirmButton);
     }

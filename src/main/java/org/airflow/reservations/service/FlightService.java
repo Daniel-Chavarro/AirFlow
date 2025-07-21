@@ -24,7 +24,7 @@ public class FlightService {
     public FlightService() throws SQLException {
         this.flightDAO = new FlightDAO();
     }
-    
+
     public FlightService(FlightDAO flightDAO) {
         this.flightDAO = flightDAO;
     }
@@ -123,29 +123,7 @@ public class FlightService {
         flightDAO.delete(id);
     }
 
-
-    /**
-     * Function to return all the codes of the available flights.
-     * @param flights : ArrayList<Flight> with the flights to be checked.
-     * @return ArrayList<String> with the codes of the available flights.
-     * @throws SQLException : if a database access error occurs.
-     * @throws IllegalArgumentException : if there are no flights to be checked.
-     */
-
-    private ArrayList<String> avilableFlightsToString(ArrayList<Flight> flights) throws SQLException{
-        try {
-            ArrayList<String> availableFlights = new ArrayList<>();
-            for (Flight flight : flights) {
-                availableFlights.add(flight.getCode());
-            }
-            return availableFlights;
-        }
-        catch(Exception e){
-            throw new IllegalArgumentException("No hay vuelos disponibles");
-        }
-    }
-
-    public ArrayList<Flight> getBydepartureTimeRange(LocalDateTime bottomRange , LocalDateTime TopRange) throws SQLException{
-        return flightDAO.getByDepartureTimeRange(bottomRange,TopRange);
+    public ArrayList<Flight> getBydepartureTimeRange(LocalDateTime bottomRange, LocalDateTime TopRange) throws SQLException {
+        return flightDAO.getByDepartureTimeRange(bottomRange, TopRange);
     }
 }

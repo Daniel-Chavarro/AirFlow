@@ -16,7 +16,7 @@ public class ReservationService {
     private final User User;
     private final SeatService seatService;
 
-    public ReservationService(User User) throws Exception {
+    public ReservationService(User User) throws SQLException {
         this.flightDAO = new FlightDAO();
         this.reservationDAO = new ReservationDAO();
         this.SeatDAO = new SeatDAO();

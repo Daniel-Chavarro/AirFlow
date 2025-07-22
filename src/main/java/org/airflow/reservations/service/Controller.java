@@ -13,17 +13,36 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controller class that manages the application logic following the pseudo MVC pattern.
+ * This singleton class handles user interactions, coordinates between the view and services,
+ * and manages the application lifecycle.
+ */
 public class Controller implements ActionListener {
+    /** Singleton instance of the controller */
     private static volatile Controller instance;
+    /** The view interface for MVC communication */
     private View view;
+    /** Service for flight-related operations */
     private FlightService flightService;
+    /** Service for city-related operations */
     private CityService cityService;
+    /** Service for airplane-related operations */
     private AirplaneService airplaneService;
+    /** Service for seat-related operations */
     private SeatService seatService;
+    /** Service for reservation-related operations */
     private ReservationService reservationService;
+    /** Currently selected flight in the application */
     private Flight selectedFlight;
+    /** Current logged-in user */
     private User currentUser;
 
+    /**
+     * Private constructor for singleton pattern.
+     * Initializes all services and creates a mock user for testing purposes.
+     * In a production environment, this should be replaced with proper authentication.
+     */
     private Controller() {
         try {
             // For now, we'll create a mock user.
@@ -181,6 +200,9 @@ public class Controller implements ActionListener {
 
     /**
      * Handles application errors with proper logging and user notification.
+     *
+     * @param message The error message to display
+     * @param e The exception that occurred
      */
     private void handleApplicationError(String message, Exception e) {
         System.err.println("ERROR: " + message);
@@ -199,10 +221,21 @@ public class Controller implements ActionListener {
         System.exit(1);
     }
 
+    /**
+     * Sets the view for the MVC pattern.
+     *
+     * @param view The view interface implementation
+     */
     public void setView(View view) {
         this.view = view;
     }
 
+    /**
+     * Gets the singleton instance of the Controller.
+     * Uses double-checked locking for thread safety.
+     *
+     * @return The singleton Controller instance
+     */
     public static Controller getInstance() {
         if (instance == null) {
             synchronized (Controller.class) {
@@ -214,6 +247,12 @@ public class Controller implements ActionListener {
         return instance;
     }
 
+    /**
+     * Handles all action events from the UI components.
+     * Routes different commands to their appropriate handler methods.
+     *
+     * @param e The ActionEvent triggered by UI interaction
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
@@ -261,6 +300,13 @@ public class Controller implements ActionListener {
         }
     }
 
+    /**
+     * Handles the flight search functionality.
+     * Validates user input, queries the database for matching flights,
+     * and displays the results in the UI.
+     *
+     * @throws SQLException if database query fails
+     */
     private void handleSearchFlight() throws SQLException {
         String originName = view.getOrigin();
         String destinationName = view.getDestination();
@@ -287,6 +333,12 @@ public class Controller implements ActionListener {
         view.displayFlights(new ArrayList<>(filteredFlights), origin, destination);
     }
 
+    /**
+     * Handles displaying flight details when a flight is selected.
+     *
+     * @param command The action command containing the flight ID
+     * @throws SQLException if database query fails
+     */
     private void handleFlightDetails(String command) throws SQLException {
         int flightId = Integer.parseInt(command.split(":")[1]);
         selectedFlight = flightService.getFlightById(flightId);
@@ -299,6 +351,12 @@ public class Controller implements ActionListener {
         }
     }
 
+    /**
+     * Handles the seat booking process for the selected flight.
+     * Loads available seats and displays the seat selection interface.
+     *
+     * @throws SQLException if database query fails
+     */
     private void handleBookSeat() throws SQLException {
         if (selectedFlight == null) {
             JOptionPane.showMessageDialog(view.getFrame(), "Please select a flight first.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -315,16 +373,29 @@ public class Controller implements ActionListener {
         view.showPanel("BookSeatsPanel");
     }
 
+    /**
+     * Handles individual seat selection/deselection.
+     *
+     * @param command The action command containing the seat number
+     */
     private void handleSeatSelection(String command) {
         String seatNumber = command.split(":")[1];
         view.toggleSeatSelection(seatNumber);
         view.updateSeatSummary();
     }
 
+    /**
+     * Handles clearing all selected seats.
+     */
     private void handleClearSeats() {
         view.clearSeatSelections();
     }
 
+    /**
+     * Shows the reservation confirmation screen with selected seats and pricing.
+     *
+     * @throws SQLException if database query fails
+     */
     private void showConfirmReservation() throws SQLException {
         ArrayList<Seat> selectedSeats = view.getSelectedSeats();
         if (selectedSeats.isEmpty()) {
@@ -346,6 +417,12 @@ public class Controller implements ActionListener {
         view.showPanel("ConfirmPanel");
     }
 
+    /**
+     * Handles the final confirmation and creation of the reservation.
+     * Creates the reservation in the database and shows success message.
+     *
+     * @throws SQLException if database operation fails
+     */
     private void handleFinalConfirmReservation() throws SQLException {
         ArrayList<Seat> selectedSeats = view.getSelectedSeats();
         if (selectedSeats.isEmpty()) {

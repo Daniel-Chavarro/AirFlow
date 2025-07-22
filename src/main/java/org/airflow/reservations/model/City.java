@@ -2,12 +2,17 @@ package org.airflow.reservations.model;
 
 /**
  * Represents a city in the reservation system.
- * Contains details such as city ID, name, country, and code.
+ * Contains details such as city ID, name, country, and airport code.
+ * Cities are used as origin and destination points for flights.
  */
 public class City {
+    /** The unique identifier for the city */
     private int id;
+    /** The name of the city (e.g., "New York", "Madrid") */
     private String name;
+    /** The country where the city is located */
     private String country;
+    /** The IATA airport code for the city (e.g., "JFK", "MAD") */
     private String code;
 
     /**

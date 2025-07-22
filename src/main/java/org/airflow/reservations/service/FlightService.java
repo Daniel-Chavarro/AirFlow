@@ -1,4 +1,3 @@
-
 package org.airflow.reservations.service;
 
 import org.airflow.reservations.DAO.FlightDAO;
@@ -25,6 +24,12 @@ public class FlightService {
         this.flightDAO = new FlightDAO();
     }
 
+    /**
+     * Constructor for FlightService with dependency injection.
+     * Allows injecting a specific FlightDAO instance, useful for testing.
+     *
+     * @param flightDAO the FlightDAO instance to use
+     */
     public FlightService(FlightDAO flightDAO) {
         this.flightDAO = flightDAO;
     }
@@ -123,7 +128,16 @@ public class FlightService {
         flightDAO.delete(id);
     }
 
-    public ArrayList<Flight> getBydepartureTimeRange(LocalDateTime bottomRange, LocalDateTime TopRange) throws SQLException {
-        return flightDAO.getByDepartureTimeRange(bottomRange, TopRange);
+    /**
+     * Retrieves flights within a specific departure time range.
+     * This method is useful for finding flights departing on a particular day or time period.
+     *
+     * @param bottomRange the earliest departure time to include
+     * @param topRange the latest departure time to include
+     * @return ArrayList of Flight objects departing within the specified time range
+     * @throws SQLException if a database access error occurs
+     */
+    public ArrayList<Flight> getBydepartureTimeRange(LocalDateTime bottomRange, LocalDateTime topRange) throws SQLException {
+        return flightDAO.getByDepartureTimeRange(bottomRange, topRange);
     }
 }

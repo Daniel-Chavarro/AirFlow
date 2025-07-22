@@ -26,6 +26,8 @@ public interface View {
     String BOOK_SEAT_CMD = "BOOK_SEAT";
     /** Command for confirming a reservation. */
     String CONFIRM_RESERVATION_CMD = "CONFIRM_RESERVATION";
+    /** Command for the final confirmation of a reservation. */
+    String FINAL_CONFIRM_CMD = "FINAL_CONFIRM";
     /** Command for clearing selected seats. */
     String CLEAR_SEATS_CMD = "CLEAR_SEATS";
     /** Command for going back to the seat selection screen. */

@@ -140,7 +140,7 @@ public class ConfirmPanel extends JPanel {
         confirmButton.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
         confirmButton.setFont(new Font("SansSerif", Font.BOLD, 14));
         confirmButton.setFocusPainted(false);
-        confirmButton.setActionCommand(View.CONFIRM_RESERVATION_CMD);
+        confirmButton.setActionCommand(View.FINAL_CONFIRM_CMD);
     }
 
     /**

@@ -141,12 +141,13 @@ public class BookSeatsPanel extends JPanel {
      * @param airplane The airplane information
      * @param seats List of available seats
      */
-    public BookSeatsPanel(Flight flight, Airplane airplane, ArrayList<Seat> seats) {
+    public BookSeatsPanel(Flight flight, Airplane airplane, ArrayList<Seat> seats, ActionListener actionListener) {
         this.flight = flight;
         this.airplane = airplane;
         this.seats = seats;
         this.selectedSeats = new ArrayList<>();
         this.seatButtons = new HashMap<>();
+        this.actionListener = actionListener;
 
         initializeComponents();
         layoutComponents();
@@ -468,10 +469,7 @@ public class BookSeatsPanel extends JPanel {
         gbc.insets = new Insets(2, 2, 2, 2);
 
         // Group seats by row number (e.g., "1", "2", "3")
-        Map<String, List<Seat>> seatsByRow = new TreeMap<>((s1, s2) -> {
-            // Allow proper numeric sorting for row keys
-            return Integer.compare(Integer.parseInt(s1), Integer.parseInt(s2));
-        });
+        Map<String, List<Seat>> seatsByRow = new TreeMap<>(Comparator.comparingInt(Integer::parseInt));
 
         for (Seat seat : seats) {
             String seatNumber = seat.getSeat_number();
@@ -542,13 +540,9 @@ public class BookSeatsPanel extends JPanel {
             button.setBackground(seatColor);
             button.setForeground(Color.BLACK);
             button.setEnabled(true);
-            // This internal listener provides immediate visual feedback.
-            button.addActionListener(e -> {
-                toggleSeatSelection(seat);
-            });
         }
 
-        // This allows the main controller to also listen to the event if needed.
+        // This allows the main controller to listen to the event.
         button.setActionCommand(View.SELECT_SEAT + ":" + seat.getSeat_number());
 
         return button;
@@ -662,6 +656,9 @@ public class BookSeatsPanel extends JPanel {
             totalPriceLabel.setText("Total Price: " + CURRENCY_FORMAT.format(totalPrice));
             confirmButton.setEnabled(true);
             clearSeatsButton.setEnabled(true);
+
+
+
         }
     }
 
@@ -690,6 +687,13 @@ public class BookSeatsPanel extends JPanel {
                 button.setForeground(Color.WHITE);
             }
         }
+
+        seatMapPanel.revalidate();
+        seatMapPanel.repaint();
+
+        buttonPanel.revalidate();
+        buttonPanel.repaint();
+
         updateSummary();
     }
 
@@ -972,13 +976,13 @@ public class BookSeatsPanel extends JPanel {
 
         // --- Add listeners ---
 
-        // Add internal listener for immediate visual feedback on seat clicks
-        for (JButton button : seatButtons.values()) {
-            Seat seat = getSeatByNumber(button.getText());
-            if (seat != null && seat.getReservation_FK() == null) {
-                button.addActionListener(e -> toggleSeatSelection(seat));
-            }
-        }
+//        // Add internal listener for immediate visual feedback on seat clicks
+//        for (JButton button : seatButtons.values()) {
+//            Seat seat = getSeatByNumber(button.getText());
+//            if (seat != null && seat.getReservation_FK() == null) {
+//                button.addActionListener(listener);
+//            }
+//        }
 
         // Add the main controller listener to all buttons
         confirmButton.addActionListener(listener);
@@ -1034,5 +1038,29 @@ public class BookSeatsPanel extends JPanel {
             frame.add(bookSeatsPanel);
             frame.setVisible(true);
         });
+    }
+
+    public City getOriginCity() {
+        return originCity;
+    }
+
+    public void setOriginCity(City originCity) {
+        this.originCity = originCity;
+    }
+
+    public City getDestinationCity() {
+        return destinationCity;
+    }
+
+    public void setDestinationCity(City destinationCity) {
+        this.destinationCity = destinationCity;
+    }
+
+    public ActionListener getActionListener() {
+        return actionListener;
+    }
+
+    public void setActionListener(ActionListener actionListener) {
+        this.actionListener = actionListener;
     }
 }

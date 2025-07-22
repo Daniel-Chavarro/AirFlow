@@ -1,6 +1,7 @@
 package org.airflow.reservations.service;
 
 import org.airflow.reservations.GUI.Bridge.View;
+import org.airflow.reservations.GUI.frames.MainFrame;
 import org.airflow.reservations.model.*;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -60,8 +61,11 @@ public class Controller implements ActionListener {
             // Start the application in the Event Dispatch Thread
             SwingUtilities.invokeLater(() -> {
                 try {
-                    // Initialize and show the main application window
-                    initializeAndShowApplication();
+                    view = new MainFrame();
+                    view.addActionListener(this);
+                    System.out.println("AirFlow Reservation System started successfully!");
+                    performStartupTasks();
+
                 } catch (Exception e) {
                     handleApplicationError("Failed to start application", e);
                 }
@@ -87,58 +91,6 @@ public class Controller implements ActionListener {
             } catch (Exception sysEx) {
                 System.err.println("Failed to set system Look and Feel: " + sysEx.getMessage());
             }
-        }
-    }
-
-    /**
-     * Initializes the main application components and displays the UI.
-     */
-    private void initializeAndShowApplication() {
-        System.out.println("Starting AirFlow Reservation System...");
-
-        // Create the main frame (view)
-        org.airflow.reservations.GUI.frames.MainFrame mainFrame =
-            new org.airflow.reservations.GUI.frames.MainFrame();
-
-        // Set up the MVC relationship
-        this.setView(mainFrame);
-        mainFrame.addActionListener(this);
-
-        // Configure the main window
-        configureMainWindow(mainFrame);
-
-        // Show the initial panel
-        mainFrame.showPanel("SearchFlightPanel");
-
-        // Make the application visible
-        mainFrame.setVisible(true);
-
-        System.out.println("AirFlow Reservation System started successfully!");
-
-        // Optional: Load initial data or perform startup tasks
-        performStartupTasks();
-    }
-
-    /**
-     * Configures the main application window properties.
-     */
-    private void configureMainWindow(org.airflow.reservations.GUI.frames.MainFrame mainFrame) {
-        // Set window properties
-        mainFrame.setTitle("AirFlow - Flight Reservation System");
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        // Center the window on screen
-        mainFrame.setLocationRelativeTo(null);
-
-        // Optional: Set application icon if available
-        try {
-            java.awt.Image icon = java.awt.Toolkit.getDefaultToolkit()
-                .getImage(getClass().getClassLoader().getResource("images/logo.png"));
-            if (icon != null) {
-                mainFrame.setIconImage(icon);
-            }
-        } catch (Exception e) {
-            System.out.println("Could not load application icon: " + e.getMessage());
         }
     }
 
@@ -175,6 +127,9 @@ public class Controller implements ActionListener {
                 if (cities != null && !cities.isEmpty()) {
                     // Use the Bridge pattern to set cities data in the UI
                     view.setCitiesData(cities);
+                    ArrayList<Flight> arrayList = new ArrayList<>();
+                    arrayList.add(flightService.getFlightById(50));
+                    view.displayFlights(arrayList, cityService.getCityById(14), cityService.getCityById(24));
                     System.out.println("✓ Successfully loaded " + cities.size() + " cities to search panel");
                 } else {
                     System.out.println("⚠ No cities found in database");
@@ -262,6 +217,7 @@ public class Controller implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
+        System.out.println("Action performed: " + command + "from " + e.getSource().getClass().getName());
 
         try {
             if (command.startsWith(View.SELECT_SEAT)) {
@@ -287,7 +243,10 @@ public class Controller implements ActionListener {
                     view.showPanel("SearchFlightPanel");
                     break;
                 case View.CONFIRM_RESERVATION_CMD:
-                    handleConfirmReservation();
+                    showConfirmReservation();
+                    break;
+                case View.FINAL_CONFIRM_CMD:
+                    handleFinalConfirmReservation();
                     break;
                 case View.BACK_TO_SEAT_SELECTION_CMD:
                     view.showPanel("BookSeatsPanel");
@@ -366,15 +325,12 @@ public class Controller implements ActionListener {
         view.clearSeatSelections();
     }
 
-    private void handleConfirmReservation() throws SQLException {
+    private void showConfirmReservation() throws SQLException {
         ArrayList<Seat> selectedSeats = view.getSelectedSeats();
         if (selectedSeats.isEmpty()) {
             JOptionPane.showMessageDialog(view.getFrame(), "Please select at least one seat.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
-        int[] seatIds = selectedSeats.stream().mapToInt(Seat::getId).toArray();
-        Reservation reservation = reservationService.createReservation(selectedFlight.getId(), seatIds);
 
         City origin = cityService.getCityById(selectedFlight.getOrigin_city_FK());
         City destination = cityService.getCityById(selectedFlight.getDestination_city_FK());
@@ -388,7 +344,21 @@ public class Controller implements ActionListener {
 
         view.setConfirmationData(selectedFlight, origin, destination, airplane, selectedSeats, multipliers, selectedFlight.getPrice_base());
         view.showPanel("ConfirmPanel");
+    }
+
+    private void handleFinalConfirmReservation() throws SQLException {
+        ArrayList<Seat> selectedSeats = view.getSelectedSeats();
+        if (selectedSeats.isEmpty()) {
+            // This should not happen if the logic is correct, but as a safeguard:
+            JOptionPane.showMessageDialog(view.getFrame(), "No seats were selected for reservation.", "Error", JOptionPane.ERROR_MESSAGE);
+            view.showPanel("SearchFlightPanel"); // Go back to the start
+            return;
+        }
+
+        int[] seatIds = selectedSeats.stream().mapToInt(Seat::getId).toArray();
+        Reservation reservation = reservationService.createReservation(selectedFlight.getId(), seatIds);
 
         JOptionPane.showMessageDialog(view.getFrame(), "Reservation created successfully! Reservation ID: " + reservation.getId(), "Success", JOptionPane.INFORMATION_MESSAGE);
+        view.showPanel("SearchFlightPanel"); // Go back to the start after success
     }
 }

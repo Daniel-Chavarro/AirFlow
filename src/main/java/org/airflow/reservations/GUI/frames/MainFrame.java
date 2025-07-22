@@ -76,6 +76,9 @@ public class MainFrame extends JFrame implements View {
 
         createHorizontalMenu();
         createContentPanel();
+
+        searchFlightPanel.setVisible(true);
+        setVisible(true);
     }
 
     /**
@@ -172,6 +175,7 @@ public class MainFrame extends JFrame implements View {
         bookSeatsPanel.getConfirmButton().addActionListener(listener);
         bookSeatsPanel.getClearSeatsButton().addActionListener(listener);
         bookSeatsPanel.getCancelButton().addActionListener(listener);
+        bookSeatsPanel.setActionListener(listener);
         confirmPanel.getBackButton().addActionListener(listener);
         confirmPanel.getConfirmButton().addActionListener(listener);
 
@@ -271,7 +275,6 @@ public class MainFrame extends JFrame implements View {
      * and sets it visible.
      * Just for testing purposes, it shows the SearchFlightPanel by default.
      *
-     * @param args command line arguments
      */
     public BookSeatsPanel getBookSeatsPanel() {
         return bookSeatsPanel;

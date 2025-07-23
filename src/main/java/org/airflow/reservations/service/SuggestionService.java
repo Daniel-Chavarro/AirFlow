@@ -182,8 +182,8 @@ public class SuggestionService {
             Optional<User> passenger = Optional.ofNullable(userDAO.getById(reservation.getUser_FK()));
             if (passenger.isPresent()) {
                 sendNotification(passenger.get().getEmail(),
-                        "Tu reserva ha sido reasignada exitosamente al vuelo " + newFlight.getCode() +
-                        " con salida el " + newFlight.getDeparture_time() + ".");
+                        "Your reservation has been successfully reassigned to flight " + newFlight.getCode() +
+                        " departing on " + newFlight.getDeparture_time() + ".");
             }
 
         } catch (SQLException e) {

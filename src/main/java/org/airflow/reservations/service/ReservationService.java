@@ -1,5 +1,6 @@
 package org.airflow.reservations.service;
 
+import java.sql.Connection;
 import org.airflow.reservations.DAO.*;
 import org.airflow.reservations.model.*;
 
@@ -7,6 +8,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import org.airflow.reservations.utils.ConnectionDB;
 
 /**
  * Service class for managing reservation-related operations.
@@ -401,4 +403,50 @@ public class ReservationService {
     }
 
 }
+
+/**
+     * Reassigns a passenger's reservation from a cancelled flight to a new alternative flight.
+     * This method is transactional and ensures consistency by handling seat updates.
+     *
+     * @param reservationId The ID of the reservation to be reallocated.
+     * @param newFlightId   The ID of the new flight accepted by the passenger.
+     * @throws SQLException if a database access error occurs during the transaction.
+     * @throws IllegalArgumentException if the reservation or new flight is not found,
+     * or if no available seat can be assigned in the new flight.
+     */
+    public void reassignPassenger(int reservationId, int newFlightId) throws SQLException {
+
+            Reservation reservation = reservationDAO.getById(reservationId);
+            if (reservation == null || reservation.getId() == 0) {
+                throw new IllegalArgumentException("Reservation not found.");
+            }
+
+            Flight newFlight = flightDAO.getById( newFlightId);
+            if (newFlight == null || newFlight.getId() == 0) {
+                throw new IllegalArgumentException("New flight not found.");
+            }
+
+            // 1. Release the seat(s) from the original flight
+            ArrayList<Seat> currentSeats = SeatDAO.getByReservationId(reservationId);
+            for (Seat seat : currentSeats) {
+                seatService.updateSeatStatus(seat.getId(), 0); // 0 indicates free seat
+            }
+
+            // 2. Update the reservation to the new flight and set status
+            reservation.setFlight_FK(newFlightId);
+            reservation.setStatus_FK(1); // Set to "Confirmed" or "Reassigned" status
+            reservationDAO.update(reservation.getId(), reservation);
+
+            // 3. Assign a new seat on the new flight
+            int newFlightAirplaneId = newFlight.getAirplane_FK();
+            ArrayList<Seat> availableSeats = SeatDAO.getByavailableSeatsByAirplaneIdClassAndWindow(newFlightAirplaneId, "ECONOMY", false);
+
+            if (availableSeats != null && !availableSeats.isEmpty()) {
+                Seat assignedNewSeat = availableSeats.get(0);
+                seatService.updateSeatStatus(assignedNewSeat.getId(), reservation.getId());
+            } else {
+                throw new IllegalArgumentException("No available seats on the new flight.");
+            }
+    }
+
 }

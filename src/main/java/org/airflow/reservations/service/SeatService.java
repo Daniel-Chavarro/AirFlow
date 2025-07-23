@@ -30,9 +30,12 @@ public class SeatService {
      *
      * @param seatDAO the SeatDAO instance to use
      */
-    public SeatService(SeatDAO seatDAO) {
-        this.seatDAO = seatDAO;
-    }
+    public void ableValueForClass(String seatClassStr) throws SQLException {
+        try {
+            Seat.SeatClass seatClass = Seat.SeatClass.valueOf(seatClassStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("No a valid seat class: " + seatClassStr);
+        }
 
     /**
      * Retrieves all seats associated with a specific airplane.
@@ -45,6 +48,19 @@ public class SeatService {
         return seatDAO.getByAirplaneId(airplaneId);
     }
 
+   
+
+    private ArrayList<String> availableSeatsToString(ArrayList<Seat> seats) {
+        try{
+            ArrayList<String> availableSeats = new ArrayList<>();
+            for (Seat seat : seats) {
+                availableSeats.add(seat.getSeat_number());
+            }
+            return availableSeats;
+        }
+        catch(Exception e){
+            throw new IllegalArgumentException("No available seats");
+
     /**
      * Updates the reservation status of a specific seat.
      * Associates a seat with a reservation or clears the association.
@@ -53,7 +69,7 @@ public class SeatService {
      * @param reservationId The reservation ID to associate with the seat, or null to clear
      * @throws SQLException if there's an error executing the database query
      * @throws IllegalArgumentException if the seat with the given ID is not found
-     */
+     */    
     public void updateSeatStatus(int seatId, Integer reservationId) throws SQLException {
         Seat seat = seatDAO.getById(seatId);
         if (seat == null) {
@@ -62,6 +78,7 @@ public class SeatService {
         seat.setReservation_FK(reservationId);
         seatDAO.update(seatId, seat);
     }
+          
 
     /**
      * Retrieves all seats associated with a specific reservation.

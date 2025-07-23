@@ -102,7 +102,12 @@ public class FlightDAO implements DAOMethods<Flight> {
         statement.setString(5, object.getCode());
         statement.setTimestamp(6, Timestamp.valueOf(object.getDeparture_time()));
         statement.setTimestamp(7, Timestamp.valueOf(object.getScheduled_arrival_time()));
-        statement.setTimestamp(8, Timestamp.valueOf(object.getArrival_time()));
+        // Handle possible NULL values for arrival_time
+        if (object.getArrival_time() != null) {
+            statement.setTimestamp(8, Timestamp.valueOf(object.getArrival_time()));
+        } else {
+            statement.setNull(8, Types.TIMESTAMP);
+        }
         statement.setFloat(9, object.getPrice_base());
 
         statement.executeUpdate();
@@ -112,7 +117,7 @@ public class FlightDAO implements DAOMethods<Flight> {
     /**
      * Updates an existing flight in the database.
      *
-     * @param id       the unique identifier of the flight to be updated
+     * @param id the unique identifier of the flight to be updated
      * @param toUpdate the Flight object containing updated data
      * @throws SQLException if a database access error occurs
      */
@@ -130,7 +135,12 @@ public class FlightDAO implements DAOMethods<Flight> {
         statement.setString(5, toUpdate.getCode());
         statement.setTimestamp(6, Timestamp.valueOf(toUpdate.getDeparture_time()));
         statement.setTimestamp(7, Timestamp.valueOf(toUpdate.getScheduled_arrival_time()));
-        statement.setTimestamp(8, Timestamp.valueOf(toUpdate.getArrival_time()));
+        // Handle possible NULL values for arrival_time
+        if (toUpdate.getArrival_time() != null) {
+            statement.setTimestamp(8, Timestamp.valueOf(toUpdate.getArrival_time()));
+        } else {
+            statement.setNull(8, Types.TIMESTAMP);
+        }
         statement.setFloat(9, toUpdate.getPrice_base());
         statement.setInt(10, id);
 
@@ -179,6 +189,33 @@ public class FlightDAO implements DAOMethods<Flight> {
     }
 
     /**
+     * Returns a flight by its code.
+     * This is the method causing the error if not correctly implemented.
+     *
+     * @param code the code of the flight
+     * @return the Flight object with the specified code, or null if not found
+     * @throws SQLException if a database access error occurs
+     */
+    public Flight getByCodeOb(String code) throws SQLException {
+        String query = "SELECT f.*, fs.name as status_name, fs.description as status_description " +
+                "FROM flights f " +
+                "JOIN flight_status fs ON f.status_FK = fs.id_PK " +
+                "WHERE f.code = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, code);
+        ResultSet resultSet = statement.executeQuery();
+
+        Flight flight = transformResultsToClass(resultSet); // Llama a transformResultsToClass directamente
+        statement.close();
+
+        // Si no se encontró un vuelo, transformResultsToClass devolverá un objeto Flight con id=0
+        if (flight != null && flight.getId() == 0) {
+            return null;
+        }
+        return flight;
+    }
+
+    /**
      * Transforms the results from a ResultSet into a Flight object.
      *
      * @param resultSet the ResultSet containing flight data
@@ -195,11 +232,20 @@ public class FlightDAO implements DAOMethods<Flight> {
             flight.setOrigin_city_FK(resultSet.getInt("origin_city_FK"));
             flight.setDestination_city_FK(resultSet.getInt("destination_city_FK"));
             flight.setCode(resultSet.getString("code"));
-            flight.setDeparture_time(resultSet.getTimestamp("departure_time").toLocalDateTime());
-            flight.setScheduled_arrival_time(resultSet.getTimestamp("scheduled_arrival_time").toLocalDateTime());
-            flight.setArrival_time(resultSet.getTimestamp("arrival_time").toLocalDateTime());
+
+            // Manejo de posibles valores NULL para columnas Timestamp
+            Timestamp departureTimestamp = resultSet.getTimestamp("departure_time");
+            flight.setDeparture_time((departureTimestamp != null) ? departureTimestamp.toLocalDateTime() : null);
+
+            Timestamp scheduledArrivalTimestamp = resultSet.getTimestamp("scheduled_arrival_time");
+            flight.setScheduled_arrival_time((scheduledArrivalTimestamp != null) ? scheduledArrivalTimestamp.toLocalDateTime() : null);
+
+            // CORRECCIÓN: Usar arrivalTimestamp para la verificación de nulidad
+            Timestamp arrivalTimestamp = resultSet.getTimestamp("arrival_time");
+            flight.setArrival_time((arrivalTimestamp != null) ? arrivalTimestamp.toLocalDateTime() : null);
+
             flight.setPrice_base(resultSet.getFloat("price_base"));
-            
+
             // Set status information from join
             flight.setStatus_name(resultSet.getString("status_name"));
             flight.setStatus_description(resultSet.getString("status_description"));
@@ -226,11 +272,20 @@ public class FlightDAO implements DAOMethods<Flight> {
             flight.setOrigin_city_FK(resultSet.getInt("origin_city_FK"));
             flight.setDestination_city_FK(resultSet.getInt("destination_city_FK"));
             flight.setCode(resultSet.getString("code"));
-            flight.setDeparture_time(resultSet.getTimestamp("departure_time").toLocalDateTime());
-            flight.setScheduled_arrival_time(resultSet.getTimestamp("scheduled_arrival_time").toLocalDateTime());
-            flight.setArrival_time(resultSet.getTimestamp("arrival_time").toLocalDateTime());
+
+            // Manejo de posibles valores NULL para columnas Timestamp
+            Timestamp departureTimestamp = resultSet.getTimestamp("departure_time");
+            flight.setDeparture_time((departureTimestamp != null) ? departureTimestamp.toLocalDateTime() : null);
+
+            Timestamp scheduledArrivalTimestamp = resultSet.getTimestamp("scheduled_arrival_time");
+            flight.setScheduled_arrival_time((scheduledArrivalTimestamp != null) ? scheduledArrivalTimestamp.toLocalDateTime() : null);
+
+            // CORRECCIÓN: Usar arrivalTimestamp para la verificación de nulidad
+            Timestamp arrivalTimestamp = resultSet.getTimestamp("arrival_time");
+            flight.setArrival_time((arrivalTimestamp != null) ? arrivalTimestamp.toLocalDateTime() : null);
+
             flight.setPrice_base(resultSet.getFloat("price_base"));
-            
+
             // Set status information from join
             flight.setStatus_name(resultSet.getString("status_name"));
             flight.setStatus_description(resultSet.getString("status_description"));
@@ -295,22 +350,59 @@ public class FlightDAO implements DAOMethods<Flight> {
      * @throws SQLException if a database access error occurs.
      */
 
-    public ArrayList<Flight> getByDestinationAndOriginCity(int originId, int destinyId) throws SQLException {
+    /**
+     * Returns flights with the specified destination and origin cities.
+     *
+     * @param destinationCityId the ID of the destination city
+     * @param originCityId the ID of the origin city
+     * @return an ArrayList of Flight objects matching the criteria
+     * @throws SQLException if a database access error occurs
+     */
+    public ArrayList<Flight> getByDestinationAndOriginCity(int destinationCityId, int originCityId) throws SQLException {
         String query = "SELECT f.*, fs.name as status_name, fs.description as status_description " +
                 "FROM flights f " +
                 "JOIN flight_status fs ON f.status_FK = fs.id_PK " +
                 "WHERE f.destination_city_FK = ? AND f.origin_city_FK = ?";
 
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setInt(1, destinyId);
-        statement.setInt(2, originId);
+        System.out.println("DEBUG (FlightDAO): Ejecutando consulta SQL en getByDestinationAndOriginCity: " + query);
+        System.out.println("DEBUG (FlightDAO): Parámetros - ID Destino: " + destinationCityId + ", ID Origen: " + originCityId);
+
+        // ¡CAMBIO CLAVE AQUÍ! Crear un PreparedStatement con un ResultSet desplazable
+        PreparedStatement statement = connection.prepareStatement(
+            query,
+            ResultSet.TYPE_SCROLL_INSENSITIVE, // Permite mover el cursor hacia adelante y hacia atrás
+            ResultSet.CONCUR_READ_ONLY         // Indica que el ResultSet es de solo lectura (más eficiente)
+        );
+        statement.setInt(1, destinationCityId);
+        statement.setInt(2, originCityId);
 
         ResultSet resultSet = statement.executeQuery();
 
+        // Debug: Imprimir contenido del ResultSet (esto ahora funcionará y luego se podrá reposicionar)
+        System.out.println("DEBUG (FlightDAO): Contenido del ResultSet para getByDestinationAndOriginCity:");
+        ResultSetMetaData metaData = resultSet.getMetaData();
+        int columnCount = metaData.getColumnCount();
+        int rowCount = 0;
+        while (resultSet.next()) { // Primera iteración para depuración
+            rowCount++;
+            StringBuilder row = new StringBuilder();
+            for (int i = 1; i <= columnCount; i++) {
+                row.append(metaData.getColumnName(i)).append(": ").append(resultSet.getObject(i)).append(" | ");
+            }
+            System.out.println("  Fila " + rowCount + ": " + row.toString());
+        }
+        System.out.println("DEBUG (FlightDAO): Total de filas en ResultSet antes de transformar: " + rowCount);
+
+        // Mover el cursor del ResultSet de nuevo al principio antes de pasarlo a transformResultsToClassArray
+        // Esto ahora es posible porque el ResultSet es desplazable.
+        resultSet.beforeFirst();
+
         ArrayList<Flight> flights = transformResultsToClassArray(resultSet);
-        statement.close();
+        System.out.println("DEBUG (FlightDAO): Número de vuelos después de transformResultsToClassArray: " + flights.size());
+
+        statement.close(); // Asegúrate de cerrar el statement, que también cerrará el resultSet
         return flights;
-    }
+}
 
     /**
      * Returns flights whose departure time is equal or less than or equal to the specified date.

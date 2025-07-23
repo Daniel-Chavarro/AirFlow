@@ -9,19 +9,31 @@ import java.time.LocalDateTime;
  * flight code, departure and arrival times, and ticket price.
  */
 public class Flight {
+    /** The unique identifier for the flight */
     private int id;
+    /** Foreign key reference to the airplane assigned to this flight */
     private int airplane_FK;
+    /** Foreign key reference to the current status of the flight */
     private int status_FK;
+    /** Foreign key reference to the origin city where the flight departs */
     private int origin_city_FK;
+    /** Foreign key reference to the destination city where the flight arrives */
     private int destination_city_FK;
+    /** The unique flight code identifier (e.g., "AA123") */
     private String code;
+    /** The scheduled departure date and time */
     private LocalDateTime departure_time;
+    /** The scheduled arrival date and time */
     private LocalDateTime scheduled_arrival_time;
+    /** The actual arrival date and time (may differ from scheduled) */
     private LocalDateTime arrival_time;
+    /** The base price for economy class tickets on this flight */
     private float price_base;
 
     // Status information retrieved from joins
+    /** The human-readable name of the flight status (retrieved from database joins) */
     private String status_name;
+    /** Detailed description of the flight status (retrieved from database joins) */
     private String status_description;
 
     /**
@@ -73,9 +85,23 @@ public class Flight {
         this.status_description = "";
     }
 
+    @Override
+    public String toString() {
+        return (
+                "------------------------------------------"+"\n " +
+                "Flight: " + id + "\n " +
+                "Code :" + code + "\n " +
+                "Departure time :" + departure_time +  "\n "+
+                "Arrival time :" + arrival_time + "\n " +
+                "Base Price :" + price_base+ "\n " +
+                "------------------------------------------"+"\n ");
+    }
+
+
     public Duration getScheduledDuration() {
         return Duration.between(departure_time, scheduled_arrival_time);
     }
+
 
     // Getters and Setters
     public int getId() {

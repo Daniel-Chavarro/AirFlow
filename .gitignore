@@ -46,3 +46,8 @@ build/
 *.tar.gz
 *.rar
 /secrets.yml
+/.env
+/docs/images/
+/node_modules/
+*.json
+/.refact/

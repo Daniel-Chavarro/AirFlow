@@ -1,5 +1,6 @@
 package org.airflow.reservations.GUI.panels;
 
+import org.airflow.reservations.GUI.Bridge.View;
 import org.airflow.reservations.model.Airplane;
 import org.airflow.reservations.model.City;
 import org.airflow.reservations.model.Flight;
@@ -10,60 +11,114 @@ import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 
 /**
- * DetailsFlightPanel is a JPanel that displays detailed information about a flight.
- * It includes flight details, baggage allowance, and buttons for navigation.
- * The panel is designed to be used in a GUI application for flight reservations.
+ * A panel that displays detailed information about a specific flight.
+ * It includes flight route, times, duration, aircraft details, baggage allowance, and action buttons.
  */
 public class DetailsFlightPanel extends JPanel {
-    private final JPanel detailsFlightPanel;
-    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
-    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm a");
+    /** Formatter for displaying dates in "MMM dd, yyyy" format. */
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("MMM dd, yyyy");
+    /** Formatter for displaying time in "hh:mm a" format. */
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("hh:mm a");
+    /** The main panel holding all components. */
+    private JPanel detailsFlightPanel;
+    /** The panel for the main flight details. */
     private JPanel detailsPanel;
+    /** The panel for action buttons. */
     private JPanel buttonsPanel;
+    /** The panel for flight information. */
     private JPanel flightInfoPanel;
+    /** The panel for baggage allowance information. */
     private JPanel baggagePanel;
+    /** The label for the flight details section. */
     private JLabel flightDetailsLabel;
+    /** The label for the baggage allowance section. */
     private JLabel baggageAllowanceLabel;
+    /** The label indicating if the flight is nonstop. */
     private JLabel nonstopLabel;
+    /** The label for the flight code. */
     private JLabel flightCodeLabel;
+    /** The label for the flight status. */
     private JLabel statusLabel;
+    /** The label for the airplane details. */
     private JLabel airplaneLabel;
+    /** The label for the flight route. */
     private JLabel routeLabel;
+    /** The label for the departure and arrival times. */
     private JLabel timeLabel;
+    /** The label for the flight duration. */
     private JLabel durationLabel;
+    /** The label for the flight date. */
     private JLabel dateLabel;
+    /** The button to go back to the previous screen. */
     private JButton backButton;
+    /** The button to proceed with booking the flight. */
     private JButton continueButton;
+    /** The flight data object. */
     private Flight flight;
+    /** The origin city of the flight. */
     private City originCity;
+    /** The destination city of the flight. */
     private City destinationCity;
+    /** The airplane for the flight. */
     private Airplane airplane;
 
     /**
-     * Constructor for DetailsFlightPanel.
-     * Initializes the panel with a layout and sets up the main components.
+     * Constructs a new DetailsFlightPanel.
      */
     public DetailsFlightPanel() {
         setLayout(new BorderLayout());
         detailsFlightPanel = new JPanel();
-        detailsFlightPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        detailsFlightPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
         detailsFlightPanel.setLayout(new BoxLayout(detailsFlightPanel, BoxLayout.Y_AXIS));
         detailsFlightPanel.setBackground(Color.WHITE);
+
+        // Initialize buttons early so they can be accessed by MainFrame
+        initializeButtons();
     }
 
     /**
-     * Sets the flight data and initializes the details panel with flight information.
+     * Initializes the buttons that need to be accessible immediately.
+     */
+    private void initializeButtons() {
+        // Initialize back button
+        backButton = new JButton("Back");
+        backButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+        backButton.setBackground(new Color(240, 240, 240));
+        backButton.setForeground(Color.BLACK);
+        backButton.setFocusPainted(false);
+        backButton.setBorderPainted(false);
+        backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        backButton.setPreferredSize(new Dimension(120, 40));
+        backButton.setActionCommand(View.BACK_TO_FLIGHTS_CMD);
+
+        // Initialize continue button
+        continueButton = new JButton("Continue to Book");
+        continueButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+        continueButton.setBackground(new Color(0, 123, 255));
+        continueButton.setForeground(Color.WHITE);
+        continueButton.setFocusPainted(false);
+        continueButton.setBorderPainted(false);
+        continueButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        continueButton.setPreferredSize(new Dimension(180, 40));
+        continueButton.setActionCommand(View.BOOK_SEAT_CMD);
+    }
+
+    /**
+     * Sets the data for the panel and rebuilds the UI.
      *
-     * @param flight            The flight object containing flight details.
-     * @param originCity        The city object representing the origin city.
-     * @param destinationCity   The city object representing the destination city.
-     * @param airplane          The airplane object containing airplane details.
+     * @param flight          The flight to display.
+     * @param originCity      The origin city.
+     * @param destinationCity The destination city.
+     * @param airplane        The airplane for the flight.
      */
     public void setData(Flight flight, City originCity, City destinationCity, Airplane airplane) {
         this.flight = flight;
         this.originCity = originCity;
         this.destinationCity = destinationCity;
         this.airplane = airplane;
+
+        // Clear existing content to prevent duplication
+        detailsFlightPanel.removeAll();
 
         startDetailsPanel();
         createFlightInfoPanel();
@@ -81,14 +136,14 @@ public class DetailsFlightPanel extends JPanel {
     }
 
     /**
-     * Initializes the details panel with a title and sets its layout.
+     * Initializes the top details panel with a title.
      */
     public void startDetailsPanel() {
         detailsPanel = new JPanel();
         detailsPanel.setLayout(new GridBagLayout());
         detailsPanel.setBackground(Color.WHITE);
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 0, 10, 0);
+        gbc.insets = new Insets(5, 0, 8, 0);
         gbc.gridx = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridy = 0;
@@ -98,9 +153,10 @@ public class DetailsFlightPanel extends JPanel {
         detailsPanel.add(flightDetailsLabel, gbc);
     }
 
+
     /**
-     * Creates the flight information panel with detailed flight data.
-     * This includes flight code, route, nonstop status, duration, times, date, airplane details, and status.
+     * Creates the flight information panel that displays detailed flight information.
+     * This includes flight code, route, nonstop status, duration, times, date, airplane details, and price.
      */
     private void createFlightInfoPanel() {
         flightInfoPanel = new JPanel();
@@ -109,7 +165,7 @@ public class DetailsFlightPanel extends JPanel {
         flightInfoPanel.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230)));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 20, 10, 20);
+        gbc.insets = new Insets(8, 15, 8, 15);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -147,14 +203,14 @@ public class DetailsFlightPanel extends JPanel {
 
         // Departure and Arrival Times
         gbc.gridy++;
-        timeLabel = new JLabel("Time: " + flight.getDeparture_time().format(timeFormatter) + " - " +
-                flight.getScheduled_arrival_time().format(timeFormatter));
+        timeLabel = new JLabel("Time: " + flight.getDeparture_time().format(TIME_FORMATTER) + " - " +
+                flight.getScheduled_arrival_time().format(TIME_FORMATTER));
         timeLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
         flightInfoPanel.add(timeLabel, gbc);
 
         // Date
         gbc.gridy++;
-        dateLabel = new JLabel("Date: " + flight.getDeparture_time().format(dateFormatter));
+        dateLabel = new JLabel("Date: " + flight.getDeparture_time().format(DATE_FORMATTER));
         dateLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
         flightInfoPanel.add(dateLabel, gbc);
 
@@ -178,8 +234,7 @@ public class DetailsFlightPanel extends JPanel {
     }
 
     /**
-     * Creates the baggage allowance panel with information about baggage policies.
-     * This includes personal item, carry-on bag, and checked baggage details.
+     * Creates the baggage allowance panel.
      */
     private void createBaggageAllowancePanel() {
         baggagePanel = new JPanel();
@@ -188,7 +243,7 @@ public class DetailsFlightPanel extends JPanel {
         baggagePanel.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230)));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 20, 10, 20);
+        gbc.insets = new Insets(8, 15, 8, 15);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -218,42 +273,21 @@ public class DetailsFlightPanel extends JPanel {
     }
 
     /**
-     * Creates the buttons panel with navigation buttons.
-     * This includes a "Back" button and a "Continue to Book" button.
+     * Creates the panel with action buttons.
      */
     private void createButtonsPanel() {
         buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         buttonsPanel.setBackground(Color.WHITE);
 
-        // Back Button
-        backButton = new JButton("Back");
-        backButton.setFont(new Font("SansSerif", Font.BOLD, 14));
-        backButton.setBackground(new Color(240, 240, 240));
-        backButton.setForeground(Color.BLACK);
-        backButton.setFocusPainted(false);
-        backButton.setBorderPainted(false);
-        backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        backButton.setPreferredSize(new Dimension(120, 40));
+        // Add the already initialized buttons to the panel
         buttonsPanel.add(backButton);
-
-        // Continue to Book Button (similar to the one in the image)
-        continueButton = new JButton("Continue to Book");
-        continueButton.setFont(new Font("SansSerif", Font.BOLD, 14));
-        continueButton.setBackground(new Color(0, 123, 255));
-        continueButton.setForeground(Color.WHITE);
-        continueButton.setFocusPainted(false);
-        continueButton.setBorderPainted(false);
-        continueButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        continueButton.setPreferredSize(new Dimension(180, 40));
         buttonsPanel.add(continueButton);
     }
 
     /**
-     * Main method to run the DetailsFlightPanel in a JFrame for testing purposes.
-     * This method is not part of the panel's functionality but is used for demonstration.
-     *
-     * @param args command line arguments (not used)
+     * Main method for testing the DetailsFlightPanel.
+     * @param args Command line arguments.
      */
     public static void main(String[] args) {
         JFrame frame = new JFrame("Flight Details");
@@ -278,7 +312,356 @@ public class DetailsFlightPanel extends JPanel {
         frame.setVisible(true);
     }
 
+    /**
+     * Gets the back button.
+     * @return The back button.
+     */
     public JButton getBackButton() {
         return backButton;
+    }
+
+
+    /**
+     * Gets the main details flight panel.
+     * @return The details flight panel.
+     */
+    public JPanel getDetailsFlightPanel() {
+        return detailsFlightPanel;
+    }
+
+    /**
+     * Gets the date formatter.
+     * @return The date formatter.
+     */
+    public DateTimeFormatter getDateFormatter() {
+        return DATE_FORMATTER;
+    }
+
+    /**
+     * Gets the time formatter.
+     * @return The time formatter.
+     */
+    public DateTimeFormatter getTimeFormatter() {
+        return TIME_FORMATTER;
+    }
+
+    /**
+     * Gets the details panel.
+     * @return The details panel.
+     */
+    public JPanel getDetailsPanel() {
+        return detailsPanel;
+    }
+
+    /**
+     * Sets the details panel.
+     * @param detailsPanel The details panel.
+     */
+    public void setDetailsPanel(JPanel detailsPanel) {
+        this.detailsPanel = detailsPanel;
+    }
+
+    /**
+     * Gets the buttons panel.
+     * @return The buttons panel.
+     */
+    public JPanel getButtonsPanel() {
+        return buttonsPanel;
+    }
+
+    /**
+     * Sets the buttons panel.
+     * @param buttonsPanel The buttons panel.
+     */
+    public void setButtonsPanel(JPanel buttonsPanel) {
+        this.buttonsPanel = buttonsPanel;
+    }
+
+    /**
+     * Gets the flight info panel.
+     * @return The flight info panel.
+     */
+    public JPanel getFlightInfoPanel() {
+        return flightInfoPanel;
+    }
+
+    /**
+     * Sets the flight info panel.
+     * @param flightInfoPanel The flight info panel.
+     */
+    public void setFlightInfoPanel(JPanel flightInfoPanel) {
+        this.flightInfoPanel = flightInfoPanel;
+    }
+
+    /**
+     * Gets the baggage panel.
+     * @return The baggage panel.
+     */
+    public JPanel getBaggagePanel() {
+        return baggagePanel;
+    }
+
+    /**
+     * Sets the baggage panel.
+     * @param baggagePanel The baggage panel.
+     */
+    public void setBaggagePanel(JPanel baggagePanel) {
+        this.baggagePanel = baggagePanel;
+    }
+
+    /**
+     * Gets the flight details label.
+     * @return The flight details label.
+     */
+    public JLabel getFlightDetailsLabel() {
+        return flightDetailsLabel;
+    }
+
+    /**
+     * Sets the flight details label.
+     * @param flightDetailsLabel The flight details label.
+     */
+    public void setFlightDetailsLabel(JLabel flightDetailsLabel) {
+        this.flightDetailsLabel = flightDetailsLabel;
+    }
+
+    /**
+     * Gets the baggage allowance label.
+     * @return The baggage allowance label.
+     */
+    public JLabel getBaggageAllowanceLabel() {
+        return baggageAllowanceLabel;
+    }
+
+    /**
+     * Sets the baggage allowance label.
+     * @param baggageAllowanceLabel The baggage allowance label.
+     */
+    public void setBaggageAllowanceLabel(JLabel baggageAllowanceLabel) {
+        this.baggageAllowanceLabel = baggageAllowanceLabel;
+    }
+
+    /**
+     * Gets the nonstop label.
+     * @return The nonstop label.
+     */
+    public JLabel getNonstopLabel() {
+        return nonstopLabel;
+    }
+
+    /**
+     * Sets the nonstop label.
+     * @param nonstopLabel The nonstop label.
+     */
+    public void setNonstopLabel(JLabel nonstopLabel) {
+        this.nonstopLabel = nonstopLabel;
+    }
+
+    /**
+     * Gets the flight code label.
+     * @return The flight code label.
+     */
+    public JLabel getFlightCodeLabel() {
+        return flightCodeLabel;
+    }
+
+    /**
+     * Sets the flight code label.
+     * @param flightCodeLabel The flight code label.
+     */
+    public void setFlightCodeLabel(JLabel flightCodeLabel) {
+        this.flightCodeLabel = flightCodeLabel;
+    }
+
+    /**
+     * Gets the status label.
+     * @return The status label.
+     */
+    public JLabel getStatusLabel() {
+        return statusLabel;
+    }
+
+    /**
+     * Sets the status label.
+     * @param statusLabel The status label.
+     */
+    public void setStatusLabel(JLabel statusLabel) {
+        this.statusLabel = statusLabel;
+    }
+
+    /**
+     * Gets the airplane label.
+     * @return The airplane label.
+     */
+    public JLabel getAirplaneLabel() {
+        return airplaneLabel;
+    }
+
+    /**
+     * Sets the airplane label.
+     * @param airplaneLabel The airplane label.
+     */
+    public void setAirplaneLabel(JLabel airplaneLabel) {
+        this.airplaneLabel = airplaneLabel;
+    }
+
+    /**
+     * Gets the route label.
+     * @return The route label.
+     */
+    public JLabel getRouteLabel() {
+        return routeLabel;
+    }
+
+    /**
+     * Sets the route label.
+     * @param routeLabel The route label.
+     */
+    public void setRouteLabel(JLabel routeLabel) {
+        this.routeLabel = routeLabel;
+    }
+
+    /**
+     * Gets the time label.
+     * @return The time label.
+     */
+    public JLabel getTimeLabel() {
+        return timeLabel;
+    }
+
+    /**
+     * Sets the time label.
+     * @param timeLabel The time label.
+     */
+    public void setTimeLabel(JLabel timeLabel) {
+        this.timeLabel = timeLabel;
+    }
+
+    /**
+     * Gets the duration label.
+     * @return The duration label.
+     */
+    public JLabel getDurationLabel() {
+        return durationLabel;
+    }
+
+    /**
+     * Sets the duration label.
+     * @param durationLabel The duration label.
+     */
+    public void setDurationLabel(JLabel durationLabel) {
+        this.durationLabel = durationLabel;
+    }
+
+    /**
+     * Gets the date label.
+     * @return The date label.
+     */
+    public JLabel getDateLabel() {
+        return dateLabel;
+    }
+
+    /**
+     * Sets the date label.
+     * @param dateLabel The date label.
+     */
+    public void setDateLabel(JLabel dateLabel) {
+        this.dateLabel = dateLabel;
+    }
+
+    /**
+     * Sets the back button.
+     * @param backButton The back button.
+     */
+    public void setBackButton(JButton backButton) {
+        this.backButton = backButton;
+    }
+
+    /**
+     * Gets the continue button.
+     * @return The continue button.
+     */
+    public JButton getContinueButton() {
+        return continueButton;
+    }
+
+    /**
+     * Sets the continue button.
+     * @param continueButton The continue button.
+     */
+    public void setContinueButton(JButton continueButton) {
+        this.continueButton = continueButton;
+    }
+
+    /**
+     * Gets the flight.
+     * @return The flight.
+     */
+    public Flight getFlight() {
+        return flight;
+    }
+
+    /**
+     * Sets the flight.
+     * @param flight The flight.
+     */
+    public void setFlight(Flight flight) {
+        this.flight = flight;
+    }
+
+    /**
+     * Gets the origin city.
+     * @return The origin city.
+     */
+    public City getOriginCity() {
+        return originCity;
+    }
+
+    /**
+     * Sets the origin city.
+     * @param originCity The origin city.
+     */
+    public void setOriginCity(City originCity) {
+        this.originCity = originCity;
+    }
+
+    /**
+     * Gets the destination city.
+     * @return The destination city.
+     */
+    public City getDestinationCity() {
+        return destinationCity;
+    }
+
+    /**
+     * Sets the destination city.
+     * @param destinationCity The destination city.
+     */
+    public void setDestinationCity(City destinationCity) {
+        this.destinationCity = destinationCity;
+    }
+
+    /**
+     * Gets the airplane.
+     * @return The airplane.
+     */
+    public Airplane getAirplane() {
+        return airplane;
+    }
+
+    /**
+     * Sets the airplane.
+     * @param airplane The airplane.
+     */
+    public void setAirplane(Airplane airplane) {
+        this.airplane = airplane;
+    }
+
+    /**
+     * Sets the main details flight panel.
+     * @param detailsFlightPanel The details flight panel to set.
+     */
+    public void setDetailsFlightPanel(JPanel detailsFlightPanel) {
+        this.detailsFlightPanel = detailsFlightPanel;
     }
 }

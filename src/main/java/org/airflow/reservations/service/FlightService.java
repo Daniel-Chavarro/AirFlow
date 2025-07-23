@@ -1,13 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.airflow.reservations.service;
 
 import org.airflow.reservations.DAO.FlightDAO;
 import org.airflow.reservations.model.Flight;
 
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 /**
@@ -26,7 +23,13 @@ public class FlightService {
     public FlightService() throws SQLException {
         this.flightDAO = new FlightDAO();
     }
-    
+
+    /**
+     * Constructor for FlightService with dependency injection.
+     * Allows injecting a specific FlightDAO instance, useful for testing.
+     *
+     * @param flightDAO the FlightDAO instance to use
+     */
     public FlightService(FlightDAO flightDAO) {
         this.flightDAO = flightDAO;
     }
@@ -123,5 +126,32 @@ public class FlightService {
      */
     public void deleteFlight(int id) throws SQLException {
         flightDAO.delete(id);
+    }
+
+    /**
+     * Retrieves flights within a specific departure time range.
+     * This method is useful for finding flights departing on a particular day or time period.
+     *
+     * @param bottomRange the earliest departure time to include
+     * @param topRange the latest departure time to include
+     * @return ArrayList of Flight objects departing within the specified time range
+     * @throws SQLException if a database access error occurs
+     */
+    private ArrayList<String> availableFlightsToString(ArrayList<Flight> flights) throws SQLException{
+        try {
+            ArrayList<String> availableFlights = new ArrayList<>();
+            for (Flight flight : flights) {
+                availableFlights.add(flight.getCode());
+            }
+            return availableFlights;
+        }
+        catch(Exception e){
+            throw new IllegalArgumentException("No available flights");
+        }
+    }
+
+    public ArrayList<Flight> getBydepartureTimeRange(LocalDateTime bottomRange , LocalDateTime TopRange) throws SQLException{
+        return flightDAO.getByDepartureTimeRange(bottomRange,TopRange);
+
     }
 }

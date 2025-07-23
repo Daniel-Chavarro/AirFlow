@@ -5,13 +5,20 @@ import java.time.Year;
 /**
  * Represents an airplane in the reservation system.
  * Contains details such as airplane ID, airline, model, code, capacity, and year.
+ * Airplanes are assigned to flights and contain seats for passenger reservations.
  */
 public class Airplane {
+    /** The unique identifier for the airplane */
     private int id;
+    /** The airline company that operates this airplane */
     private String airline;
+    /** The aircraft model (e.g., "Boeing 737", "Airbus A320") */
     private String model;
+    /** The unique airplane code identifier within the airline fleet */
     private String code;
+    /** The total passenger capacity of the airplane */
     private int capacity;
+    /** The year the airplane was manufactured */
     private Year year;
 
     /**

@@ -97,25 +97,25 @@ public class SuggestionService {
         if (cancelledFlight == null) {
             throw new IllegalArgumentException("Cancelled flight with ID " + cancelledFlightId + " not found.");
         }
-        System.out.println("DEBUG (SuggestionService): Vuelo Cancelado ID: " + cancelledFlight.getId() + ", Origen: " + cancelledFlight.getOrigin_city_FK() + ", Destino: " + cancelledFlight.getDestination_city_FK() + ", Salida: " + cancelledFlight.getDeparture_time() + ", Estado: " + cancelledFlight.getStatus_name());
+        System.out.println("DEBUG (SuggestionService): Cancelled Flight ID: " + cancelledFlight.getId() + ", Origin: " + cancelledFlight.getOrigin_city_FK() + ", Destination: " + cancelledFlight.getDestination_city_FK() + ", Departure: " + cancelledFlight.getDeparture_time() + ", Status: " + cancelledFlight.getStatus_name());
 
         LocalDateTime searchStartTime = cancelledFlight.getDeparture_time().minusHours(24);
         LocalDateTime searchEndTime = cancelledFlight.getDeparture_time().plusHours(48);
-        System.out.println("DEBUG (SuggestionService): Rango de tiempo de búsqueda: " + searchStartTime + " a " + searchEndTime);
+        System.out.println("DEBUG (SuggestionService): Search time range: " + searchStartTime + " to " + searchEndTime);
 
         // Call to the DAO: Pay attention to the order of parameters.
         // The DAO method signature is getByDestinationAndOriginCity(int destinationCityId, int originCityId)
-        System.out.println("DEBUG (SuggestionService): Llamando a getByDestinationAndOriginCity con ID Destino: " + cancelledFlight.getDestination_city_FK() + " y ID Origen: " + cancelledFlight.getOrigin_city_FK());
+        System.out.println("DEBUG (SuggestionService): Calling getByDestinationAndOriginCity with Destination ID: " + cancelledFlight.getDestination_city_FK() + " and Origin ID: " + cancelledFlight.getOrigin_city_FK());
         List<Flight> potentialFlights = flightDAO.getByDestinationAndOriginCity(
                 cancelledFlight.getDestination_city_FK(), // This is the first parameter: Destination ID
                 cancelledFlight.getOrigin_city_FK()       // This is the second parameter: Origin ID
         );
 
-        System.out.println("DEBUG (SuggestionService): Vuelos potenciales encontrados por DAO: " + potentialFlights.size());
+        System.out.println("DEBUG (SuggestionService): Potential flights found by DAO: " + potentialFlights.size());
         for (Flight pFlight : potentialFlights) {
-            System.out.println("DEBUG (SuggestionService): Vuelo potencial del DAO - ID: " + pFlight.getId() + ", Código: " + pFlight.getCode() +
-                               ", Origen: " + pFlight.getOrigin_city_FK() + ", Destino: " + pFlight.getDestination_city_FK() +
-                               ", Salida: " + pFlight.getDeparture_time() + ", Nombre Estado: " + pFlight.getStatus_name() + ", ID Estado: " + pFlight.getStatus_FK());
+            System.out.println("DEBUG (SuggestionService): Potential flight from DAO - ID: " + pFlight.getId() + ", Code: " + pFlight.getCode() +
+                               ", Origin: " + pFlight.getOrigin_city_FK() + ", Destination: " + pFlight.getDestination_city_FK() +
+                               ", Departure: " + pFlight.getDeparture_time() + ", Status Name: " + pFlight.getStatus_name() + ", Status ID: " + pFlight.getStatus_FK());
         }
 
         List<Flight> suitableAlternatives = new ArrayList<>();

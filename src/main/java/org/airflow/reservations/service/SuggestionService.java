@@ -229,7 +229,7 @@ public class SuggestionService {
         Optional<User> passenger = Optional.ofNullable(userDAO.getById(reservation.getUser_FK()));
         if (passenger.isPresent()) {
             sendNotification(passenger.get().getEmail(),
-                    "Hemos recibido tu rechazo de las alternativas. Nos pondremos en contacto contigo para otras opciones o gestionar un reembolso.");
+                    "We have received your rejection of the alternatives. We will contact you to discuss other options or process a refund.");
         }
 
         System.out.println("Suggestion rejected for reservation ID: " + reservationId);

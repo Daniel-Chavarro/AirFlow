@@ -135,7 +135,7 @@ public class FlightDAO implements DAOMethods<Flight> {
         statement.setString(5, toUpdate.getCode());
         statement.setTimestamp(6, Timestamp.valueOf(toUpdate.getDeparture_time()));
         statement.setTimestamp(7, Timestamp.valueOf(toUpdate.getScheduled_arrival_time()));
-        // Manejo de posibles valores NULL para arrival_time
+        // Handle possible NULL values for arrival_time
         if (toUpdate.getArrival_time() != null) {
             statement.setTimestamp(8, Timestamp.valueOf(toUpdate.getArrival_time()));
         } else {

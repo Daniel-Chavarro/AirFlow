@@ -258,18 +258,18 @@ class SuggestionServiceTest {
     void testSuggestAlternativeFlights_foundAlternatives() throws SQLException {
         List<Flight> suggestedFlights = suggestionService.suggestAlternativeFlights(testFlightCancelledId);
 
-        System.out.println("DEBUG: Número de vuelos sugeridos: " + suggestedFlights.size());
+        System.out.println("DEBUG: Number of suggested flights: " + suggestedFlights.size());
         if (suggestedFlights.isEmpty()) {
-            System.out.println("DEBUG: La lista de vuelos sugeridos está vacía.");
+            System.out.println("DEBUG: The list of suggested flights is empty.");
         } else {
-            System.out.println("DEBUG: Vuelos sugeridos encontrados:");
+            System.out.println("DEBUG: Suggested flights found:");
             for (Flight f : suggestedFlights) {
                 System.out.println("  ID: " + f.getId() +
-                                   ", Código: " + f.getCode() +
-                                   ", Origen: " + f.getOrigin_city_FK() +
-                                   ", Destino: " + f.getDestination_city_FK() +
-                                   ", Salida: " + f.getDeparture_time() +
-                                   ", Estado: " + f.getStatus_FK());
+                                   ", Code: " + f.getCode() +
+                                   ", Origin: " + f.getOrigin_city_FK() +
+                                   ", Destination: " + f.getDestination_city_FK() +
+                                   ", Departure: " + f.getDeparture_time() +
+                                   ", Status: " + f.getStatus_FK());
             }
         }
 

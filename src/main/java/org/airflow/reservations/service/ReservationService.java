@@ -1,6 +1,5 @@
 package org.airflow.reservations.service;
 
-import java.sql.Connection;
 import org.airflow.reservations.DAO.*;
 import org.airflow.reservations.model.*;
 
@@ -8,7 +7,6 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import org.airflow.reservations.utils.ConnectionDB;
 
 /**
  * Service class for managing reservation-related operations.
@@ -21,7 +19,7 @@ public class ReservationService {
     /** Data Access Object for flight operations */
     private final FlightDAO flightDAO;
     /** Data Access Object for seat operations */
-    private final SeatDAO SeatDAO;
+    private final SeatDAO seatDAO;
     /** Data Access Object for city operations */
     private final CityDAO cityDAO;
     /** The current user making reservations */
@@ -38,9 +36,9 @@ public class ReservationService {
     public ReservationService(User User) throws SQLException {
         this.flightDAO = new FlightDAO();
         this.reservationDAO = new ReservationDAO();
-        this.SeatDAO = new SeatDAO();
+        this.seatDAO = new SeatDAO();
         this.cityDAO = new CityDAO();
-        this.seatService = new SeatService(this.SeatDAO);
+        this.seatService = new SeatService(this.seatDAO);
         this.User = User;
     }
 
@@ -51,14 +49,14 @@ public class ReservationService {
      * @param User The user who will be making reservations
      * @param reservationDAO The ReservationDAO instance to use
      * @param flightDAO The FlightDAO instance to use
-     * @param SeatDAO The SeatDAO instance to use
+     * @param SeatDAO The seatDAO instance to use
      * @param cityDAO The CityDAO instance to use
      * @param seatService The SeatService instance to use
      */
     public ReservationService(User User, ReservationDAO reservationDAO, FlightDAO flightDAO, SeatDAO SeatDAO, CityDAO cityDAO, SeatService seatService) {
         this.reservationDAO = reservationDAO;
         this.flightDAO = flightDAO;
-        this.SeatDAO = SeatDAO;
+        this.seatDAO = SeatDAO;
         this.cityDAO = cityDAO;
         this.seatService = seatService;
         this.User = User;
@@ -79,7 +77,7 @@ public class ReservationService {
     private boolean ableForReservation(int selectedFlight, int selectedSeat) throws SQLException{
         Flight flight= flightDAO.getById(selectedFlight);
         if (flight.getId() == 0) throw new IllegalArgumentException("El vuelo no existe");
-        Seat seat = SeatDAO.getById(selectedSeat);
+        Seat seat = seatDAO.getById(selectedSeat);
         if (seat.getId() == 0) throw new IllegalArgumentException("El asiento no existe");
         long differenceHours = ChronoUnit.HOURS.between(LocalDateTime.now(),flight.getDeparture_time());
         if (differenceHours < 3) return false;
@@ -190,9 +188,9 @@ public class ReservationService {
         try {
             if (ableForCancelation(selectedReservation)) {
                 Reservation reservation = reservationDAO.getById(selectedReservation);
-                ArrayList<Seat> seat = SeatDAO.getByReservationId(selectedReservation);
+                ArrayList<Seat> seat = seatDAO.getByReservationId(selectedReservation);
                 for (Seat s : seat) {
-                    seatService.updateSeatStatus(s.getId(), 0);
+                    seatService.updateSeatStatus(s.getId(), null);
                 }
                 reservationDAO.delete(selectedReservation);
             } else {
@@ -217,21 +215,21 @@ public class ReservationService {
         try{
             if (reservationDAO.getById(selectedReservation) == null) throw new IllegalArgumentException("La reserva no existe");
             if (ableForCancelation(selectedReservation)) {
-                ArrayList<Seat> seats = SeatDAO.getByReservationId(selectedReservation);
+                ArrayList<Seat> seats = seatDAO.getByReservationId(selectedReservation);
                 if (seatsIdtoCancel.isEmpty()) {
                     throw new IllegalArgumentException("No hay asientos seleccionados");
                 }
 
                 for (Seat s : seats) {
                     if (seatsIdtoCancel.contains(s.getId())) {
-                        seatService.updateSeatStatus(s.getId(), 0);
+                        seatService.updateSeatStatus(s.getId(), null);
                         seatsIdtoCancel.remove(Integer.valueOf(s.getId()));
                     }
                 }
                 if (!seatsIdtoCancel.isEmpty()) {
                     throw new IllegalArgumentException("Hay asientos que no pertenecen a la reserva");
                 }
-                if (SeatDAO.getByReservationId(selectedReservation).isEmpty()) {
+                if (seatDAO.getByReservationId(selectedReservation).isEmpty()) {
                     cancelReservation(selectedReservation);
                 }
             }
@@ -427,9 +425,9 @@ public class ReservationService {
             }
 
             // 1. Release the seat(s) from the original flight
-            ArrayList<Seat> currentSeats = SeatDAO.getByReservationId(reservationId);
+            ArrayList<Seat> currentSeats = seatDAO.getByReservationId(reservationId);
             for (Seat seat : currentSeats) {
-                seatService.updateSeatStatus(seat.getId(), 0); // 0 indicates free seat
+                seatService.updateSeatStatus(seat.getId(), null); // null indicates free seat
             }
 
             // 2. Update the reservation to the new flight and set status
@@ -439,7 +437,7 @@ public class ReservationService {
 
             // 3. Assign a new seat on the new flight
             int newFlightAirplaneId = newFlight.getAirplane_FK();
-            ArrayList<Seat> availableSeats = SeatDAO.getByavailableSeatsByAirplaneIdClassAndWindow(newFlightAirplaneId, "ECONOMY", false);
+            ArrayList<Seat> availableSeats = seatDAO.getByavailableSeatsByAirplaneIdClassAndWindow(newFlightAirplaneId, "ECONOMY", false);
 
             if (availableSeats != null && !availableSeats.isEmpty()) {
                 Seat assignedNewSeat = availableSeats.get(0);
@@ -448,5 +446,4 @@ public class ReservationService {
                 throw new IllegalArgumentException("No available seats on the new flight.");
             }
     }
-
 }

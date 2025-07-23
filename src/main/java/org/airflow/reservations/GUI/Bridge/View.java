@@ -26,8 +26,8 @@ public interface View {
     String BOOK_SEAT_CMD = "BOOK_SEAT";
     /** Command for confirming a reservation. */
     String CONFIRM_RESERVATION_CMD = "CONFIRM_RESERVATION";
-    /** Command for proceeding to payment. */
-    String GO_TO_PAYMENT_CMD = "GO_TO_PAYMENT";
+    /** Command for the final confirmation of a reservation. */
+    String FINAL_CONFIRM_CMD = "FINAL_CONFIRM";
     /** Command for clearing selected seats. */
     String CLEAR_SEATS_CMD = "CLEAR_SEATS";
     /** Command for going back to the seat selection screen. */
@@ -36,6 +36,8 @@ public interface View {
     String BACK_TO_FLIGHTS_CMD = "BACK_TO_FLIGHTS";
     /** Command for logging out. */
     String LOGOUT_CMD = "LOGOUT";
+    /** Command for selecting a seat. */
+    String SELECT_SEAT = "SELECT_SEAT";
 
     /**
      * Adds an action listener to the view's components.
@@ -87,6 +89,15 @@ public interface View {
     LocalDate getReturnDate();
 
     /**
+     * Sets the cities data for the search panel combo boxes.
+     * This method allows the controller to populate the origin and destination dropdowns
+     * with cities from the database through the service layer.
+     *
+     * @param cities The list of cities to populate the combo boxes with.
+     */
+    void setCitiesData(ArrayList<City> cities);
+
+    /**
      * Gets the list of selected seats from the UI.
      *
      * @return The list of selected seats.
@@ -113,6 +124,17 @@ public interface View {
     void setBookSeatsData(Flight flight, Airplane airplane, ArrayList<Seat> seats);
 
     /**
+     * Sets the data for the book seats panel with city information.
+     *
+     * @param flight   The flight for which to book seats.
+     * @param airplane The airplane for the flight.
+     * @param seats    The list of available seats.
+     * @param originCity The origin city of the flight.
+     * @param destinationCity The destination city of the flight.
+     */
+    void setBookSeatsData(Flight flight, Airplane airplane, ArrayList<Seat> seats, City originCity, City destinationCity);
+
+    /**
      * Sets the data for the confirmation panel.
      *
      * @param flight           The flight to confirm.
@@ -120,8 +142,6 @@ public interface View {
      * @param destinationCity  The destination city of the flight.
      * @param airplane         The airplane for the flight.
      * @param selectedSeats    The list of selected seats.
-     * @param classMultipliers The map of seat class multipliers for pricing.
-     * @param basePrice        The base price of the flight.
      */
     void setConfirmationData(Flight flight, City originCity, City destinationCity, Airplane airplane,
                              ArrayList<Seat> selectedSeats, Map<Seat.SeatClass, Double> classMultipliers, double basePrice);
@@ -134,4 +154,10 @@ public interface View {
      * @param destination The destination city of the flights.
      */
     void displayFlights(ArrayList<Flight> flights, City origin, City destination);
+
+    void toggleSeatSelection(String seatNumber);
+
+    void clearSeatSelections();
+
+    void updateSeatSummary();
 }

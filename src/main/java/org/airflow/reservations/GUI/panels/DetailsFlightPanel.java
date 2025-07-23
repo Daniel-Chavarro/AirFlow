@@ -68,9 +68,39 @@ public class DetailsFlightPanel extends JPanel {
     public DetailsFlightPanel() {
         setLayout(new BorderLayout());
         detailsFlightPanel = new JPanel();
-        detailsFlightPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        detailsFlightPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
         detailsFlightPanel.setLayout(new BoxLayout(detailsFlightPanel, BoxLayout.Y_AXIS));
         detailsFlightPanel.setBackground(Color.WHITE);
+
+        // Initialize buttons early so they can be accessed by MainFrame
+        initializeButtons();
+    }
+
+    /**
+     * Initializes the buttons that need to be accessible immediately.
+     */
+    private void initializeButtons() {
+        // Initialize back button
+        backButton = new JButton("Back");
+        backButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+        backButton.setBackground(new Color(240, 240, 240));
+        backButton.setForeground(Color.BLACK);
+        backButton.setFocusPainted(false);
+        backButton.setBorderPainted(false);
+        backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        backButton.setPreferredSize(new Dimension(120, 40));
+        backButton.setActionCommand(View.BACK_TO_FLIGHTS_CMD);
+
+        // Initialize continue button
+        continueButton = new JButton("Continue to Book");
+        continueButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+        continueButton.setBackground(new Color(0, 123, 255));
+        continueButton.setForeground(Color.WHITE);
+        continueButton.setFocusPainted(false);
+        continueButton.setBorderPainted(false);
+        continueButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        continueButton.setPreferredSize(new Dimension(180, 40));
+        continueButton.setActionCommand(View.BOOK_SEAT_CMD);
     }
 
     /**
@@ -86,6 +116,9 @@ public class DetailsFlightPanel extends JPanel {
         this.originCity = originCity;
         this.destinationCity = destinationCity;
         this.airplane = airplane;
+
+        // Clear existing content to prevent duplication
+        detailsFlightPanel.removeAll();
 
         startDetailsPanel();
         createFlightInfoPanel();
@@ -110,7 +143,7 @@ public class DetailsFlightPanel extends JPanel {
         detailsPanel.setLayout(new GridBagLayout());
         detailsPanel.setBackground(Color.WHITE);
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 0, 10, 0);
+        gbc.insets = new Insets(5, 0, 8, 0);
         gbc.gridx = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridy = 0;
@@ -132,7 +165,7 @@ public class DetailsFlightPanel extends JPanel {
         flightInfoPanel.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230)));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 20, 10, 20);
+        gbc.insets = new Insets(8, 15, 8, 15);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -210,7 +243,7 @@ public class DetailsFlightPanel extends JPanel {
         baggagePanel.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230)));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 20, 10, 20);
+        gbc.insets = new Insets(8, 15, 8, 15);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -247,28 +280,8 @@ public class DetailsFlightPanel extends JPanel {
         buttonsPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         buttonsPanel.setBackground(Color.WHITE);
 
-        // Back Button
-        backButton = new JButton("Back");
-        backButton.setFont(new Font("SansSerif", Font.BOLD, 14));
-        backButton.setBackground(new Color(240, 240, 240));
-        backButton.setForeground(Color.BLACK);
-        backButton.setFocusPainted(false);
-        backButton.setBorderPainted(false);
-        backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        backButton.setPreferredSize(new Dimension(120, 40));
-        backButton.setActionCommand(View.BACK_TO_FLIGHTS_CMD);
+        // Add the already initialized buttons to the panel
         buttonsPanel.add(backButton);
-
-        // Continue to Book Button (similar to the one in the image)
-        continueButton = new JButton("Continue to Book");
-        continueButton.setFont(new Font("SansSerif", Font.BOLD, 14));
-        continueButton.setBackground(new Color(0, 123, 255));
-        continueButton.setForeground(Color.WHITE);
-        continueButton.setFocusPainted(false);
-        continueButton.setBorderPainted(false);
-        continueButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        continueButton.setPreferredSize(new Dimension(180, 40));
-        continueButton.setActionCommand(View.BOOK_SEAT_CMD);
         buttonsPanel.add(continueButton);
     }
 

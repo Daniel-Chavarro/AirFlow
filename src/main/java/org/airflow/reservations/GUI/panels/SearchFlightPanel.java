@@ -11,7 +11,6 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-
 /**
  * SearchFlightPanel class provides a panel for searching flights.
  * It includes input fields for origin, destination, departure and return dates,
@@ -48,7 +47,7 @@ public class SearchFlightPanel extends JPanel {
         // Initialize the main panel
         setLayout(new BorderLayout());
         searchFlightPanel = new JPanel();
-        searchFlightPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        searchFlightPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
         searchFlightPanel.setLayout(new BoxLayout(searchFlightPanel, BoxLayout.Y_AXIS));
         searchFlightPanel.setBackground(Color.WHITE);
 
@@ -60,6 +59,34 @@ public class SearchFlightPanel extends JPanel {
 
         // Set the main panel as the viewport view for the JScrollPane
         add(searchFlightPanel);
+    }
+
+    /**
+     * Sets the cities data for the origin and destination combo boxes.
+     * This method should be called from the Controller to populate the dropdowns.
+     *
+     * @param cities The list of cities to populate the combo boxes with
+     */
+    public void setCitiesData(ArrayList<City> cities) {
+        // Clear existing items
+        originComboBox.removeAllItems();
+        destinationComboBox.removeAllItems();
+
+        // Add select options
+        originComboBox.addItem("Select Origin");
+        destinationComboBox.addItem("Select Destination");
+
+        // Add cities from database
+        if (cities != null) {
+            for (City city : cities) {
+                originComboBox.addItem(city.getName());
+                destinationComboBox.addItem(city.getName());
+            }
+        }
+
+        // Refresh the UI
+        originComboBox.revalidate();
+        destinationComboBox.revalidate();
     }
 
     /**
@@ -86,7 +113,7 @@ public class SearchFlightPanel extends JPanel {
         formPanel.add(bookFlightLabel, gbc);
 
         // Origin
-        originComboBox = new JComboBox<>(new String[]{"Select Origin", "New York", "Los Angeles", "Chicago"});
+        originComboBox = new JComboBox<>();
         originComboBox.setPreferredSize(inputSize);
         originComboBox.setMaximumSize(inputSize);
         originComboBox.setBackground(new Color(240, 242, 245));
@@ -96,7 +123,7 @@ public class SearchFlightPanel extends JPanel {
         formPanel.add(originComboBox, gbc);
 
         // Destination
-        destinationComboBox = new JComboBox<>(new String[]{"Select Destination", "Miami", "San Francisco", "Seattle"});
+        destinationComboBox = new JComboBox<>();
         destinationComboBox.setPreferredSize(inputSize);
         destinationComboBox.setMaximumSize(inputSize);
         destinationComboBox.setBackground(new Color(240, 242, 245));

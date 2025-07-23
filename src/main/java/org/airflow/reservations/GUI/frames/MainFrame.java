@@ -76,6 +76,9 @@ public class MainFrame extends JFrame implements View {
 
         createHorizontalMenu();
         createContentPanel();
+
+        searchFlightPanel.setVisible(true);
+        setVisible(true);
     }
 
     /**
@@ -172,6 +175,7 @@ public class MainFrame extends JFrame implements View {
         bookSeatsPanel.getConfirmButton().addActionListener(listener);
         bookSeatsPanel.getClearSeatsButton().addActionListener(listener);
         bookSeatsPanel.getCancelButton().addActionListener(listener);
+        bookSeatsPanel.setActionListener(listener);
         confirmPanel.getBackButton().addActionListener(listener);
         confirmPanel.getConfirmButton().addActionListener(listener);
 
@@ -218,15 +222,23 @@ public class MainFrame extends JFrame implements View {
     }
 
     @Override
+    public void setCitiesData(ArrayList<City> cities) {
+        searchFlightPanel.setCitiesData(cities);
+    }
+
+    @Override
     public void setFlightDetails(Flight flight, City origin, City destination, Airplane airplane) {
         detailsFlightPanel.setData(flight, origin, destination, airplane);
     }
 
     @Override
     public void setBookSeatsData(Flight flight, Airplane airplane, ArrayList<Seat> seats) {
-        bookSeatsPanel.setFlight(flight);
-        bookSeatsPanel.setAirplane(airplane);
-        bookSeatsPanel.setSeats(seats);
+        bookSeatsPanel.setFlightData(flight, airplane, seats);
+    }
+
+    @Override
+    public void setBookSeatsData(Flight flight, Airplane airplane, ArrayList<Seat> seats, City originCity, City destinationCity) {
+        bookSeatsPanel.setFlightData(flight, airplane, seats, originCity, destinationCity);
     }
 
     @Override
@@ -239,24 +251,33 @@ public class MainFrame extends JFrame implements View {
         searchFlightPanel.displayFlights(flights, origin, destination, this.actionListener);
     }
 
+    @Override
+    public void toggleSeatSelection(String seatNumber) {
+        Seat seat = bookSeatsPanel.getSeatByNumber(seatNumber);
+        if (seat != null) {
+            bookSeatsPanel.toggleSeatSelection(seat);
+        }
+    }
+
+    @Override
+    public void clearSeatSelections() {
+        bookSeatsPanel.clearAllSelections();
+    }
+
+    @Override
+    public void updateSeatSummary() {
+        bookSeatsPanel.updateSummary();
+    }
+
     /**
      * Main method to run the application.
      * Initializes the FlatLaf look and feel, creates the main frame,
      * and sets it visible.
      * Just for testing purposes, it shows the SearchFlightPanel by default.
      *
-     * @param args command line arguments
      */
-    public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(new FlatLightLaf());
-        } catch (Exception ex) {
-            System.err.println("Failed to initialize FlatLaf");
-        }
-
-        MainFrame mainFrame = new MainFrame();
-        mainFrame.showPanel("SearchFlightPanel");
-        mainFrame.setVisible(true);
+    public BookSeatsPanel getBookSeatsPanel() {
+        return bookSeatsPanel;
     }
 
     /**

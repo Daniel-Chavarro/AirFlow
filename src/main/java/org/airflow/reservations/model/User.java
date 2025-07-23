@@ -4,13 +4,25 @@ import org.airflow.reservations.utils.PasswordUtils;
 
 import java.time.LocalDateTime;
 
+/**
+ * Represents a user in the AirFlow reservation system.
+ * This class contains all user information including personal details,
+ * authentication credentials, and system privileges.
+ */
 public class User {
+    /** The unique identifier for the user */
     private int id;
+    /** The first name of the user */
     private String name;
+    /** The last name of the user */
     private String last_name;
+    /** The email address of the user (used for login and notifications) */
     private String email;
+    /** The hashed password for user authentication */
     private String password;
+    /** Flag indicating whether the user has administrative privileges */
     private Boolean isSuperUser;
+    /** The timestamp when the user account was created */
     private LocalDateTime created_at;
 
 

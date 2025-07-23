@@ -5,16 +5,24 @@ import java.time.LocalDateTime;
 /**
  * Represents a reservation in the reservation system.
  * Contains details such as reservation ID, user FK, status FK, flight FK, and reservation time.
+ * Reservations link users to specific flights and track the booking status.
  */
 public class Reservation {
+    /** The unique identifier for the reservation */
     private int id;
+    /** Foreign key reference to the user who made this reservation */
     private int user_FK;
+    /** Foreign key reference to the current status of the reservation */
     private int status_FK;
+    /** Foreign key reference to the flight being reserved */
     private int flight_FK;
+    /** The timestamp when the reservation was created */
     private LocalDateTime reserved_at;
     
     // Status information retrieved from joins
+    /** The human-readable name of the reservation status (retrieved from database joins) */
     private String status_name;
+    /** Detailed description of the reservation status (retrieved from database joins) */
     private String status_description;
 
     /**

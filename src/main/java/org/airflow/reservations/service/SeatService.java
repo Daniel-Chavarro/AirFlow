@@ -30,12 +30,23 @@ public class SeatService {
      *
      * @param seatDAO the SeatDAO instance to use
      */
-    public void ableValueForClass(String seatClassStr) throws SQLException {
+    public SeatService(SeatDAO seatDAO) {
+        this.seatDAO = seatDAO;
+    }
+
+    /**
+     * Validates if the provided string represents a valid seat class.
+     *
+     * @param seatClassStr the seat class string to validate
+     * @throws IllegalArgumentException if the seat class string is not valid
+     */
+    public void validateSeatClass(String seatClassStr) {
         try {
-            Seat.SeatClass seatClass = Seat.SeatClass.valueOf(seatClassStr.toUpperCase());
+            Seat.SeatClass.valueOf(seatClassStr.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("No a valid seat class: " + seatClassStr);
+            throw new IllegalArgumentException("Not a valid seat class: " + seatClassStr);
         }
+    }
 
     /**
      * Retrieves all seats associated with a specific airplane.
@@ -48,18 +59,27 @@ public class SeatService {
         return seatDAO.getByAirplaneId(airplaneId);
     }
 
-   
-
-    private ArrayList<String> availableSeatsToString(ArrayList<Seat> seats) {
-        try{
+    /**
+     * Converts a list of Seat objects to a list of seat number strings.
+     * This method is used internally to extract seat numbers from seat objects.
+     *
+     * @param seats the list of Seat objects to convert
+     * @return ArrayList containing seat numbers as strings
+     * @throws IllegalArgumentException if no seats are available or an error occurs during conversion
+     */
+    public ArrayList<String> availableSeatsToString(ArrayList<Seat> seats) {
+        try {
             ArrayList<String> availableSeats = new ArrayList<>();
             for (Seat seat : seats) {
-                availableSeats.add(seat.getSeat_number());
+                if (seat.getReservation_FK() == null) { // Only include available seats
+                    availableSeats.add(seat.getSeat_number());
+                }
             }
             return availableSeats;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error processing available seats: " + e.getMessage());
         }
-        catch(Exception e){
-            throw new IllegalArgumentException("No available seats");
+    }
 
     /**
      * Updates the reservation status of a specific seat.
@@ -78,7 +98,6 @@ public class SeatService {
         seat.setReservation_FK(reservationId);
         seatDAO.update(seatId, seat);
     }
-          
 
     /**
      * Retrieves all seats associated with a specific reservation.
@@ -95,10 +114,47 @@ public class SeatService {
      * Retrieves a specific seat by its unique identifier.
      *
      * @param seatId The unique identifier of the seat
-     * @return The Seat object if found, or an empty Seat object if not found
+     * @return The Seat object if found, or null if not found
      * @throws SQLException if there's an error executing the database query
      */
     public Seat getSeatById(int seatId) throws SQLException {
         return seatDAO.getById(seatId);
+    }
+
+    /**
+     * Retrieves all available seats for a specific airplane.
+     * Available seats are those that are not currently reserved.
+     *
+     * @param airplaneId The unique identifier of the airplane
+     * @return ArrayList containing all available Seat objects for the specified airplane
+     * @throws SQLException if there's an error executing the database query
+     */
+    public ArrayList<Seat> getAvailableSeatsByAirplaneId(int airplaneId) throws SQLException {
+        ArrayList<Seat> allSeats = getSeatsByAirplaneId(airplaneId);
+        ArrayList<Seat> availableSeats = new ArrayList<>();
+
+        for (Seat seat : allSeats) {
+            if (seat.getReservation_FK() == null) {
+                availableSeats.add(seat);
+            }
+        }
+
+        return availableSeats;
+    }
+
+    /**
+     * Checks if a specific seat is available for reservation.
+     *
+     * @param seatId The unique identifier of the seat
+     * @return true if the seat is available, false if it's already reserved
+     * @throws SQLException if there's an error executing the database query
+     * @throws IllegalArgumentException if the seat with the given ID is not found
+     */
+    public boolean isSeatAvailable(int seatId) throws SQLException {
+        Seat seat = getSeatById(seatId);
+        if (seat == null) {
+            throw new IllegalArgumentException("Seat not found: " + seatId);
+        }
+        return seat.getReservation_FK() == null;
     }
 }

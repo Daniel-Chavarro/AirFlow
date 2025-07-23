@@ -137,7 +137,21 @@ public class FlightService {
      * @return ArrayList of Flight objects departing within the specified time range
      * @throws SQLException if a database access error occurs
      */
-    public ArrayList<Flight> getBydepartureTimeRange(LocalDateTime bottomRange, LocalDateTime topRange) throws SQLException {
-        return flightDAO.getByDepartureTimeRange(bottomRange, topRange);
+    private ArrayList<String> availableFlightsToString(ArrayList<Flight> flights) throws SQLException{
+        try {
+            ArrayList<String> availableFlights = new ArrayList<>();
+            for (Flight flight : flights) {
+                availableFlights.add(flight.getCode());
+            }
+            return availableFlights;
+        }
+        catch(Exception e){
+            throw new IllegalArgumentException("No available flights");
+        }
+    }
+
+    public ArrayList<Flight> getBydepartureTimeRange(LocalDateTime bottomRange , LocalDateTime TopRange) throws SQLException{
+        return flightDAO.getByDepartureTimeRange(bottomRange,TopRange);
+
     }
 }

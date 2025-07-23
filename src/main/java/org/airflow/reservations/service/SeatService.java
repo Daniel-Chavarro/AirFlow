@@ -6,48 +6,49 @@ import org.airflow.reservations.model.Seat;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+/**
+ * Service class for managing seat-related operations.
+ * This class provides business logic for seat management including
+ * seat retrieval, status updates, and reservation handling.
+ */
 public class SeatService {
-    private SeatDAO SeatDAO;
+    /** Data Access Object for seat operations */
+    private final SeatDAO seatDAO;
 
-    public SeatService() throws Exception {
-        this.SeatDAO = new SeatDAO();
-    }
-    public SeatService(SeatDAO flightDAO) {
-        this.SeatDAO = flightDAO;
+    /**
+     * Default constructor that initializes the SeatService with a new SeatDAO.
+     *
+     * @throws SQLException if there's an error connecting to the database
+     */
+    public SeatService() throws SQLException {
+        this.seatDAO = new SeatDAO();
     }
 
     /**
-     * Function to check if a seat class is valid.
-     * @param seatClassStr : the string representation of the seat class.
-     * @throws SQLException : if a database access error occurs.
+     * Constructor for SeatService with dependency injection.
+     * Allows injecting a specific SeatDAO instance, useful for testing.
+     *
+     * @param seatDAO the SeatDAO instance to use
      */
-    public void AbleValueForClass(String seatClassStr) throws SQLException {
+    public void ableValueForClass(String seatClassStr) throws SQLException {
         try {
             Seat.SeatClass seatClass = Seat.SeatClass.valueOf(seatClassStr.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("No a valid seat class: " + seatClassStr);
         }
-    }
 
     /**
-     * Function to get all the available seats for a given airplane, class and window.
-     * @param AirplaneId : the id of the airplane.
-     * @param seatClass : the class of the seats to be returned.
-     * @param Window : true if the seats are for the window, false if the seats are for the aisle.
-     * @return ArrayList<String> with the codes of the available seats.
-     * @throws SQLException
+     * Retrieves all seats associated with a specific airplane.
+     *
+     * @param airplaneId The unique identifier of the airplane
+     * @return ArrayList containing all Seat objects for the specified airplane
+     * @throws SQLException if there's an error executing the database query
      */
-    public ArrayList<String> getSeatsByAirplaneIdClassWindow(int AirplaneId ,String seatClass, boolean Window) throws SQLException {
-        AbleValueForClass(seatClass);
-        ArrayList<Seat> seats = SeatDAO.getByavailableSeatsByAirplaneIdClassAndWindow(AirplaneId,seatClass,Window);
-        return availableSeatsToString(seats);
+    public ArrayList<Seat> getSeatsByAirplaneId(int airplaneId) throws SQLException {
+        return seatDAO.getByAirplaneId(airplaneId);
     }
 
-    /**
-     * Function to return all the codes of the available seats.
-     * @param seats : ArrayList<Seat> with the seats to be checked.
-     * @return ArrayList<String> with the codes of the available seats.
-     */
+   
 
     private ArrayList<String> availableSeatsToString(ArrayList<Seat> seats) {
         try{
@@ -59,41 +60,45 @@ public class SeatService {
         }
         catch(Exception e){
             throw new IllegalArgumentException("No available seats");
-        }
 
+    /**
+     * Updates the reservation status of a specific seat.
+     * Associates a seat with a reservation or clears the association.
+     *
+     * @param seatId The unique identifier of the seat
+     * @param reservationId The reservation ID to associate with the seat, or null to clear
+     * @throws SQLException if there's an error executing the database query
+     * @throws IllegalArgumentException if the seat with the given ID is not found
+     */    
+    public void updateSeatStatus(int seatId, Integer reservationId) throws SQLException {
+        Seat seat = seatDAO.getById(seatId);
+        if (seat == null) {
+            throw new IllegalArgumentException("Seat not found: " + seatId);
+        }
+        seat.setReservation_FK(reservationId);
+        seatDAO.update(seatId, seat);
+    }
+          
+
+    /**
+     * Retrieves all seats associated with a specific reservation.
+     *
+     * @param reservationId The unique identifier of the reservation
+     * @return ArrayList containing all Seat objects for the specified reservation
+     * @throws SQLException if there's an error executing the database query
+     */
+    public ArrayList<Seat> getSeatsByReservationId(int reservationId) throws SQLException {
+        return seatDAO.getByReservationId(reservationId);
     }
 
     /**
-     * Function to update the status of a seat.
-     * @param seatId : the id of the seat to be updated.
-     * @param Status : the new status of the seat.
-     * @throws SQLException : if a database access error occurs.
+     * Retrieves a specific seat by its unique identifier.
+     *
+     * @param seatId The unique identifier of the seat
+     * @return The Seat object if found, or an empty Seat object if not found
+     * @throws SQLException if there's an error executing the database query
      */
-
-    public void updateSeatStatus(int seatId , int Status) throws SQLException {
-        Seat seat = SeatDAO.getById(seatId);
-        try{
-            if(Status == 0){
-                seat.setReservation_FK(null);
-            }
-            else seat.setReservation_FK(Status);
-            SeatDAO.update(seatId,seat);
-        }
-        catch(Exception e) {
-            throw new IllegalArgumentException("El asiento no existe");
-        }
-    }
-
-    /**
-     * Function to find seats with a reservation Id.
-     * @param reservationId: Id of the reservation.
-     * @return ArrayList of the seats related to the reservation.
-     * @throws SQLException : if a database access error occurs.
-     */
-    public ArrayList<Seat> getSeatsByReservationId(int reservationId) throws SQLException{
-        return SeatDAO.getByReservationId(reservationId);
-    }
-    public Seat getSeatById(int seatId) throws SQLException{
-        return SeatDAO.getById(seatId);
+    public Seat getSeatById(int seatId) throws SQLException {
+        return seatDAO.getById(seatId);
     }
 }

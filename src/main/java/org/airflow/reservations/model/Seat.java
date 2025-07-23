@@ -3,13 +3,20 @@ package org.airflow.reservations.model;
 /**
  * Represents a seat in the reservation system.
  * Contains details such as seat ID, airplane FK, reservation FK, seat number, seat class, and window status.
+ * Seats are part of airplanes and can be reserved by passengers.
  */
 public class Seat {
+    /** The unique identifier for the seat */
     private int id;
+    /** Foreign key reference to the airplane this seat belongs to */
     private int airplane_FK;
+    /** Foreign key reference to the reservation (null if seat is available) */
     private Integer reservation_FK; // Can be null
+    /** The seat number identifier (e.g., "12A", "15F") */
     private String seat_number;
+    /** The class/category of the seat (ECONOMY, BUSINESS, FIRST) */
     private SeatClass seat_class;
+    /** Flag indicating whether this is a window seat */
     private Boolean is_window;
 
     /**

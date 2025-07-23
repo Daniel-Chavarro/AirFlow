@@ -1,4 +1,3 @@
-
 package org.airflow.reservations.service;
 
 import org.airflow.reservations.DAO.FlightDAO;
@@ -24,7 +23,13 @@ public class FlightService {
     public FlightService() throws SQLException {
         this.flightDAO = new FlightDAO();
     }
-    
+
+    /**
+     * Constructor for FlightService with dependency injection.
+     * Allows injecting a specific FlightDAO instance, useful for testing.
+     *
+     * @param flightDAO the FlightDAO instance to use
+     */
     public FlightService(FlightDAO flightDAO) {
         this.flightDAO = flightDAO;
     }
@@ -122,28 +127,16 @@ public class FlightService {
     public void deleteFlight(int id) throws SQLException {
         flightDAO.delete(id);
     }
-        
-    /**
-     * Function to get all the available flights between two cities.
-     *@param Destiny_id: id of the destination city
-     *@param Origin_id: id of the origin city
-     *@return: an arraylist of flights that are available between the two cities.
-     *@throws SQLException: if a database access error occurs.
-     */
-
-    public ArrayList<String> availableFlights(int Destiny_id, int Origin_id) throws SQLException{
-        ArrayList<Flight> flights = flightDAO.getByDestinationAndOriginCity(Destiny_id,Origin_id);
-        return availableFlightsToString(flights);
-    }
 
     /**
-     * Function to return all the codes of the available flights.
-     * @param flights : ArrayList<Flight> with the flights to be checked.
-     * @return ArrayList<String> with the codes of the available flights.
-     * @throws SQLException : if a database access error occurs.
-     * @throws IllegalArgumentException : if there are no flights to be checked.
+     * Retrieves flights within a specific departure time range.
+     * This method is useful for finding flights departing on a particular day or time period.
+     *
+     * @param bottomRange the earliest departure time to include
+     * @param topRange the latest departure time to include
+     * @return ArrayList of Flight objects departing within the specified time range
+     * @throws SQLException if a database access error occurs
      */
-
     private ArrayList<String> availableFlightsToString(ArrayList<Flight> flights) throws SQLException{
         try {
             ArrayList<String> availableFlights = new ArrayList<>();
@@ -159,5 +152,6 @@ public class FlightService {
 
     public ArrayList<Flight> getBydepartureTimeRange(LocalDateTime bottomRange , LocalDateTime TopRange) throws SQLException{
         return flightDAO.getByDepartureTimeRange(bottomRange,TopRange);
+
     }
 }

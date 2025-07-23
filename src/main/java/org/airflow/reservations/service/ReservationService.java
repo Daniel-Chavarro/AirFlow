@@ -10,15 +10,32 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import org.airflow.reservations.utils.ConnectionDB;
 
+/**
+ * Service class for managing reservation-related operations.
+ * This class handles the business logic for creating, updating, and managing
+ * flight reservations, including seat assignments and validation.
+ */
 public class ReservationService {
-    private ReservationDAO reservationDAO;
-    private FlightDAO flightDAO;
-    private SeatDAO SeatDAO;
-    private CityDAO cityDAO;
-    private User User;
-    private SeatService seatService;
+    /** Data Access Object for reservation operations */
+    private final ReservationDAO reservationDAO;
+    /** Data Access Object for flight operations */
+    private final FlightDAO flightDAO;
+    /** Data Access Object for seat operations */
+    private final SeatDAO SeatDAO;
+    /** Data Access Object for city operations */
+    private final CityDAO cityDAO;
+    /** The current user making reservations */
+    private final User User;
+    /** Service for seat-related operations */
+    private final SeatService seatService;
 
-    public ReservationService(User User) throws Exception {
+    /**
+     * Default constructor that initializes the ReservationService with necessary DAOs.
+     *
+     * @param User The user who will be making reservations
+     * @throws SQLException if there's an error connecting to the database
+     */
+    public ReservationService(User User) throws SQLException {
         this.flightDAO = new FlightDAO();
         this.reservationDAO = new ReservationDAO();
         this.SeatDAO = new SeatDAO();
@@ -26,6 +43,18 @@ public class ReservationService {
         this.seatService = new SeatService(this.SeatDAO);
         this.User = User;
     }
+
+    /**
+     * Constructor for ReservationService with dependency injection.
+     * Allows injecting specific DAO instances, useful for testing.
+     *
+     * @param User The user who will be making reservations
+     * @param reservationDAO The ReservationDAO instance to use
+     * @param flightDAO The FlightDAO instance to use
+     * @param SeatDAO The SeatDAO instance to use
+     * @param cityDAO The CityDAO instance to use
+     * @param seatService The SeatService instance to use
+     */
     public ReservationService(User User, ReservationDAO reservationDAO, FlightDAO flightDAO, SeatDAO SeatDAO, CityDAO cityDAO, SeatService seatService) {
         this.reservationDAO = reservationDAO;
         this.flightDAO = flightDAO;
@@ -37,10 +66,14 @@ public class ReservationService {
 
     /**
      * Function to check if the seat and flight given are able for reservation.
-     * @param selectedFlight : the flight to be reserved.
-     * @param selectedSeat : the seat to be reserved.
-     * @return : true if the reservation is able for be created
-     * @throws SQLException : if a database access error occurs.
+     * Validates that the flight exists, seat is available, departure time allows reservation,
+     * and flight status permits bookings.
+     *
+     * @param selectedFlight The flight ID to be reserved
+     * @param selectedSeat The seat ID to be reserved
+     * @return true if the reservation can be created, false otherwise
+     * @throws SQLException if a database access error occurs
+     * @throws IllegalArgumentException if the flight or seat doesn't exist
      */
 
     private boolean ableForReservation(int selectedFlight, int selectedSeat) throws SQLException{
@@ -52,8 +85,7 @@ public class ReservationService {
         if (differenceHours < 3) return false;
         if (flight.getStatus_FK() == 7 || flight.getStatus_FK() == 3) return false;
         if ( seat.getAirplane_FK() != flight.getAirplane_FK()) return false;
-        if (seat.getReservation_FK() != null) return false;
-        return true;
+        return seat.getReservation_FK() == null;
     }
 
     /**
@@ -116,16 +148,25 @@ public class ReservationService {
         return reservationDAO.getByFlightIdAndUserId(User.getId(),flightId);
     }
 
-    public Reservation FindByReservationId(int reservationId) throws SQLException{
+    /**
+     * Finds a reservation by its unique identifier.
+     *
+     * @param reservationId The unique identifier of the reservation to find
+     * @return The Reservation object if found, or an empty Reservation object if not found
+     * @throws SQLException if a database access error occurs
+     */
+    public Reservation FindByReservationId(int reservationId) throws SQLException {
         return reservationDAO.getById(reservationId);
     }
 
     /**
      * Function to check if a reservation can be canceled.
-     * @param selectedReservation : the reservation to be canceled.
-     * @return boolean: true if the reservation can be canceled, false otherwise.
-     * @throws SQLException : if a database access error occurs.
-     * @throws IllegalArgumentException : if the reservation do not exist
+     * Validates that the reservation exists and that there are at least 12 hours before departure.
+     *
+     * @param selectedReservation The reservation ID to be canceled
+     * @return true if the reservation can be canceled, false otherwise
+     * @throws SQLException if a database access error occurs
+     * @throws IllegalArgumentException if the reservation doesn't exist
      */
     private boolean ableForCancelation(int selectedReservation) throws SQLException{
 
@@ -245,12 +286,7 @@ public class ReservationService {
         Flight flight= flightDAO.getById(reservation.getFlight_FK());
         if(flight.getId() == 0) throw new IllegalArgumentException("El vuelo no existe");
         long differenceHours = ChronoUnit.HOURS.between(LocalDateTime.now(),flight.getDeparture_time());
-        if (differenceHours > 2 && reservation.getStatus_FK()==1){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return differenceHours > 2 && reservation.getStatus_FK() == 1;
     }
 
     /**
@@ -320,22 +356,18 @@ public class ReservationService {
     private boolean ableToCanelAutomatically(int reservationId)throws SQLException{
         Reservation reservation = reservationDAO.getById(reservationId);
         if (reservation.getId() == 0) throw new IllegalArgumentException("La reserva no existe");
-        if (reservation.getStatus_FK() == 4 || reservation.getStatus_FK() == 5){
-           return false;
-        }
-        else{
-            return true;
-        }
+        return reservation.getStatus_FK() != 4 && reservation.getStatus_FK() != 5;
     }
 
     /**
-     * Function to cancel a reservation, this function should be run by a system boot to cancel all
-     * the reservations that are not checked in and the Flight must depart
-     * @param ReservationId : the reservation to be canceled.
-     * @throws SQLException : if a database access error occurs.
-     * @throws IllegalArgumentException : if the reservation do not exist.
+     * Automatically cancels a reservation when flight departure conditions are met.
+     * This method should be called by system processes to handle automatic cancellations.
+     *
+     * @param ReservationId The reservation ID to be canceled
+     * @throws SQLException if a database access error occurs
+     * @throws IllegalArgumentException if the reservation doesn't exist
      */
-    private void cancel_reservation(int ReservationId)throws SQLException{
+    private void cancel_reservation(int ReservationId) throws SQLException{
 
         if (ableToCanelAutomatically(ReservationId)){
             Reservation reservation = reservationDAO.getById(ReservationId);
@@ -346,13 +378,14 @@ public class ReservationService {
 }
 
     /**
-     * Function to search the flights that will departure and cancel the reservations that are not checked in.
-     * Must be runed by a system boot every 15 minutes.
-     * @throws SQLException : if a database access error occurs.
-     * @throws IllegalArgumentException : if there are no flights to be checked.
+     * System control method to automatically cancel reservations for flights near departure.
+     * This method should be run by a system scheduler every 15 minutes to maintain
+     * reservation integrity for flights departing soon.
+     *
+     * @throws SQLException if a database access error occurs
+     * @throws IllegalArgumentException if there are validation errors
      */
-
-public void reservations_control()throws SQLException{
+    public void reservations_control()throws SQLException{
     try {
         LocalDateTime topRange = LocalDateTime.now().plusHours(2);
         LocalDateTime bottomRange = LocalDateTime.now().minusMinutes(15);

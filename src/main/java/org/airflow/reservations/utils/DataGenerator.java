@@ -12,28 +12,42 @@ import java.util.Random;
 /**
  * Utility class for generating and inserting fake data into the database.
  * This class populates all tables with realistic test data to facilitate
- * development and testing.
+ * development and testing of the AirFlow reservation system.
  */
 public class DataGenerator {
+    /** Random number generator for creating varied test data */
     private final Random random = new Random();
+    /** Database connection for data insertion operations */
     private final Connection connection;
 
     // DAOs
+    /** Data Access Object for user operations */
     private final UsersDAO usersDAO;
+    /** Data Access Object for airplane operations */
     private final AirplaneDAO airplaneDAO;
+    /** Data Access Object for city operations */
     private final CityDAO cityDAO;
+    /** Data Access Object for flight operations */
     private final FlightDAO flightDAO;
+    /** Data Access Object for reservation operations */
     private final ReservationDAO reservationDAO;
+    /** Data Access Object for seat operations */
     private final SeatDAO seatDAO;
 
     // Lists to store generated entities for relationships
-    private ArrayList<User> users = new ArrayList<>();
-    private ArrayList<Airplane> airplanes = new ArrayList<>();
-    private ArrayList<City> cities = new ArrayList<>();
-    private ArrayList<Flight> flights = new ArrayList<>();
+    /** List of generated users for reference in other data generation */
+    private final ArrayList<User> users = new ArrayList<>();
+    /** List of generated airplanes for reference in flight generation */
+    private final ArrayList<Airplane> airplanes = new ArrayList<>();
+    /** List of generated cities for reference in flight generation */
+    private final ArrayList<City> cities = new ArrayList<>();
+    /** List of generated flights for reference in reservation generation */
+    private final ArrayList<Flight> flights = new ArrayList<>();
 
     /**
-     * Constructor initializes connection and DAOs
+     * Constructor initializes connection and all required DAOs.
+     *
+     * @throws SQLException if there's an error connecting to the database or initializing DAOs
      */
     public DataGenerator() throws SQLException {
         connection = ConnectionDB.getConnection();
@@ -46,7 +60,9 @@ public class DataGenerator {
     }
 
     /**
-     * Main method to generate all fake data and insert into database
+     * Main method to generate all fake data and insert into database.
+     * This method orchestrates the complete data generation process including
+     * cleanup, reference data initialization, and main entity generation.
      */
     public void generateAllData() {
         try {
